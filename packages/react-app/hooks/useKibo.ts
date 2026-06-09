@@ -53,6 +53,22 @@ export function useKibo() {
     query: { enabled: !!KIBO_ADDRESS, staleTime: 30_000 },
   });
 
+  const { data: pendingReferralReward } = useReadContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "pendingReferralReward",
+    args: [address!],
+    query: { enabled: !!address && !!KIBO_ADDRESS },
+  });
+
+  const { data: referrer } = useReadContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "referrer",
+    args: [address!],
+    query: { enabled: !!address && !!KIBO_ADDRESS },
+  });
+
   const { isSuccess: txConfirmed, isLoading: isTxLoading } =
     useWaitForTransactionReceipt({ hash: txHash });
 
@@ -238,6 +254,8 @@ export function useKibo() {
     setGoal,
     claimReferralReward,
     refetchUser,
+    pendingReferralReward: pendingReferralReward ?? BigInt(0),
+    referrer: (referrer && referrer !== "0x0000000000000000000000000000000000000000") ? referrer as string : null,
   };
 }
 
