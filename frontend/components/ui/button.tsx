@@ -4,27 +4,38 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-[1.0625rem] font-semibold transition-all duration-[120ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
+  [
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap font-bold",
+    "border-2 border-[#09090B] cursor-pointer select-none",
+    "transition-all duration-75",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7C3AED] focus-visible:ring-offset-2",
+    "disabled:pointer-events-none disabled:opacity-40",
+    "shadow-[4px_4px_0_#09090B]",
+    "hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_#09090B]",
+    "active:translate-x-[4px] active:translate-y-[4px] active:shadow-none",
+  ].join(" "),
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-[0_4px_16px_hsl(221_83%_53%/0.32)] hover:shadow-[0_6px_20px_hsl(221_83%_53%/0.4)]",
+          "bg-[#7C3AED] text-white rounded-2xl",
+        accent:
+          "bg-[#FFE500] text-[#09090B] rounded-2xl",
         success:
-          "bg-success text-success-foreground shadow-[0_4px_16px_hsl(142_71%_45%/0.32)]",
+          "bg-[#16A34A] text-white rounded-2xl",
         warning:
-          "bg-warning text-warning-foreground rounded-xl text-[0.9375rem]",
-        ghost:
-          "bg-muted text-muted-foreground hover:bg-muted/80",
+          "bg-[#F59E0B] text-white rounded-2xl",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "bg-[#DC2626] text-white rounded-2xl",
+        ghost:
+          "bg-white text-[#09090B] rounded-2xl",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "bg-transparent text-[#09090B] rounded-2xl shadow-none hover:shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-white/60 border-dashed",
       },
       size: {
-        default: "h-[52px] px-5 w-full",
-        sm: "h-9 px-3 text-sm rounded-full",
-        icon: "h-9 w-9",
+        default: "h-[52px] px-5 w-full text-[1rem]",
+        sm: "h-10 px-4 text-[0.875rem] rounded-xl border-[1.5px] shadow-[2px_2px_0_#09090B] hover:shadow-[1px_1px_0_#09090B] active:shadow-none",
+        icon: "h-10 w-10 rounded-xl shadow-[2px_2px_0_#09090B] hover:shadow-[1px_1px_0_#09090B] active:shadow-none",
       },
     },
     defaultVariants: {
