@@ -43,7 +43,19 @@ function StreakRing({ streak }: { streak: number }) {
   );
 }
 
-type Tab = "home" | "leaderboard";
+function SkeletonRow() {
+  return (
+    <div className="card-row">
+      <div className="card-row-left">
+        <span className="skeleton skeleton-icon" />
+        <span className="skeleton skeleton-label" />
+      </div>
+      <span className="skeleton skeleton-value" />
+    </div>
+  );
+}
+
+type Tab = "home" | "leaderboard" | "settings";
 
 export default function Home() {
   const { address, isConnected } = useAccount();
@@ -62,6 +74,9 @@ export default function Home() {
     shields,
     leaderboard,
     isTxLoading,
+    isLoading,
+    error,
+    clearError,
     deposit,
     claimReward,
     withdraw,
@@ -102,6 +117,14 @@ export default function Home() {
         </button>
       </nav>
 
+      {error && (
+        <div className="error-banner" role="alert">
+          <span className="error-banner-icon">⚠️</span>
+          <span className="error-banner-text">{error}</span>
+          <button className="error-banner-close" onClick={clearError} aria-label="Dismiss">✕</button>
+        </div>
+      )}
+
       <div className="app-content">
 
         {/* ── HOME TAB ────────────────────────────────────── */}
@@ -111,7 +134,9 @@ export default function Home() {
               <StreakRing streak={streak} />
 
               <p className="hero-caption">
-                {streak === 0
+                {isLoading
+                  ? " "
+                  : streak === 0
                   ? "Start your streak today"
                   : streak % 7 === 0
                   ? "Milestone reached!"
@@ -127,41 +152,52 @@ export default function Home() {
             <div className="section">
               <p className="section-header">Overview</p>
               <div className="card-group">
-                <div className="card-row">
-                  <div className="card-row-left">
-                    <span className="row-icon icon-blue">💰</span>
-                    <span className="row-label">Total saved</span>
-                  </div>
-                  <span className="row-value is-accent">
-                    {savedAmount.toFixed(3)} cUSD
-                  </span>
-                </div>
-                <div className="card-row">
-                  <div className="card-row-left">
-                    <span className="row-icon icon-orange">🏆</span>
-                    <span className="row-label">Best streak</span>
-                  </div>
-                  <span className="row-value">
-                    {longestStreak} days
-                  </span>
-                </div>
-                <div className="card-row">
-                  <div className="card-row-left">
-                    <span className="row-icon icon-green">💵</span>
-                    <span className="row-label">cUSD balance</span>
-                  </div>
-                  <span className="row-value is-muted">{balanceAmount}</span>
-                </div>
-                <div className="card-row">
-                  <div className="card-row-left">
-                    <span className="row-icon icon-blue">🛡️</span>
-                    <span className="row-label">Streak shields</span>
-                  </div>
-                  <span className="row-value">
-                    {"🛡️".repeat(shields) || "—"}
-                    <span className="row-sub"> {shields}/3</span>
-                  </span>
-                </div>
+                {isLoading ? (
+                  <>
+                    <SkeletonRow />
+                    <SkeletonRow />
+                    <SkeletonRow />
+                    <SkeletonRow />
+                  </>
+                ) : (
+                  <>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-blue">💰</span>
+                        <span className="row-label">Total saved</span>
+                      </div>
+                      <span className="row-value is-accent">
+                        {savedAmount.toFixed(3)} cUSD
+                      </span>
+                    </div>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-orange">🏆</span>
+                        <span className="row-label">Best streak</span>
+                      </div>
+                      <span className="row-value">
+                        {longestStreak} days
+                      </span>
+                    </div>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-green">💵</span>
+                        <span className="row-label">cUSD balance</span>
+                      </div>
+                      <span className="row-value is-muted">{balanceAmount}</span>
+                    </div>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-blue">🛡️</span>
+                        <span className="row-label">Streak shields</span>
+                      </div>
+                      <span className="row-value">
+                        {"🛡️".repeat(shields) || "—"}
+                        <span className="row-sub"> {shields}/3</span>
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -209,33 +245,43 @@ export default function Home() {
             <div className="section">
               <p className="section-header">Progress</p>
               <div className="card-group">
-                <div className="card-row">
-                  <div className="card-row-left">
-                    <span className="row-icon icon-purple">🎯</span>
-                    <span className="row-label">Next milestone</span>
-                  </div>
-                  <span className="row-value">
-                    Day {streak === 0 ? 7 : Math.ceil((streak + 1) / 7) * 7}
-                  </span>
-                </div>
-                <div className="card-row">
-                  <div className="card-row-left">
-                    <span className="row-icon icon-blue">✨</span>
-                    <span className="row-label">Milestones hit</span>
-                  </div>
-                  <span className="row-value is-accent">
-                    {Math.floor(streak / 7)}
-                  </span>
-                </div>
-                <div className="card-row">
-                  <div className="card-row-left">
-                    <span className="row-icon icon-orange">📅</span>
-                    <span className="row-label">Days this cycle</span>
-                  </div>
-                  <span className="row-value">
-                    {streak % 7 || (streak > 0 ? 7 : 0)} / 7
-                  </span>
-                </div>
+                {isLoading ? (
+                  <>
+                    <SkeletonRow />
+                    <SkeletonRow />
+                    <SkeletonRow />
+                  </>
+                ) : (
+                  <>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-purple">🎯</span>
+                        <span className="row-label">Next milestone</span>
+                      </div>
+                      <span className="row-value">
+                        Day {streak === 0 ? 7 : Math.ceil((streak + 1) / 7) * 7}
+                      </span>
+                    </div>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-blue">✨</span>
+                        <span className="row-label">Milestones hit</span>
+                      </div>
+                      <span className="row-value is-accent">
+                        {Math.floor(streak / 7)}
+                      </span>
+                    </div>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-orange">📅</span>
+                        <span className="row-label">Days this cycle</span>
+                      </div>
+                      <span className="row-value">
+                        {streak % 7 || (streak > 0 ? 7 : 0)} / 7
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </>
@@ -274,6 +320,77 @@ export default function Home() {
           </div>
         )}
 
+        {/* ── SETTINGS TAB ────────────────────────────────── */}
+        {tab === "settings" && (
+          <div style={{ paddingTop: 8 }}>
+            <div className="section">
+              <p className="section-header">How it works</p>
+              <div className="card-group">
+                <div className="card-row">
+                  <div className="card-row-left">
+                    <span className="row-icon icon-blue">📅</span>
+                    <span className="row-label">Daily deposit</span>
+                  </div>
+                  <span className="row-value is-muted">0.0001–1 cUSD</span>
+                </div>
+                <div className="card-row">
+                  <div className="card-row-left">
+                    <span className="row-icon icon-orange">⏱️</span>
+                    <span className="row-label">Cooldown</span>
+                  </div>
+                  <span className="row-value is-muted">20 hours</span>
+                </div>
+                <div className="card-row">
+                  <div className="card-row-left">
+                    <span className="row-icon icon-blue">🛡️</span>
+                    <span className="row-label">Shields</span>
+                  </div>
+                  <span className="row-value is-muted">Skip 1 day, keep streak</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="section">
+              <p className="section-header">Rewards</p>
+              <div className="card-group">
+                <div className="card-row">
+                  <div className="card-row-left">
+                    <span className="row-icon icon-green">🏅</span>
+                    <span className="row-label">Day 7 milestone</span>
+                  </div>
+                  <span className="row-value is-accent">+0.005 cUSD</span>
+                </div>
+                <div className="card-row">
+                  <div className="card-row-left">
+                    <span className="row-icon icon-green">🥈</span>
+                    <span className="row-label">Day 14+ milestone</span>
+                  </div>
+                  <span className="row-value is-accent">+0.012 cUSD</span>
+                </div>
+                <div className="card-row">
+                  <div className="card-row-left">
+                    <span className="row-icon icon-orange">🏆</span>
+                    <span className="row-label">Day 35+ milestone</span>
+                  </div>
+                  <span className="row-value is-accent">+0.025 cUSD</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="section">
+              <p className="section-header">Contract</p>
+              <div className="card-group">
+                <div className="card-row" style={{ flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
+                  <span className="row-label">Celo Mainnet</span>
+                  <span className="row-value is-muted" style={{ fontSize: "0.75rem", fontFamily: "var(--font-mono)", wordBreak: "break-all" }}>
+                    0x765c96F44c2d82EB5C6609e2a09220600e1C8006
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* ── Tab Bar ────────────────────────────────────────── */}
@@ -296,9 +413,14 @@ export default function Home() {
           <span className="tab-icon">🏆</span>
           <span className="tab-label">Leaderboard</span>
         </button>
-        <button className="tab-btn" disabled role="tab" aria-selected={false}>
+        <button
+          className={`tab-btn${tab === "settings" ? " active" : ""}`}
+          onClick={() => setTab("settings")}
+          role="tab"
+          aria-selected={tab === "settings"}
+        >
           <span className="tab-icon">⚙️</span>
-          <span className="tab-label">Settings</span>
+          <span className="tab-label">Info</span>
         </button>
       </div>
     </div>
