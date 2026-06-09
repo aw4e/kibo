@@ -153,6 +153,7 @@ export function useKibo() {
   async function recoverStreak() {
     setError(null);
     try {
+      await ensureApproval(parseUnits("0.1", 18));
       const hash = await writeContractAsync({
         address: KIBO_ADDRESS,
         abi: KIBO_ABI,
@@ -255,6 +256,8 @@ function parseContractError(e: unknown): string {
     if (msg.includes("AlreadyClaimed")) return "Reward already claimed for this streak.";
     if (msg.includes("NothingToWithdraw")) return "No balance to withdraw.";
     if (msg.includes("AmountOutOfRange")) return "Deposit amount out of range.";
+    if (msg.includes("StreakNotBroken")) return "No broken streak to recover.";
+    if (msg.includes("RecoveryFeeTooHigh")) return "Recovery fee too high.";
     if (msg.includes("Paused")) return "Contract is paused. Try again later.";
     if (msg) return msg.slice(0, 120);
   }

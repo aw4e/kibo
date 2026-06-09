@@ -692,6 +692,42 @@ button:focus-visible {
 }
 
 /* ─── Reduced motion ──────────────────────────────────────────── */
+/* ─── Recovery Card ───────────────────────────────────────────── */
+.recovery-card {
+  background: oklch(70% 0.16 60 / 0.1);
+  border: 0.5px solid oklch(70% 0.16 60 / 0.4);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.recovery-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.recovery-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+.recovery-title { font-size: 0.9375rem; font-weight: 600; color: var(--color-ink); margin: 0 0 2px; }
+.recovery-sub { font-size: 0.8125rem; color: var(--color-ink-2); margin: 0; }
+
+.btn-warning {
+  width: 100%;
+  padding: 12px var(--space-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-warning);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.btn-warning:disabled { opacity: 0.5; cursor: not-allowed; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
