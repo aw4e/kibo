@@ -1,7 +1,7 @@
 {
   "framework": "nextjs",
-  "buildCommand": "cd frontend && yarn next build",
+  "installCommand": "yarn install",
+  "buildCommand": "yarn workspace @kibo/react-app build",
   "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && yarn install",
-  "devCommand": "cd frontend && yarn next dev --port $PORT"
+  "devCommand": "yarn workspace @kibo/react-app dev --port $PORT"
 }
