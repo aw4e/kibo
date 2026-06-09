@@ -137,6 +137,9 @@ export function useKibo() {
   const canDeposit = userData ? userData[4] : true;
   const lastClaimedStreak = userData ? Number(userData[5]) : 0;
   const shields = userData ? Number(userData[6]) : 0;
+  const brokenStreak = userData ? Number(userData[7]) : 0;
+  const badge = userData ? Number(userData[8]) : 0;
+  const rewardsClaimed = userData ? userData[9] : BigInt(0);
   const canClaim = streak > 0 && streak % 7 === 0 && streak > lastClaimedStreak;
   const isLoading = !!address && !userData;
 
@@ -147,6 +150,68 @@ export function useKibo() {
       ? Math.max(0, lastDeposit * 1000 + 20 * 60 * 60 * 1000 - Date.now())
       : 0;
 
+  async function recoverStreak() {
+    setError(null);
+    try {
+      const hash = await writeContractAsync({
+        address: KIBO_ADDRESS,
+        abi: KIBO_ABI,
+        functionName: "recoverStreak",
+      });
+      setTxHash(hash);
+    } catch (e: unknown) {
+      setError(parseContractError(e));
+    }
+  }
+
+  async function depositFor(
+    beneficiary: `0x${string}`,
+    amount: bigint = DEFAULT_DEPOSIT,
+  ) {
+    setError(null);
+    try {
+      await ensureApproval(amount);
+      const hash = await writeContractAsync({
+        address: KIBO_ADDRESS,
+        abi: KIBO_ABI,
+        functionName: "depositFor",
+        args: [beneficiary, amount],
+      });
+      setTxHash(hash);
+    } catch (e: unknown) {
+      setError(parseContractError(e));
+    }
+  }
+
+  async function setGoal(target: bigint) {
+    setError(null);
+    try {
+      const hash = await writeContractAsync({
+        address: KIBO_ADDRESS,
+        abi: KIBO_ABI,
+        functionName: "setGoal",
+        args: [target],
+      });
+      setTxHash(hash);
+    } catch (e: unknown) {
+      setError(parseContractError(e));
+    }
+  }
+
+  async function claimReferralReward() {
+    setError(null);
+    try {
+      const hash = await writeContractAsync({
+        address: KIBO_ADDRESS,
+        abi: KIBO_ABI,
+        functionName: "claimReferralReward",
+      });
+      setTxHash(hash);
+    } catch (e: unknown) {
+      setError(parseContractError(e));
+    }
+  }
+
   return {
     streak,
     longestStreak,
@@ -156,6 +221,9 @@ export function useKibo() {
     nextDepositIn,
     cUSDBalance,
     shields,
+    badge,
+    brokenStreak,
+    rewardsClaimed,
     leaderboard,
     isTxLoading,
     isLoading,
@@ -164,6 +232,11 @@ export function useKibo() {
     deposit,
     claimReward,
     withdraw,
+    recoverStreak,
+    depositFor,
+    setGoal,
+    claimReferralReward,
+    refetchUser,
   };
 }
 

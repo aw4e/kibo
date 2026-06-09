@@ -6,6 +6,9 @@ import { useKibo } from "../hooks/useKibo";
 import { formatUnits } from "viem";
 import { useState } from "react";
 
+const BADGE_LABEL = ["—", "Bronze", "Silver", "Gold", "Diamond"] as const;
+const BADGE_EMOJI = ["", "🥉", "🥈", "🥇", "💎"] as const;
+
 const R = 54;
 const CIRCUMFERENCE = 2 * Math.PI * R;
 
@@ -72,6 +75,9 @@ export default function Home() {
     nextDepositIn,
     cUSDBalance,
     shields,
+    badge,
+    brokenStreak,
+    rewardsClaimed,
     leaderboard,
     isTxLoading,
     isLoading,
@@ -196,6 +202,26 @@ export default function Home() {
                         <span className="row-sub"> {shields}/3</span>
                       </span>
                     </div>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-orange">{badge > 0 ? BADGE_EMOJI[badge] : "🏅"}</span>
+                        <span className="row-label">Badge</span>
+                      </div>
+                      <span className={`row-value${badge > 0 ? " is-accent" : " is-muted"}`}>
+                        {badge > 0 ? `${BADGE_EMOJI[badge]} ${BADGE_LABEL[badge]}` : "None yet"}
+                      </span>
+                    </div>
+                    {parseFloat(formatUnits(rewardsClaimed, 18)) > 0 && (
+                      <div className="card-row">
+                        <div className="card-row-left">
+                          <span className="row-icon icon-green">🎁</span>
+                          <span className="row-label">Rewards earned</span>
+                        </div>
+                        <span className="row-value is-accent">
+                          {parseFloat(formatUnits(rewardsClaimed, 18)).toFixed(4)} cUSD
+                        </span>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
