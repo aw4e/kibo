@@ -66,9 +66,10 @@ contract Kibo {
     enum Badge { None, Bronze, Silver, Gold, Diamond }
 
     mapping(address => UserData) public users;
-    mapping(address => address)  public referrer;             // user => referrer address
+    mapping(address => address)  public referrer;              // user => referrer address
     mapping(address => uint256)  public pendingReferralReward; // accrued, pull-pattern
     mapping(address => uint128)  public savingsGoal;
+    mapping(address => uint256)  public totalRewardsClaimed;   // lifetime rewards received per user
 
     address[] public depositors;
 
@@ -142,8 +143,10 @@ contract Kibo {
         uint40 ts = uint40(block.timestamp);
         if (ts < u.lastDeposit + COOLDOWN) revert TooSoon();
 
-        // Register referrer on very first deposit
-        if (!u.isDepositor && ref != address(0) && ref != msg.sender) {
+        // Register referrer on very first deposit.
+        // Block self-referral and circular referral (A→B→A).
+        if (!u.isDepositor && ref != address(0) && ref != msg.sender
+            && referrer[ref] != msg.sender) {
             referrer[msg.sender] = ref;
         }
 
@@ -218,26 +221,28 @@ contract Kibo {
         if (u.streak <= u.lastClaimedStreak) revert AlreadyClaimed();
 
         uint256 reward = _rewardAmount(u.streak);
-        if (poolFunds < reward) revert PoolEmpty();
 
         bool isFirstClaim = u.lastClaimedStreak == 0;
 
-        // CEI: state before external calls
+        // Pre-calculate referral amount so we can reserve pool funds atomically
+        address ref = referrer[msg.sender];
+        uint256 refAmount = 0;
+        if (isFirstClaim && ref != address(0) && referralRewardBps > 0) {
+            refAmount = (reward * referralRewardBps) / 10_000;
+        }
+
+        // Single pool check covering reward + referral bonus
+        if (poolFunds < reward + refAmount) revert PoolEmpty();
+
+        // CEI: all state updates before external calls
         u.lastClaimedStreak = uint32(u.streak);
         if (u.shields < MAX_SHIELDS) { unchecked { u.shields++; } }
-        unchecked { poolFunds -= reward; }
+        unchecked { poolFunds -= reward + refAmount; }
+        unchecked { totalRewardsClaimed[msg.sender] += reward; }
 
-        // Referral bonus on first milestone claim
-        address ref = referrer[msg.sender];
-        if (isFirstClaim && ref != address(0) && referralRewardBps > 0) {
-            uint256 refAmount = (reward * referralRewardBps) / 10_000;
-            if (poolFunds >= refAmount) {
-                unchecked {
-                    poolFunds -= refAmount;
-                    pendingReferralReward[ref] += refAmount;
-                }
-                emit ReferralRewardAccrued(ref, msg.sender, refAmount);
-            }
+        if (refAmount > 0) {
+            unchecked { pendingReferralReward[ref] += refAmount; }
+            emit ReferralRewardAccrued(ref, msg.sender, refAmount);
         }
 
         if (!cUSD.transfer(msg.sender, reward)) revert TransferFailed();
@@ -268,17 +273,24 @@ contract Kibo {
 
     // ── Withdraw ─────────────────────────────────────────────────
 
-    // Users who never hit a milestone (lastClaimedStreak == 0) pay a withdrawal penalty
-    // that seeds the reward pool. Penalty-free once any milestone has been claimed.
+    // Penalty tiers to prevent reward-cycle farming:
+    //   · Never claimed milestone           → full withdrawalPenaltyBps (default 5%)
+    //   · Claimed but earned >= deposited   → full penalty (closed the loop, farmed the pool)
+    //   · Committed saver (deposited > earned) → reduced penalty (1%, owner-adjustable)
     function withdraw() external {
         UserData storage u = users[msg.sender];
         uint128 amount = u.totalDeposited;
         if (amount == 0) revert NothingToWithdraw();
 
-        uint256 penalty = u.lastClaimedStreak == 0
-            ? (uint256(amount) * withdrawalPenaltyBps) / 10_000
-            : 0;
-        uint256 payout = uint256(amount) - penalty;
+        uint256 earned = totalRewardsClaimed[msg.sender];
+        bool isCommittedSaver = u.lastClaimedStreak > 0 && uint256(amount) > earned;
+
+        uint256 penaltyBps = isCommittedSaver
+            ? withdrawalPenaltyBps / 5   // 1% (1/5 of default 5%)
+            : withdrawalPenaltyBps;       // 5% full penalty
+
+        uint256 penalty = (uint256(amount) * penaltyBps) / 10_000;
+        uint256 payout  = uint256(amount) - penalty;
 
         // CEI
         u.totalDeposited    = 0;
@@ -287,6 +299,7 @@ contract Kibo {
         u.shields           = 0;
         u.lastClaimedStreak = 0;
         u.brokenStreak      = 0;
+        totalRewardsClaimed[msg.sender] = 0;
 
         if (penalty > 0) unchecked { poolFunds += penalty; }
 
@@ -357,7 +370,8 @@ contract Kibo {
         uint256 lastClaimedStreak,
         uint8   shields,
         uint256 brokenStreak,
-        Badge   badge
+        Badge   badge,
+        uint256 rewardsClaimed
     ) {
         UserData storage u = users[user];
         return (
@@ -369,7 +383,8 @@ contract Kibo {
             u.lastClaimedStreak,
             u.shields,
             u.brokenStreak,
-            _getBadge(u.longestStreak)
+            _getBadge(u.longestStreak),
+            totalRewardsClaimed[user]
         );
     }
 
