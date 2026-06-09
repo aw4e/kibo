@@ -3,7 +3,7 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useKibo } from "../hooks/useKibo";
-import { formatUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 import { useState, useEffect } from "react";
 
 const BADGE_LABEL = ["—", "Bronze", "Silver", "Gold", "Diamond"] as const;
@@ -67,6 +67,7 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("home");
   const [refParam, setRefParam] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
   const [copied, setCopied] = useState(false);
+  const [goalInput, setGoalInput] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -96,9 +97,12 @@ export default function Home() {
     deposit,
     claimReward,
     withdraw,
+    recoverStreak,
     pendingReferralReward,
     referrer,
     claimReferralReward,
+    savingsGoal,
+    setGoal,
   } = useKibo();
 
   const countdown = formatCountdown(nextDepositIn);
@@ -347,6 +351,57 @@ export default function Home() {
                 )}
               </div>
             </div>
+            {/* Savings Goal */}
+            <div className="section">
+              <p className="section-header">Savings Goal</p>
+              <div className="card-group">
+                {savingsGoal > BigInt(0) ? (
+                  <div className="goal-progress-wrap">
+                    <div className="goal-progress-labels">
+                      <span className="goal-saved">
+                        {parseFloat(formatUnits(totalDeposited, 18)).toFixed(3)} cUSD
+                      </span>
+                      <span className="goal-target">
+                        Goal: {parseFloat(formatUnits(savingsGoal, 18)).toFixed(2)} cUSD
+                      </span>
+                    </div>
+                    <div className="goal-progress-bar">
+                      <div
+                        className="goal-progress-fill"
+                        style={{
+                          width: `${Math.min(100, Number((totalDeposited * BigInt(100)) / savingsGoal))}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <p className="goal-empty">No goal set yet.</p>
+                )}
+                <div className="goal-input-row">
+                  <input
+                    className="goal-input"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="Target (cUSD)"
+                    value={goalInput}
+                    onChange={(e) => setGoalInput(e.target.value)}
+                  />
+                  <button
+                    className="goal-set-btn"
+                    onClick={() => {
+                      const val = parseFloat(goalInput);
+                      if (!val || val <= 0) return;
+                      setGoal(parseUnits(String(val), 18));
+                    }}
+                    disabled={isTxLoading || !goalInput}
+                  >
+                    Set Goal
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Referral */}
             <div className="section">
               <p className="section-header">Referral</p>

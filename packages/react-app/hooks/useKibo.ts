@@ -69,6 +69,14 @@ export function useKibo() {
     query: { enabled: !!address && !!KIBO_ADDRESS },
   });
 
+  const { data: savingsGoal, refetch: refetchGoal } = useReadContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "savingsGoal",
+    args: [address!],
+    query: { enabled: !!address && !!KIBO_ADDRESS },
+  });
+
   const { isSuccess: txConfirmed, isLoading: isTxLoading } =
     useWaitForTransactionReceipt({ hash: txHash });
 
@@ -76,9 +84,10 @@ export function useKibo() {
     if (txConfirmed) {
       refetchUser();
       refetchAllowance();
+      refetchGoal();
       setTxHash(undefined);
     }
-  }, [txConfirmed, refetchUser, refetchAllowance]);
+  }, [txConfirmed, refetchUser, refetchAllowance, refetchGoal]);
 
   // Tick every 30s to keep countdown fresh
   useEffect(() => {
@@ -256,6 +265,7 @@ export function useKibo() {
     refetchUser,
     pendingReferralReward: pendingReferralReward ?? BigInt(0),
     referrer: (referrer && referrer !== "0x0000000000000000000000000000000000000000") ? referrer as string : null,
+    savingsGoal: savingsGoal ?? BigInt(0),
   };
 }
 

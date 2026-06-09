@@ -755,6 +755,85 @@ button:focus-visible {
 
 .btn-warning:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ─── Savings Goal ────────────────────────────────────────────── */
+.goal-progress-wrap {
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.goal-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-caption);
+  color: var(--color-ink-3);
+}
+
+.goal-saved { font-weight: 600; color: var(--color-accent); }
+.goal-target { color: var(--color-ink-2); }
+
+.goal-progress-bar {
+  height: 8px;
+  background: var(--color-paper-2);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: var(--radius-pill);
+  transition: width var(--dur-slow) var(--ease-out);
+  min-width: 4px;
+}
+
+.goal-empty {
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--text-footnote);
+  color: var(--color-ink-3);
+}
+
+.goal-input-row {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  border-top: 0.5px solid var(--color-separator);
+}
+
+.goal-input {
+  flex: 1;
+  padding: 10px var(--space-md);
+  border: 0.5px solid var(--color-separator);
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+  font-size: var(--text-body);
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.goal-input::-webkit-outer-spin-button,
+.goal-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.goal-input:focus { border-color: var(--color-accent); }
+
+.goal-set-btn {
+  padding: 10px var(--space-lg);
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-body);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.goal-set-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
