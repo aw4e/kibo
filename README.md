@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/Celo-Mainnet-FCFF52?logo=ethereum&logoColor=000" alt="Celo Mainnet" />
   </a>
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT License" />
-  <img src="https://img.shields.io/badge/Stack-Next.js%2015%20%2B%20wagmi%20v2-black?logo=nextdotjs" alt="Stack" />
+  <img src="https://img.shields.io/badge/Stack-Next.js%2016%20%2B%20wagmi%20v2-black?logo=nextdotjs" alt="Stack" />
 </p>
 
 ---
@@ -64,7 +64,7 @@ Kibo turns saving into a streak game:
 
 ```
 sc/           Solidity 0.8.20, Hardhat, deployed to Celo mainnet
-frontend/     Next.js 15, wagmi v2, viem, shadcn/ui, Tailwind CSS
+frontend/     Next.js 16, React 19, wagmi v2, viem, shadcn/ui, Tailwind CSS
 kibo-sdk/     Framework-agnostic TypeScript SDK
 ```
 
