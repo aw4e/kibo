@@ -2,8 +2,6 @@
 
 > **Daily micro-savings on Celo.** Deposit 0.01 cUSD every day, build your streak, earn rewards at milestones — all on-chain, non-custodial, MiniPay-native.
 
-Built for the **14M+ MiniPay users** who want a dead-simple daily savings habit with real yield.
-
 ---
 
 ## What it does
