@@ -691,6 +691,33 @@ button:focus-visible {
   }
 }
 
+/* ─── Referral ────────────────────────────────────────────────── */
+.referral-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px var(--space-md);
+  background: var(--color-accent-dim);
+  border-radius: var(--radius-md);
+  font-size: var(--text-footnote);
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.referral-invite-row {
+  padding-top: var(--space-sm);
+}
+
+.referral-invite-label {
+  font-size: var(--text-caption);
+  color: var(--color-ink-3);
+  margin-bottom: var(--space-xs);
+}
+
+.referral-copy-btn {
+  width: 100%;
+}
+
 /* ─── Reduced motion ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

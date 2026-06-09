@@ -4,7 +4,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useKibo } from "../hooks/useKibo";
 import { formatUnits } from "viem";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const BADGE_LABEL = ["—", "Bronze", "Silver", "Gold", "Diamond"] as const;
 const BADGE_EMOJI = ["", "🥉", "🥈", "🥇", "💎"] as const;
@@ -65,6 +65,16 @@ export default function Home() {
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
   const [tab, setTab] = useState<Tab>("home");
+  const [refParam, setRefParam] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const r = params.get("ref");
+    if (r && /^0x[0-9a-fA-F]{40}$/.test(r)) {
+      setRefParam(r as `0x${string}`);
+    }
+  }, []);
 
   const {
     streak,
@@ -86,6 +96,9 @@ export default function Home() {
     deposit,
     claimReward,
     withdraw,
+    pendingReferralReward,
+    referrer,
+    claimReferralReward,
   } = useKibo();
 
   const countdown = formatCountdown(nextDepositIn);
@@ -242,7 +255,7 @@ export default function Home() {
 
                 <button
                   className="btn-primary"
-                  onClick={deposit}
+                  onClick={() => deposit(undefined, refParam)}
                   disabled={!canDeposit || isTxLoading}
                 >
                   {isTxLoading ? "Processing…" : "Deposit 0.01 cUSD"}
@@ -308,6 +321,65 @@ export default function Home() {
                     </div>
                   </>
                 )}
+              </div>
+            </div>
+            {/* Referral */}
+            <div className="section">
+              <p className="section-header">Referral</p>
+              <div className="card-group">
+                {referrer && (
+                  <div className="card-row">
+                    <div className="card-row-left">
+                      <span className="row-icon icon-purple">👥</span>
+                      <span className="row-label">Referred by</span>
+                    </div>
+                    <span className="row-value is-muted" style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem" }}>
+                      {referrer.slice(0, 6)}…{referrer.slice(-4)}
+                    </span>
+                  </div>
+                )}
+                {refParam !== "0x0000000000000000000000000000000000000000" && !referrer && (
+                  <div className="referral-chip">
+                    <span>🔗</span>
+                    <span>Invite code applied: {refParam.slice(0, 6)}…{refParam.slice(-4)}</span>
+                  </div>
+                )}
+                {pendingReferralReward > BigInt(0) && (
+                  <>
+                    <div className="card-row">
+                      <div className="card-row-left">
+                        <span className="row-icon icon-green">💸</span>
+                        <span className="row-label">Referral reward</span>
+                      </div>
+                      <span className="row-value is-accent">
+                        {parseFloat(formatUnits(pendingReferralReward, 18)).toFixed(4)} cUSD
+                      </span>
+                    </div>
+                    <button
+                      className="btn-success"
+                      onClick={claimReferralReward}
+                      disabled={isTxLoading}
+                    >
+                      Claim referral reward
+                    </button>
+                  </>
+                )}
+                <div className="referral-invite-row">
+                  <p className="referral-invite-label">Your invite link</p>
+                  <button
+                    className="btn-ghost referral-copy-btn"
+                    onClick={() => {
+                      if (!address) return;
+                      const url = `${window.location.origin}?ref=${address}`;
+                      navigator.clipboard.writeText(url);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    disabled={!address}
+                  >
+                    {copied ? "Copied!" : "📋 Copy invite link"}
+                  </button>
+                </div>
               </div>
             </div>
           </>
