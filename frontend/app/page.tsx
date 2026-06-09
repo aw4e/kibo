@@ -542,7 +542,7 @@ export default function Home() {
                   <div className="px-5 py-4 flex flex-col gap-1">
                     <span className="text-muted-foreground">Celo Mainnet</span>
                     <span className="font-mono text-[0.75rem] text-muted-foreground break-all">
-                      0x765c96F44c2d82EB5C6609e2a09220600e1C8006
+                      0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12
                     </span>
                   </div>
                 </CardContent>

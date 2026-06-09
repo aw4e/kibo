@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://celoscan.io/address/0x765c96F44c2d82EB5C6609e2a09220600e1C8006">
+  <a href="https://celoscan.io/address/0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12">
     <img src="https://img.shields.io/badge/Celo-Mainnet-FCFF52?logo=ethereum&logoColor=000" alt="Celo Mainnet" />
   </a>
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT License" />
@@ -55,7 +55,7 @@ Kibo turns saving into a streak game:
 | | |
 |---|---|
 | **Network** | Celo Mainnet (chainId 42220) |
-| **Kibo** | [`0x765c96F44c2d82EB5C6609e2a09220600e1C8006`](https://celoscan.io/address/0x765c96F44c2d82EB5C6609e2a09220600e1C8006) |
+| **Kibo** | [`0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12`](https://celoscan.io/address/0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12) |
 | **cUSD** | [`0x765DE816845861e75A25fCA122bb6898B8B1282a`](https://celoscan.io/address/0x765DE816845861e75A25fCA122bb6898B8B1282a) |
 
 ---
@@ -90,7 +90,7 @@ cp .env.example .env
 ```
 
 ```env
-NEXT_PUBLIC_KIBO_ADDRESS=0x765c96F44c2d82EB5C6609e2a09220600e1C8006
+NEXT_PUBLIC_KIBO_ADDRESS=0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12
 PRIVATE_KEY=           # only needed for deploy
 CELOSCAN_API_KEY=      # only needed for verify
 ```

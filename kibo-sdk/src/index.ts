@@ -2,7 +2,7 @@ import { createPublicClient, http, parseUnits, maxUint256 } from "viem";
 import { celo } from "viem/chains";
 import type { WalletClient, PublicClient, Address } from "viem";
 
-export const KIBO_ADDRESS = "0x765c96F44c2d82EB5C6609e2a09220600e1C8006" as Address;
+export const KIBO_ADDRESS = "0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12" as Address;
 export const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as Address;
 export const DEPOSIT_AMOUNT = parseUnits("0.01", 18);
 
