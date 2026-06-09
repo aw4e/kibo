@@ -28,15 +28,16 @@ export interface KiboInterface extends Interface {
     nameOrSignature:
       | "COOLDOWN"
       | "MAX_DEPOSIT"
+      | "MAX_POOL_FEE_BPS"
       | "MAX_RECOVERY_FEE"
       | "MAX_REWARD_TIER"
       | "MAX_SHIELDS"
       | "MIN_DEPOSIT"
-      | "POOL_FEE_BPS"
       | "PRECISION_WINDOW"
       | "STREAK_THRESHOLD"
       | "acceptOwnership"
       | "cUSD"
+      | "cancelOwnershipTransfer"
       | "claimReferralReward"
       | "claimReward"
       | "deposit"
@@ -52,6 +53,7 @@ export interface KiboInterface extends Interface {
       | "pendingOwner"
       | "pendingReferralReward"
       | "poolBalance"
+      | "poolFeeBps"
       | "poolFunds"
       | "recoverStreak"
       | "referralRewardBps"
@@ -62,6 +64,7 @@ export interface KiboInterface extends Interface {
       | "rewardTier4"
       | "savingsGoal"
       | "setGoal"
+      | "setPoolFeeBps"
       | "setReferralRewardBps"
       | "setRewardTiers"
       | "setWithdrawalPenaltyBps"
@@ -81,10 +84,12 @@ export interface KiboInterface extends Interface {
       | "ContractUnpaused"
       | "Deposited"
       | "DepositedFor"
+      | "GoalCancelled"
       | "GoalReached"
       | "GoalSet"
       | "OwnershipTransferStarted"
       | "OwnershipTransferred"
+      | "PoolFeeBpsUpdated"
       | "PoolFunded"
       | "PrecisionShield"
       | "ReferralRewardAccrued"
@@ -105,6 +110,10 @@ export interface KiboInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "MAX_POOL_FEE_BPS",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "MAX_RECOVERY_FEE",
     values?: undefined
   ): string;
@@ -121,10 +130,6 @@ export interface KiboInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "POOL_FEE_BPS",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "PRECISION_WINDOW",
     values?: undefined
   ): string;
@@ -137,6 +142,10 @@ export interface KiboInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "cUSD", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "cancelOwnershipTransfer",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "claimReferralReward",
     values?: undefined
@@ -188,6 +197,10 @@ export interface KiboInterface extends Interface {
     functionFragment: "poolBalance",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "poolFeeBps",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "poolFunds", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "recoverStreak",
@@ -223,6 +236,10 @@ export interface KiboInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setGoal",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setPoolFeeBps",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -263,6 +280,10 @@ export interface KiboInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "MAX_POOL_FEE_BPS",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "MAX_RECOVERY_FEE",
     data: BytesLike
   ): Result;
@@ -279,10 +300,6 @@ export interface KiboInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "POOL_FEE_BPS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "PRECISION_WINDOW",
     data: BytesLike
   ): Result;
@@ -295,6 +312,10 @@ export interface KiboInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "cUSD", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "cancelOwnershipTransfer",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "claimReferralReward",
     data: BytesLike
@@ -328,6 +349,7 @@ export interface KiboInterface extends Interface {
     functionFragment: "poolBalance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "poolFeeBps", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "poolFunds", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "recoverStreak",
@@ -359,6 +381,10 @@ export interface KiboInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setGoal", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setPoolFeeBps",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setReferralRewardBps",
     data: BytesLike
@@ -472,6 +498,18 @@ export namespace DepositedForEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace GoalCancelledEvent {
+  export type InputTuple = [user: AddressLike];
+  export type OutputTuple = [user: string];
+  export interface OutputObject {
+    user: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace GoalReachedEvent {
   export type InputTuple = [user: AddressLike, totalDeposited: BigNumberish];
   export type OutputTuple = [user: string, totalDeposited: bigint];
@@ -517,6 +555,19 @@ export namespace OwnershipTransferredEvent {
   export interface OutputObject {
     previousOwner: string;
     newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace PoolFeeBpsUpdatedEvent {
+  export type InputTuple = [oldBps: BigNumberish, newBps: BigNumberish];
+  export type OutputTuple = [oldBps: bigint, newBps: bigint];
+  export interface OutputObject {
+    oldBps: bigint;
+    newBps: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -764,6 +815,8 @@ export interface Kibo extends BaseContract {
 
   MAX_DEPOSIT: TypedContractMethod<[], [bigint], "view">;
 
+  MAX_POOL_FEE_BPS: TypedContractMethod<[], [bigint], "view">;
+
   MAX_RECOVERY_FEE: TypedContractMethod<[], [bigint], "view">;
 
   MAX_REWARD_TIER: TypedContractMethod<[], [bigint], "view">;
@@ -772,8 +825,6 @@ export interface Kibo extends BaseContract {
 
   MIN_DEPOSIT: TypedContractMethod<[], [bigint], "view">;
 
-  POOL_FEE_BPS: TypedContractMethod<[], [bigint], "view">;
-
   PRECISION_WINDOW: TypedContractMethod<[], [bigint], "view">;
 
   STREAK_THRESHOLD: TypedContractMethod<[], [bigint], "view">;
@@ -781,6 +832,8 @@ export interface Kibo extends BaseContract {
   acceptOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   cUSD: TypedContractMethod<[], [string], "view">;
+
+  cancelOwnershipTransfer: TypedContractMethod<[], [void], "nonpayable">;
 
   claimReferralReward: TypedContractMethod<[], [void], "nonpayable">;
 
@@ -862,6 +915,8 @@ export interface Kibo extends BaseContract {
 
   poolBalance: TypedContractMethod<[], [bigint], "view">;
 
+  poolFeeBps: TypedContractMethod<[], [bigint], "view">;
+
   poolFunds: TypedContractMethod<[], [bigint], "view">;
 
   recoverStreak: TypedContractMethod<[], [void], "nonpayable">;
@@ -881,6 +936,8 @@ export interface Kibo extends BaseContract {
   savingsGoal: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
   setGoal: TypedContractMethod<[target: BigNumberish], [void], "nonpayable">;
+
+  setPoolFeeBps: TypedContractMethod<[bps: BigNumberish], [void], "nonpayable">;
 
   setReferralRewardBps: TypedContractMethod<
     [bps: BigNumberish],
@@ -948,6 +1005,9 @@ export interface Kibo extends BaseContract {
     nameOrSignature: "MAX_DEPOSIT"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "MAX_POOL_FEE_BPS"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "MAX_RECOVERY_FEE"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -958,9 +1018,6 @@ export interface Kibo extends BaseContract {
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "MIN_DEPOSIT"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "POOL_FEE_BPS"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "PRECISION_WINDOW"
@@ -974,6 +1031,9 @@ export interface Kibo extends BaseContract {
   getFunction(
     nameOrSignature: "cUSD"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "cancelOwnershipTransfer"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "claimReferralReward"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -1066,6 +1126,9 @@ export interface Kibo extends BaseContract {
     nameOrSignature: "poolBalance"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "poolFeeBps"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "poolFunds"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -1095,6 +1158,9 @@ export interface Kibo extends BaseContract {
   getFunction(
     nameOrSignature: "setGoal"
   ): TypedContractMethod<[target: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setPoolFeeBps"
+  ): TypedContractMethod<[bps: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "setReferralRewardBps"
   ): TypedContractMethod<[bps: BigNumberish], [void], "nonpayable">;
@@ -1181,6 +1247,13 @@ export interface Kibo extends BaseContract {
     DepositedForEvent.OutputObject
   >;
   getEvent(
+    key: "GoalCancelled"
+  ): TypedContractEvent<
+    GoalCancelledEvent.InputTuple,
+    GoalCancelledEvent.OutputTuple,
+    GoalCancelledEvent.OutputObject
+  >;
+  getEvent(
     key: "GoalReached"
   ): TypedContractEvent<
     GoalReachedEvent.InputTuple,
@@ -1207,6 +1280,13 @@ export interface Kibo extends BaseContract {
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
+  >;
+  getEvent(
+    key: "PoolFeeBpsUpdated"
+  ): TypedContractEvent<
+    PoolFeeBpsUpdatedEvent.InputTuple,
+    PoolFeeBpsUpdatedEvent.OutputTuple,
+    PoolFeeBpsUpdatedEvent.OutputObject
   >;
   getEvent(
     key: "PoolFunded"
@@ -1349,6 +1429,17 @@ export interface Kibo extends BaseContract {
       DepositedForEvent.OutputObject
     >;
 
+    "GoalCancelled(address)": TypedContractEvent<
+      GoalCancelledEvent.InputTuple,
+      GoalCancelledEvent.OutputTuple,
+      GoalCancelledEvent.OutputObject
+    >;
+    GoalCancelled: TypedContractEvent<
+      GoalCancelledEvent.InputTuple,
+      GoalCancelledEvent.OutputTuple,
+      GoalCancelledEvent.OutputObject
+    >;
+
     "GoalReached(address,uint128)": TypedContractEvent<
       GoalReachedEvent.InputTuple,
       GoalReachedEvent.OutputTuple,
@@ -1391,6 +1482,17 @@ export interface Kibo extends BaseContract {
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
+    >;
+
+    "PoolFeeBpsUpdated(uint256,uint256)": TypedContractEvent<
+      PoolFeeBpsUpdatedEvent.InputTuple,
+      PoolFeeBpsUpdatedEvent.OutputTuple,
+      PoolFeeBpsUpdatedEvent.OutputObject
+    >;
+    PoolFeeBpsUpdated: TypedContractEvent<
+      PoolFeeBpsUpdatedEvent.InputTuple,
+      PoolFeeBpsUpdatedEvent.OutputTuple,
+      PoolFeeBpsUpdatedEvent.OutputObject
     >;
 
     "PoolFunded(address,uint256)": TypedContractEvent<

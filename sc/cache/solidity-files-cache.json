@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\awe\\Downloads\\Compressed\\Hackathon\\kibo\\sc\\contracts\\Kibo.sol": {
-      "lastModificationDate": 1781020378857,
-      "contentHash": "1988bae2c2b38b3ce24f13ae4d253ec1",
+      "lastModificationDate": 1781020804760,
+      "contentHash": "726d0b3eb02cd3606bd35df701e567ab",
       "sourceName": "contracts/Kibo.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -44,6 +44,50 @@
       "artifacts": [
         "IERC20",
         "Kibo"
+      ]
+    },
+    "C:\\Users\\awe\\Downloads\\Compressed\\Hackathon\\kibo\\sc\\contracts\\mocks\\MockERC20.sol": {
+      "lastModificationDate": 1781020826557,
+      "contentHash": "d162eb12ba46436e6ea10c8f6384a7dc",
+      "sourceName": "contracts/mocks/MockERC20.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MockERC20"
       ]
     }
   }

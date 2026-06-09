@@ -17,8 +17,10 @@ contract Kibo {
     uint8   public constant MAX_SHIELDS      = 3;
     uint256 public constant MAX_RECOVERY_FEE = 0.1 ether;
     uint256 public constant PRECISION_WINDOW = 2 hours;
-    uint256 public constant POOL_FEE_BPS     = 50;   // 0.5% of each deposit auto-routed to pool
-    uint256 public constant MAX_REWARD_TIER  = 1 ether; // ceiling on owner-adjustable tiers
+    uint256 public constant MAX_POOL_FEE_BPS  = 200;   // 2% ceiling on pool fee
+    uint256 public constant MAX_REWARD_TIER   = 1 ether; // ceiling on owner-adjustable tiers
+
+    uint256 public poolFeeBps = 50; // 0.5% of each deposit auto-routed to pool (owner-adjustable)
 
     // Owner-adjustable reward tiers
     uint256 public rewardTier1 = 0.005 ether;  // streak 7–13
@@ -101,6 +103,8 @@ contract Kibo {
     event ContractUnpaused(address indexed by);
     event ReferralRewardSkipped(address indexed ref, address indexed referee, uint256 amount);
     event ReferralRewardBpsUpdated(uint256 oldBps, uint256 newBps);
+    event PoolFeeBpsUpdated(uint256 oldBps, uint256 newBps);
+    event GoalCancelled(address indexed user);
 
     // ── Modifiers ────────────────────────────────────────────────
 
@@ -152,6 +156,16 @@ contract Kibo {
     function setWithdrawalPenaltyBps(uint256 bps) external onlyOwner {
         if (bps > 1000) revert BpsOutOfRange();
         withdrawalPenaltyBps = bps;
+    }
+
+    function setPoolFeeBps(uint256 bps) external onlyOwner {
+        if (bps > MAX_POOL_FEE_BPS) revert BpsOutOfRange();
+        emit PoolFeeBpsUpdated(poolFeeBps, bps);
+        poolFeeBps = bps;
+    }
+
+    function cancelOwnershipTransfer() external onlyOwner {
+        pendingOwner = address(0);
     }
 
     // ── Deposit ──────────────────────────────────────────────────
@@ -217,12 +231,13 @@ contract Kibo {
     function _processDeposit(address user, uint256 amount, uint40 ts) internal {
         UserData storage u = users[user];
 
-        // Auto-route 0.5% to reward pool; user's balance tracks net amount
-        uint256 fee = (amount * POOL_FEE_BPS) / 10_000;
+        // Auto-route poolFeeBps% to reward pool; user's balance tracks net amount
+        uint256 fee = (amount * poolFeeBps) / 10_000;
         unchecked { poolFunds += fee; }
         uint256 net = amount - fee;
 
         // Missed a day — shield absorbs the break if available
+        bool didBreak = false;
         if (u.lastDeposit != 0 && ts > u.lastDeposit + 48 hours) {
             if (u.shields > 0) {
                 unchecked { u.shields--; }
@@ -232,6 +247,8 @@ contract Kibo {
                 u.brokenStreak = u.streak;
                 emit StreakBroken(user, u.streak);
                 u.streak = 0;
+                didBreak = true;
+                // streak stays 0 so recoverStreak() is callable before next deposit
             }
         }
 
@@ -243,7 +260,10 @@ contract Kibo {
             }
         }
 
-        unchecked { u.streak++; }
+        if (!didBreak) {
+            unchecked { u.streak++; }
+            if (u.brokenStreak > 0) u.brokenStreak = 0; // user chose fresh start, forfeit recovery
+        }
         u.lastDeposit = ts;
         u.totalDeposited += uint128(net);
 
@@ -366,7 +386,8 @@ contract Kibo {
 
     function setGoal(uint128 target) external {
         savingsGoal[msg.sender] = target;
-        emit GoalSet(msg.sender, target);
+        if (target == 0) emit GoalCancelled(msg.sender);
+        else emit GoalSet(msg.sender, target);
     }
 
     // ── Internal helpers ─────────────────────────────────────────
