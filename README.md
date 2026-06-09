@@ -1,4 +1,8 @@
-# ⛰️ Kibo
+<p align="center">
+  <img src="assets/Kibo.png" alt="Kibo" width="120" />
+</p>
+
+# Kibo
 
 > **Daily micro-savings on Celo.** Deposit 0.01 cUSD every day, build your streak, earn rewards at milestones — all on-chain, non-custodial, MiniPay-native.
 
