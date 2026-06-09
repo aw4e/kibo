@@ -18,6 +18,7 @@ contract Kibo {
     uint256 public constant MAX_RECOVERY_FEE = 0.1 ether;
     uint256 public constant PRECISION_WINDOW = 2 hours;
     uint256 public constant POOL_FEE_BPS     = 50;   // 0.5% of each deposit auto-routed to pool
+    uint256 public constant MAX_REWARD_TIER  = 1 ether; // ceiling on owner-adjustable tiers
 
     // Owner-adjustable reward tiers
     uint256 public rewardTier1 = 0.005 ether;  // streak 7–13
@@ -96,6 +97,10 @@ contract Kibo {
     event RewardTiersUpdated(uint256 t1, uint256 t2, uint256 t3, uint256 t4);
     event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event ContractPaused(address indexed by);
+    event ContractUnpaused(address indexed by);
+    event ReferralRewardSkipped(address indexed ref, address indexed referee, uint256 amount);
+    event ReferralRewardBpsUpdated(uint256 oldBps, uint256 newBps);
 
     // ── Modifiers ────────────────────────────────────────────────
 
@@ -115,8 +120,8 @@ contract Kibo {
 
     // ── Owner functions ──────────────────────────────────────────
 
-    function pause() external onlyOwner { paused = true; }
-    function unpause() external onlyOwner { paused = false; }
+    function pause() external onlyOwner { paused = true; emit ContractPaused(msg.sender); }
+    function unpause() external onlyOwner { paused = false; emit ContractUnpaused(msg.sender); }
 
     // 2-step ownership transfer — prevents accidental loss of contract control
     function transferOwnership(address newOwner) external onlyOwner {
@@ -133,13 +138,14 @@ contract Kibo {
     }
 
     function setRewardTiers(uint256 t1, uint256 t2, uint256 t3, uint256 t4) external onlyOwner {
-        if (t1 == 0 || t2 <= t1 || t3 <= t2 || t4 <= t3) revert InvalidTiers();
+        if (t1 == 0 || t2 <= t1 || t3 <= t2 || t4 <= t3 || t4 > MAX_REWARD_TIER) revert InvalidTiers();
         rewardTier1 = t1; rewardTier2 = t2; rewardTier3 = t3; rewardTier4 = t4;
         emit RewardTiersUpdated(t1, t2, t3, t4);
     }
 
     function setReferralRewardBps(uint256 bps) external onlyOwner {
         if (bps > 1000) revert BpsOutOfRange();
+        emit ReferralRewardBpsUpdated(referralRewardBps, bps);
         referralRewardBps = bps;
     }
 
@@ -182,6 +188,8 @@ contract Kibo {
                     unchecked { poolFunds -= refAmount; }
                     unchecked { pendingReferralReward[r] += refAmount; }
                     emit ReferralRewardAccrued(r, msg.sender, refAmount);
+                } else {
+                    emit ReferralRewardSkipped(r, msg.sender, refAmount);
                 }
             }
         }
@@ -218,6 +226,7 @@ contract Kibo {
         if (u.lastDeposit != 0 && ts > u.lastDeposit + 48 hours) {
             if (u.shields > 0) {
                 unchecked { u.shields--; }
+                u.brokenStreak = 0; // clear stale value — shield absorbed, no recovery available
                 emit ShieldUsed(user, u.streak, u.shields);
             } else {
                 u.brokenStreak = u.streak;
@@ -319,7 +328,7 @@ contract Kibo {
         uint256 penalty = (uint256(amount) * penaltyBps) / 10_000;
         uint256 payout  = uint256(amount) - penalty;
 
-        // CEI — full state reset including longestStreak so badges re-earn on return
+        // CEI — full state reset so returning users start fresh (badges re-earn, leaderboard cleaned)
         u.totalDeposited    = 0;
         u.streak            = 0;
         u.longestStreak     = 0;
@@ -327,6 +336,7 @@ contract Kibo {
         u.shields           = 0;
         u.lastClaimedStreak = 0;
         u.brokenStreak      = 0;
+        u.isDepositor       = false;
         totalRewardsClaimed[msg.sender] = 0;
 
         if (penalty > 0) { unchecked { poolFunds += penalty; } }
@@ -431,9 +441,12 @@ contract Kibo {
 
         for (uint256 i; i < scope;) {
             address addr = depositors[i];
-            a[i] = addr;
-            s[i] = users[addr].streak;
-            t[i] = users[addr].totalDeposited;
+            uint32 sk = users[addr].streak;
+            if (sk > 0) { // skip withdrawn/inactive addresses
+                a[i] = addr;
+                s[i] = sk;
+                t[i] = users[addr].totalDeposited;
+            }
             unchecked { i++; }
         }
 

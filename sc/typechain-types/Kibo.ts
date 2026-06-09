@@ -29,6 +29,7 @@ export interface KiboInterface extends Interface {
       | "COOLDOWN"
       | "MAX_DEPOSIT"
       | "MAX_RECOVERY_FEE"
+      | "MAX_REWARD_TIER"
       | "MAX_SHIELDS"
       | "MIN_DEPOSIT"
       | "POOL_FEE_BPS"
@@ -76,6 +77,8 @@ export interface KiboInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "BadgeEarned"
+      | "ContractPaused"
+      | "ContractUnpaused"
       | "Deposited"
       | "DepositedFor"
       | "GoalReached"
@@ -85,7 +88,9 @@ export interface KiboInterface extends Interface {
       | "PoolFunded"
       | "PrecisionShield"
       | "ReferralRewardAccrued"
+      | "ReferralRewardBpsUpdated"
       | "ReferralRewardClaimed"
+      | "ReferralRewardSkipped"
       | "RewardClaimed"
       | "RewardTiersUpdated"
       | "ShieldUsed"
@@ -101,6 +106,10 @@ export interface KiboInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "MAX_RECOVERY_FEE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MAX_REWARD_TIER",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -258,6 +267,10 @@ export interface KiboInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "MAX_REWARD_TIER",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "MAX_SHIELDS",
     data: BytesLike
   ): Result;
@@ -385,6 +398,30 @@ export namespace BadgeEarnedEvent {
   export interface OutputObject {
     user: string;
     badge: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ContractPausedEvent {
+  export type InputTuple = [by: AddressLike];
+  export type OutputTuple = [by: string];
+  export interface OutputObject {
+    by: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ContractUnpausedEvent {
+  export type InputTuple = [by: AddressLike];
+  export type OutputTuple = [by: string];
+  export interface OutputObject {
+    by: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -531,11 +568,42 @@ export namespace ReferralRewardAccruedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace ReferralRewardBpsUpdatedEvent {
+  export type InputTuple = [oldBps: BigNumberish, newBps: BigNumberish];
+  export type OutputTuple = [oldBps: bigint, newBps: bigint];
+  export interface OutputObject {
+    oldBps: bigint;
+    newBps: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace ReferralRewardClaimedEvent {
   export type InputTuple = [ref: AddressLike, amount: BigNumberish];
   export type OutputTuple = [ref: string, amount: bigint];
   export interface OutputObject {
     ref: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ReferralRewardSkippedEvent {
+  export type InputTuple = [
+    ref: AddressLike,
+    referee: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [ref: string, referee: string, amount: bigint];
+  export interface OutputObject {
+    ref: string;
+    referee: string;
     amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -697,6 +765,8 @@ export interface Kibo extends BaseContract {
   MAX_DEPOSIT: TypedContractMethod<[], [bigint], "view">;
 
   MAX_RECOVERY_FEE: TypedContractMethod<[], [bigint], "view">;
+
+  MAX_REWARD_TIER: TypedContractMethod<[], [bigint], "view">;
 
   MAX_SHIELDS: TypedContractMethod<[], [bigint], "view">;
 
@@ -879,6 +949,9 @@ export interface Kibo extends BaseContract {
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "MAX_RECOVERY_FEE"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "MAX_REWARD_TIER"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "MAX_SHIELDS"
@@ -1080,6 +1153,20 @@ export interface Kibo extends BaseContract {
     BadgeEarnedEvent.OutputObject
   >;
   getEvent(
+    key: "ContractPaused"
+  ): TypedContractEvent<
+    ContractPausedEvent.InputTuple,
+    ContractPausedEvent.OutputTuple,
+    ContractPausedEvent.OutputObject
+  >;
+  getEvent(
+    key: "ContractUnpaused"
+  ): TypedContractEvent<
+    ContractUnpausedEvent.InputTuple,
+    ContractUnpausedEvent.OutputTuple,
+    ContractUnpausedEvent.OutputObject
+  >;
+  getEvent(
     key: "Deposited"
   ): TypedContractEvent<
     DepositedEvent.InputTuple,
@@ -1143,11 +1230,25 @@ export interface Kibo extends BaseContract {
     ReferralRewardAccruedEvent.OutputObject
   >;
   getEvent(
+    key: "ReferralRewardBpsUpdated"
+  ): TypedContractEvent<
+    ReferralRewardBpsUpdatedEvent.InputTuple,
+    ReferralRewardBpsUpdatedEvent.OutputTuple,
+    ReferralRewardBpsUpdatedEvent.OutputObject
+  >;
+  getEvent(
     key: "ReferralRewardClaimed"
   ): TypedContractEvent<
     ReferralRewardClaimedEvent.InputTuple,
     ReferralRewardClaimedEvent.OutputTuple,
     ReferralRewardClaimedEvent.OutputObject
+  >;
+  getEvent(
+    key: "ReferralRewardSkipped"
+  ): TypedContractEvent<
+    ReferralRewardSkippedEvent.InputTuple,
+    ReferralRewardSkippedEvent.OutputTuple,
+    ReferralRewardSkippedEvent.OutputObject
   >;
   getEvent(
     key: "RewardClaimed"
@@ -1202,6 +1303,28 @@ export interface Kibo extends BaseContract {
       BadgeEarnedEvent.InputTuple,
       BadgeEarnedEvent.OutputTuple,
       BadgeEarnedEvent.OutputObject
+    >;
+
+    "ContractPaused(address)": TypedContractEvent<
+      ContractPausedEvent.InputTuple,
+      ContractPausedEvent.OutputTuple,
+      ContractPausedEvent.OutputObject
+    >;
+    ContractPaused: TypedContractEvent<
+      ContractPausedEvent.InputTuple,
+      ContractPausedEvent.OutputTuple,
+      ContractPausedEvent.OutputObject
+    >;
+
+    "ContractUnpaused(address)": TypedContractEvent<
+      ContractUnpausedEvent.InputTuple,
+      ContractUnpausedEvent.OutputTuple,
+      ContractUnpausedEvent.OutputObject
+    >;
+    ContractUnpaused: TypedContractEvent<
+      ContractUnpausedEvent.InputTuple,
+      ContractUnpausedEvent.OutputTuple,
+      ContractUnpausedEvent.OutputObject
     >;
 
     "Deposited(address,uint32,uint40)": TypedContractEvent<
@@ -1303,6 +1426,17 @@ export interface Kibo extends BaseContract {
       ReferralRewardAccruedEvent.OutputObject
     >;
 
+    "ReferralRewardBpsUpdated(uint256,uint256)": TypedContractEvent<
+      ReferralRewardBpsUpdatedEvent.InputTuple,
+      ReferralRewardBpsUpdatedEvent.OutputTuple,
+      ReferralRewardBpsUpdatedEvent.OutputObject
+    >;
+    ReferralRewardBpsUpdated: TypedContractEvent<
+      ReferralRewardBpsUpdatedEvent.InputTuple,
+      ReferralRewardBpsUpdatedEvent.OutputTuple,
+      ReferralRewardBpsUpdatedEvent.OutputObject
+    >;
+
     "ReferralRewardClaimed(address,uint256)": TypedContractEvent<
       ReferralRewardClaimedEvent.InputTuple,
       ReferralRewardClaimedEvent.OutputTuple,
@@ -1312,6 +1446,17 @@ export interface Kibo extends BaseContract {
       ReferralRewardClaimedEvent.InputTuple,
       ReferralRewardClaimedEvent.OutputTuple,
       ReferralRewardClaimedEvent.OutputObject
+    >;
+
+    "ReferralRewardSkipped(address,address,uint256)": TypedContractEvent<
+      ReferralRewardSkippedEvent.InputTuple,
+      ReferralRewardSkippedEvent.OutputTuple,
+      ReferralRewardSkippedEvent.OutputObject
+    >;
+    ReferralRewardSkipped: TypedContractEvent<
+      ReferralRewardSkippedEvent.InputTuple,
+      ReferralRewardSkippedEvent.OutputTuple,
+      ReferralRewardSkippedEvent.OutputObject
     >;
 
     "RewardClaimed(address,uint32,uint256)": TypedContractEvent<
