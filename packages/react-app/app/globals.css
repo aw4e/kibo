@@ -597,6 +597,70 @@ button:focus-visible {
   font-weight: 600;
 }
 
+/* ─── Error Banner ────────────────────────────────────────────── */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px var(--space-lg);
+  background: oklch(55% 0.21 25 / 0.1);
+  border-bottom: 0.5px solid oklch(55% 0.21 25 / 0.3);
+  animation: slide-down var(--dur-normal) var(--ease-out);
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.error-banner-icon { font-size: 1rem; flex-shrink: 0; }
+
+.error-banner-text {
+  flex: 1;
+  font-size: var(--text-footnote);
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.error-banner-close {
+  background: none;
+  border: none;
+  color: var(--color-ink-3);
+  font-size: var(--text-footnote);
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+/* ─── Skeleton Loading ────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton {
+  display: inline-block;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-paper-2) 25%,
+    var(--color-paper-3) 50%,
+    var(--color-paper-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-icon  { width: 30px; height: 30px; border-radius: 8px; }
+.skeleton-label { width: 100px; height: 14px; }
+.skeleton-value { width: 70px; height: 14px; }
+
+/* ─── Row sub-label ───────────────────────────────────────────── */
+.row-sub {
+  font-size: var(--text-footnote);
+  font-weight: 400;
+  color: var(--color-ink-3);
+}
+
 /* ─── Misc ────────────────────────────────────────────────────── */
 .empty-state {
   text-align: center;
