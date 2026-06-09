@@ -59,6 +59,7 @@ export default function Home() {
     canClaim,
     nextDepositIn,
     cUSDBalance,
+    shields,
     leaderboard,
     isTxLoading,
     deposit,
@@ -150,6 +151,16 @@ export default function Home() {
                     <span className="row-label">cUSD balance</span>
                   </div>
                   <span className="row-value is-muted">{balanceAmount}</span>
+                </div>
+                <div className="card-row">
+                  <div className="card-row-left">
+                    <span className="row-icon icon-blue">🛡️</span>
+                    <span className="row-label">Streak shields</span>
+                  </div>
+                  <span className="row-value">
+                    {"🛡️".repeat(shields) || "—"}
+                    <span className="row-sub"> {shields}/3</span>
+                  </span>
                 </div>
               </div>
             </div>
