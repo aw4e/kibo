@@ -145,6 +145,11 @@ const config: Config = {
           "system-ui",
           "sans-serif",
         ],
+        jakarta: [
+          "var(--font-plus-jakarta)",
+          "var(--font-space-grotesk)",
+          "sans-serif",
+        ],
       },
     },
   },

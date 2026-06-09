@@ -155,49 +155,45 @@ export default function Home() {
     : 0;
 
   /* ── CONNECT PAGE ────────────────────────────────────────── */
+  /* Hallmark · pre-emit critique: P4 H5 E4 S5 R4 V5 */
   if (!isConnected) {
     return (
-      <div className="relative min-h-dvh bg-[#0B0614] overflow-hidden flex flex-col">
+      <div className="relative min-h-dvh bg-[#FAFAF8] overflow-x-clip overflow-y-hidden flex flex-col">
 
-        {/* Gradient mesh */}
+        {/* Soft aurora — premium, not harsh */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-          <div className="absolute top-[-20%] left-[-15%] w-[70vw] h-[70vw] max-w-[500px] max-h-[500px] rounded-full bg-violet-700/35 blur-[100px]" />
-          <div className="absolute top-[30%] right-[-15%] w-[55vw] h-[55vw] max-w-[400px] max-h-[400px] rounded-full bg-blue-600/25 blur-[90px]" />
-          <div className="absolute bottom-[-10%] left-[10%] w-[50vw] h-[50vw] max-w-[360px] max-h-[360px] rounded-full bg-indigo-500/20 blur-[80px]" />
-          {/* Fine grid overlay */}
-          <div className="absolute inset-0 opacity-[0.04]"
-               style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+          <div className="absolute -top-[15%] left-1/2 -translate-x-1/2 w-[120vw] max-w-[680px] h-[55vh] rounded-[50%] bg-violet-300/14 blur-[90px]" />
+          <div className="absolute top-[50%] right-[-8%] w-[45vw] max-w-[260px] aspect-square rounded-full bg-blue-200/10 blur-[70px]" />
+          <div className="absolute bottom-[10%] left-[-5%] w-[40vw] max-w-[220px] aspect-square rounded-full bg-violet-200/8 blur-[60px]" />
         </div>
 
-        {/* Floating ambient icons */}
+        {/* Floating accents — sparse, minimal */}
         <div className="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
-          <span className="absolute top-[9%]  left-[6%]   text-2xl opacity-50 animate-float"         style={{ animationDelay: "0s" }}>💰</span>
-          <span className="absolute top-[14%] right-[7%]  text-xl  opacity-40 animate-spin-slow"     style={{ animationDelay: "0s" }}>🪙</span>
-          <span className="absolute top-[38%] left-[4%]   text-lg  opacity-35 animate-sparkle"       style={{ animationDelay: "1.5s" }}>✦</span>
-          <span className="absolute top-[54%] right-[5%]  text-2xl opacity-45 animate-float"         style={{ animationDelay: "0.8s" }}>💎</span>
-          <span className="absolute bottom-[28%] left-[7%] text-xl opacity-35 animate-float-sm"      style={{ animationDelay: "2.1s" }}>🔗</span>
-          <span className="absolute bottom-[16%] right-[11%] text-xl opacity-40 animate-sparkle"     style={{ animationDelay: "0.3s" }}>⭐</span>
-          <span className="absolute top-[48%] right-[3%]  text-base opacity-30 animate-float-sm"     style={{ animationDelay: "2.9s" }}>◈</span>
-          <span className="absolute top-[6%]  right-[24%] text-base opacity-30 animate-sparkle"      style={{ animationDelay: "1.2s" }}>✨</span>
-          <span className="absolute bottom-[42%] right-[17%] text-base opacity-25 animate-float"     style={{ animationDelay: "3.4s" }}>◆</span>
-          <span className="absolute bottom-[58%] left-[17%] text-base opacity-20 animate-spin-slow-r" style={{ animationDelay: "0s" }}>⬡</span>
+          <span className="absolute top-[10%] right-[8%]   text-lg opacity-[0.14] animate-spin-slow">🪙</span>
+          <span className="absolute top-[42%] left-[5%]    text-base opacity-[0.11] animate-sparkle" style={{ animationDelay: "1.4s" }}>✦</span>
+          <span className="absolute bottom-[22%] right-[6%] text-base opacity-[0.16] animate-float-sm" style={{ animationDelay: "0.7s" }}>💎</span>
+          <span className="absolute bottom-[38%] left-[7%]  text-sm opacity-[0.10] animate-spin-slow-r">⬡</span>
+        </div>
+
+        {/* Top bar */}
+        <div className="relative z-10 flex items-center justify-between px-5 pt-6">
+          <span className="text-[0.9375rem] font-black tracking-[-0.02em] text-[#09090B]">KIBO</span>
+          <span className="bg-[#09090B] text-white text-[0.5625rem] font-black px-2.5 py-[5px] rounded-full tracking-wider">
+            CELO MAINNET
+          </span>
         </div>
 
         {/* Main */}
-        <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-12 text-center">
+        <div className="relative z-10 flex flex-col items-center flex-1 px-6 pt-8 pb-10 text-center">
 
-          {/* Mascot with glow */}
-          <div className="relative mb-6 animate-float">
-            {/* Outer glow ring */}
-            <div className="absolute inset-[-18px] rounded-full bg-blue-400/20 blur-2xl animate-pulse-glow" />
-            {/* Inner halo */}
-            <div className="absolute inset-[-8px] rounded-full border-[2px] border-white/10" />
-            <div className="relative w-28 h-28 rounded-3xl overflow-hidden border-[3px] border-white/20 shadow-[0_0_40px_rgba(139,92,246,0.5)]">
+          {/* Mascot in neobrutalist yellow card */}
+          <div className="mb-7 animate-float">
+            <div className="bg-[#FFE500] border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] rounded-2xl p-4 inline-flex items-center justify-center">
               <Image
                 src="/kibo.png"
                 alt="Kibo mascot"
-                fill
-                sizes="112px"
+                width={84}
+                height={84}
                 className="object-cover"
                 priority
               />
@@ -205,36 +201,30 @@ export default function Home() {
           </div>
 
           {/* Title */}
-          <h1
-            className="text-[5.25rem] font-black tracking-[-0.055em] text-white leading-[0.9] mb-1"
-            style={{ textShadow: "0 4px 24px rgba(139,92,246,0.6), 3px 3px 0 rgba(0,0,0,0.4)" }}
-          >
+          <h1 className="text-[4.75rem] font-black tracking-[-0.06em] text-[#09090B] leading-[0.9] mb-4">
             KIBO
           </h1>
-          <p className="text-white/40 text-[0.75rem] font-bold uppercase tracking-[0.2em] mb-4">
-            Daily Savings · Celo Network
-          </p>
 
           {/* Tagline */}
-          <p className="text-white/70 text-[1.0625rem] font-semibold leading-relaxed mb-8 max-w-[260px]">
+          <p className="font-jakarta text-[1.0625rem] font-medium text-[#09090B]/50 leading-relaxed mb-8 max-w-[258px]">
             Save small. Build habits.<br />Earn rewards every 7 days.
           </p>
 
-          {/* Feature grid */}
+          {/* Feature grid — neobrutalist cards on clean bg */}
           <div className="grid grid-cols-2 gap-2 w-full max-w-[300px] mb-8">
             {[
-              { icon: "🔥", label: "Daily Streaks",  desc: "20h cooldown" },
-              { icon: "🏆", label: "Rewards",         desc: "Every 7 days" },
-              { icon: "🛡️", label: "Streak Shields",  desc: "Miss without reset" },
-              { icon: "💎", label: "On-chain Badges",  desc: "30/90/180/365d" },
-            ].map(({ icon, label, desc }) => (
+              { icon: "🔥", label: "Daily Streaks",   desc: "20h cooldown",       bg: "bg-[#EDE9FE]" },
+              { icon: "🏆", label: "Rewards",          desc: "Every 7 days",       bg: "bg-[#FEF9C3]" },
+              { icon: "🛡️", label: "Streak Shields",  desc: "Miss without reset",  bg: "bg-[#DBEAFE]" },
+              { icon: "💎", label: "On-chain Badges",  desc: "30/90/180/365d",     bg: "bg-[#DCFCE7]" },
+            ].map(({ icon, label, desc, bg }) => (
               <div
                 key={label}
-                className="bg-white/7 backdrop-blur-sm rounded-2xl border border-white/12 px-3 py-3 text-left"
+                className={cn("rounded-xl border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] px-3 py-3 text-left", bg)}
               >
                 <span className="text-xl block mb-1">{icon}</span>
-                <p className="text-white text-[0.8125rem] font-bold leading-tight">{label}</p>
-                <p className="text-white/45 text-[0.6875rem] font-medium mt-0.5">{desc}</p>
+                <p className="text-[#09090B] text-[0.8125rem] font-bold leading-tight">{label}</p>
+                <p className="font-jakarta text-[#09090B]/45 text-[0.6875rem] font-medium mt-0.5">{desc}</p>
               </div>
             ))}
           </div>
@@ -248,18 +238,20 @@ export default function Home() {
               <Wallet className="w-5 h-5" />
               Connect Wallet
             </button>
-            <p className="text-white/25 text-[0.6875rem] font-semibold text-center tracking-wide">
+            <p className="font-jakarta text-[#09090B]/28 text-[0.6875rem] font-semibold text-center tracking-wide">
               Non-custodial · Open source · Celo Mainnet
             </p>
           </div>
+
         </div>
 
         {/* Bottom strip */}
-        <div className="relative z-10 flex items-center justify-center gap-6 pb-8 pt-2">
+        <div className="relative z-10 flex items-center justify-center gap-5 pb-8 pt-2">
           {["🔥 Save Daily", "🏔️ Reach Summit", "💰 Earn Rewards"].map((t) => (
-            <span key={t} className="text-white/25 text-[0.6875rem] font-bold">{t}</span>
+            <span key={t} className="text-[#09090B]/20 text-[0.6875rem] font-bold">{t}</span>
           ))}
         </div>
+
       </div>
     );
   }

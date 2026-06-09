@@ -99,8 +99,12 @@
 
 /* ── Desktop centering ────────────────────────────────────── */
 @media (min-width: 480px) {
+  html {
+    overflow-x: clip;
+  }
   body {
-    background: #E8E4DC;
+    background: #ECEAE6;
+    overflow-x: clip;
   }
   .app-shell {
     border-left: 3px solid #09090B;
