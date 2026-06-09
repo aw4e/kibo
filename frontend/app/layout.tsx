@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     icon: "/kibo.png",
     apple: "/kibo.png",
   },
+  other: {
+    "talentapp:project_verification": "876ddf77b1b760c74f107494b623050f0ac7e82204002c5343de1cc275f30a12b3d1741dff5652553193ac4a8753abb656a22e9271eef94623f7aa0f77bdd284",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
