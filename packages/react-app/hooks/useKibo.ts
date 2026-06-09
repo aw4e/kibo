@@ -10,13 +10,16 @@ import { parseUnits, maxUint256 } from "viem";
 import { KIBO_ADDRESS, CUSD_ADDRESS, KIBO_ABI, ERC20_ABI } from "../lib/kibo-abi";
 import { useState, useEffect } from "react";
 
-const DEFAULT_DEPOSIT = parseUnits("0.0001", 18);
+const DEFAULT_DEPOSIT = parseUnits("0.01", 18);
 
 export function useKibo() {
   const { address } = useAccount();
   const { writeContractAsync } = useWriteContract();
   const wagmiConfig = useConfig();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
+  const [error, setError] = useState<string | null>(null);
+  // Force re-render every 30s so countdown ticks while deposit is pending
+  const [, setTick] = useState(0);
 
   const { data: userData, refetch: refetchUser } = useReadContract({
     address: KIBO_ADDRESS,
@@ -47,7 +50,7 @@ export function useKibo() {
     abi: KIBO_ABI,
     functionName: "getLeaderboard",
     args: [BigInt(20)],
-    query: { enabled: !!KIBO_ADDRESS },
+    query: { enabled: !!KIBO_ADDRESS, staleTime: 30_000 },
   });
 
   const { isSuccess: txConfirmed, isLoading: isTxLoading } =
@@ -61,6 +64,12 @@ export function useKibo() {
     }
   }, [txConfirmed, refetchUser, refetchAllowance]);
 
+  // Tick every 30s to keep countdown fresh
+  useEffect(() => {
+    const id = setInterval(() => setTick((n) => n + 1), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
   async function ensureApproval(amount: bigint) {
     if (!allowance || allowance < amount) {
       const hash = await writeContractAsync({
@@ -69,39 +78,53 @@ export function useKibo() {
         functionName: "approve",
         args: [KIBO_ADDRESS, maxUint256],
       });
-      // Wait for approve to confirm before calling deposit
       await waitForTransactionReceipt(wagmiConfig, { hash });
       await refetchAllowance();
     }
   }
 
   async function deposit(amount: bigint = DEFAULT_DEPOSIT) {
-    await ensureApproval(amount);
-    const hash = await writeContractAsync({
-      address: KIBO_ADDRESS,
-      abi: KIBO_ABI,
-      functionName: "deposit",
-      args: [amount],
-    });
-    setTxHash(hash);
+    setError(null);
+    try {
+      await ensureApproval(amount);
+      const hash = await writeContractAsync({
+        address: KIBO_ADDRESS,
+        abi: KIBO_ABI,
+        functionName: "deposit",
+        args: [amount],
+      });
+      setTxHash(hash);
+    } catch (e: unknown) {
+      setError(parseContractError(e));
+    }
   }
 
   async function claimReward() {
-    const hash = await writeContractAsync({
-      address: KIBO_ADDRESS,
-      abi: KIBO_ABI,
-      functionName: "claimReward",
-    });
-    setTxHash(hash);
+    setError(null);
+    try {
+      const hash = await writeContractAsync({
+        address: KIBO_ADDRESS,
+        abi: KIBO_ABI,
+        functionName: "claimReward",
+      });
+      setTxHash(hash);
+    } catch (e: unknown) {
+      setError(parseContractError(e));
+    }
   }
 
   async function withdraw() {
-    const hash = await writeContractAsync({
-      address: KIBO_ADDRESS,
-      abi: KIBO_ABI,
-      functionName: "withdraw",
-    });
-    setTxHash(hash);
+    setError(null);
+    try {
+      const hash = await writeContractAsync({
+        address: KIBO_ADDRESS,
+        abi: KIBO_ABI,
+        functionName: "withdraw",
+      });
+      setTxHash(hash);
+    } catch (e: unknown) {
+      setError(parseContractError(e));
+    }
   }
 
   const streak = userData ? Number(userData[0]) : 0;
@@ -112,6 +135,7 @@ export function useKibo() {
   const lastClaimedStreak = userData ? Number(userData[5]) : 0;
   const shields = userData ? Number(userData[6]) : 0;
   const canClaim = streak > 0 && streak % 7 === 0 && streak > lastClaimedStreak;
+  const isLoading = !!address && !userData;
 
   const nextDepositIn =
     lastDeposit > 0
@@ -129,8 +153,32 @@ export function useKibo() {
     shields,
     leaderboard,
     isTxLoading,
+    isLoading,
+    error,
+    clearError: () => setError(null),
     deposit,
     claimReward,
     withdraw,
   };
+}
+
+function parseContractError(e: unknown): string {
+  if (typeof e === "object" && e !== null) {
+    const err = e as Record<string, unknown>;
+    // User rejected in wallet
+    if (err.code === 4001 || err.name === "UserRejectedRequestError") {
+      return "Transaction cancelled.";
+    }
+    // Contract revert with named error
+    const msg = String(err.shortMessage ?? err.message ?? "");
+    if (msg.includes("TooSoon")) return "Deposit cooldown active. Try again later.";
+    if (msg.includes("PoolEmpty")) return "Reward pool is empty. Try again later.";
+    if (msg.includes("NeedMilestone")) return "No milestone reached yet.";
+    if (msg.includes("AlreadyClaimed")) return "Reward already claimed for this streak.";
+    if (msg.includes("NothingToWithdraw")) return "No balance to withdraw.";
+    if (msg.includes("AmountOutOfRange")) return "Deposit amount out of range.";
+    if (msg.includes("Paused")) return "Contract is paused. Try again later.";
+    if (msg) return msg.slice(0, 120);
+  }
+  return "Transaction failed. Please try again.";
 }
