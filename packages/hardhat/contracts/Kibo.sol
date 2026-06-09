@@ -10,33 +10,45 @@ interface IERC20 {
 contract Kibo {
     IERC20 public constant cUSD = IERC20(0x765DE816845861e75A25fCA122bb6898B8B1282a);
 
-    uint256 public constant MIN_DEPOSIT = 0.0001 ether; // 0.0001 cUSD minimum
-    uint256 public constant MAX_DEPOSIT = 1 ether;     // 1 cUSD maximum
-    uint256 public constant COOLDOWN = 20 hours;
-    uint256 public constant STREAK_REWARD_THRESHOLD = 7;
-    uint256 public constant REWARD_AMOUNT = 0.005 ether; // 0.005 cUSD reward per 7-day streak
+    uint256 public constant MIN_DEPOSIT       = 0.0001 ether;
+    uint256 public constant MAX_DEPOSIT       = 1 ether;
+    uint256 public constant COOLDOWN          = 20 hours;
+    uint256 public constant STREAK_THRESHOLD  = 7;
+    uint256 public constant REWARD_AMOUNT     = 0.005 ether;
 
+    // Custom errors — no string storage, ~50 gas cheaper per revert
+    error AmountOutOfRange();
+    error TooSoon();
+    error PoolEmpty();
+    error NeedMilestone();
+    error AlreadyClaimed();
+    error NothingToWithdraw();
+    error NotOwner();
+    error TransferFailed();
+
+    // Packed into 2 storage slots instead of 5+mapping
+    // slot 1: streak(32) + longestStreak(32) + lastClaimedStreak(32) + lastDeposit(40) + isDepositor(8) = 144 bits
+    // slot 2: totalDeposited(128) = 128 bits
     struct UserData {
-        uint256 streak;
-        uint256 lastDeposit;
-        uint256 totalDeposited;
-        uint256 longestStreak;
-        uint256 lastClaimedStreak;
+        uint32  streak;
+        uint32  longestStreak;
+        uint32  lastClaimedStreak;
+        uint40  lastDeposit;
+        bool    isDepositor;
+        uint128 totalDeposited;
     }
 
     mapping(address => UserData) public users;
     address[] public depositors;
-    mapping(address => bool) public hasDeposited;
-
     address public owner;
 
-    event Deposited(address indexed user, uint256 streak, uint256 timestamp);
-    event StreakBroken(address indexed user, uint256 oldStreak);
-    event RewardClaimed(address indexed user, uint256 streak, uint256 reward);
+    event Deposited(address indexed user, uint32 streak, uint40 timestamp);
+    event StreakBroken(address indexed user, uint32 oldStreak);
+    event RewardClaimed(address indexed user, uint32 streak, uint256 reward);
     event PoolFunded(uint256 amount);
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Not owner");
+        if (msg.sender != owner) revert NotOwner();
         _;
     }
 
@@ -45,72 +57,62 @@ contract Kibo {
     }
 
     function deposit(uint256 amount) external {
-        require(amount >= MIN_DEPOSIT && amount <= MAX_DEPOSIT, "Amount out of range");
+        if (amount < MIN_DEPOSIT || amount > MAX_DEPOSIT) revert AmountOutOfRange();
 
         UserData storage u = users[msg.sender];
+        uint40 ts = uint40(block.timestamp);
 
-        require(
-            block.timestamp >= u.lastDeposit + COOLDOWN,
-            "Too soon: wait 20h between deposits"
-        );
+        if (ts < u.lastDeposit + COOLDOWN) revert TooSoon();
 
         // Break streak if > 48h gap (missed a day)
-        if (u.lastDeposit != 0 && block.timestamp > u.lastDeposit + 48 hours) {
+        if (u.lastDeposit != 0 && ts > u.lastDeposit + 48 hours) {
             emit StreakBroken(msg.sender, u.streak);
             u.streak = 0;
         }
 
-        require(
-            cUSD.transferFrom(msg.sender, address(this), amount),
-            "cUSD transfer failed"
-        );
+        if (!cUSD.transferFrom(msg.sender, address(this), amount)) revert TransferFailed();
 
-        u.streak++;
-        u.lastDeposit = block.timestamp;
-        u.totalDeposited += amount;
+        unchecked { u.streak++; }
+        u.lastDeposit = ts;
+        u.totalDeposited += uint128(amount);
 
-        if (u.streak > u.longestStreak) {
-            u.longestStreak = u.streak;
-        }
+        if (u.streak > u.longestStreak) u.longestStreak = u.streak;
 
-        if (!hasDeposited[msg.sender]) {
-            hasDeposited[msg.sender] = true;
+        if (!u.isDepositor) {
+            u.isDepositor = true;
             depositors.push(msg.sender);
         }
 
-        emit Deposited(msg.sender, u.streak, block.timestamp);
+        emit Deposited(msg.sender, u.streak, ts);
     }
 
     function claimReward() external {
         UserData storage u = users[msg.sender];
-        require(u.streak >= STREAK_REWARD_THRESHOLD, "Need 7-day streak");
-        require(u.streak % STREAK_REWARD_THRESHOLD == 0, "Not at milestone");
-        require(u.streak > u.lastClaimedStreak, "Already claimed this milestone");
+        if (u.streak < STREAK_THRESHOLD || u.streak % STREAK_THRESHOLD != 0) revert NeedMilestone();
+        if (u.streak <= u.lastClaimedStreak) revert AlreadyClaimed();
+        if (cUSD.balanceOf(address(this)) < REWARD_AMOUNT) revert PoolEmpty();
 
-        uint256 reward = REWARD_AMOUNT;
-        require(cUSD.balanceOf(address(this)) >= reward, "Pool empty");
+        // CEI: state before external call
+        u.lastClaimedStreak = uint32(u.streak);
 
-        // CEI: update state before external call
-        u.lastClaimedStreak = u.streak;
-
-        require(cUSD.transfer(msg.sender, reward), "Reward transfer failed");
-        emit RewardClaimed(msg.sender, u.streak, reward);
+        if (!cUSD.transfer(msg.sender, REWARD_AMOUNT)) revert TransferFailed();
+        emit RewardClaimed(msg.sender, u.streak, REWARD_AMOUNT);
     }
 
     function withdraw() external {
         UserData storage u = users[msg.sender];
-        uint256 amount = u.totalDeposited;
-        require(amount > 0, "Nothing to withdraw");
+        uint128 amount = u.totalDeposited;
+        if (amount == 0) revert NothingToWithdraw();
 
         u.totalDeposited = 0;
         u.streak = 0;
         u.lastDeposit = 0;
 
-        cUSD.transfer(msg.sender, amount);
+        if (!cUSD.transfer(msg.sender, amount)) revert TransferFailed();
     }
 
     function fundPool(uint256 amount) external onlyOwner {
-        require(cUSD.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        if (!cUSD.transferFrom(msg.sender, address(this), amount)) revert TransferFailed();
         emit PoolFunded(amount);
     }
 
@@ -119,16 +121,16 @@ contract Kibo {
         uint256 lastDeposit,
         uint256 totalDeposited,
         uint256 longestStreak,
-        bool canDeposit,
+        bool    canDeposit,
         uint256 lastClaimedStreak
     ) {
-        UserData memory u = users[user];
+        UserData storage u = users[user];
         return (
             u.streak,
             u.lastDeposit,
             u.totalDeposited,
             u.longestStreak,
-            block.timestamp >= u.lastDeposit + COOLDOWN,
+            uint40(block.timestamp) >= u.lastDeposit + COOLDOWN,
             u.lastClaimedStreak
         );
     }
@@ -139,14 +141,16 @@ contract Kibo {
         uint256[] memory totals
     ) {
         uint256 count = depositors.length < limit ? depositors.length : limit;
-        addrs = new address[](count);
+        addrs  = new address[](count);
         streaks = new uint256[](count);
-        totals = new uint256[](count);
+        totals  = new uint256[](count);
 
-        for (uint256 i = 0; i < count; i++) {
-            addrs[i] = depositors[i];
-            streaks[i] = users[depositors[i]].streak;
-            totals[i] = users[depositors[i]].totalDeposited;
+        for (uint256 i; i < count;) {
+            address a = depositors[i];
+            addrs[i]   = a;
+            streaks[i] = users[a].streak;
+            totals[i]  = users[a].totalDeposited;
+            unchecked { i++; }
         }
     }
 
