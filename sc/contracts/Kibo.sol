@@ -17,20 +17,22 @@ contract Kibo {
     uint8   public constant MAX_SHIELDS      = 3;
     uint256 public constant MAX_RECOVERY_FEE = 0.1 ether;
     uint256 public constant PRECISION_WINDOW = 2 hours;
+    uint256 public constant POOL_FEE_BPS     = 50;   // 0.5% of each deposit auto-routed to pool
 
     // Owner-adjustable reward tiers
     uint256 public rewardTier1 = 0.005 ether;  // streak 7–13
     uint256 public rewardTier2 = 0.012 ether;  // streak 14–34
-    uint256 public rewardTier3 = 0.025 ether;  // streak 35–48
+    uint256 public rewardTier3 = 0.025 ether;  // streak 35–48 (threshold: >=35)
     uint256 public rewardTier4 = 0.05 ether;   // streak 49+
 
     // Owner-adjustable rates (basis points, 1 bps = 0.01%)
-    uint256 public referralRewardBps    = 50;   // 0.5% of milestone reward → referrer
+    uint256 public referralRewardBps    = 500;  // 5% of referee's first deposit → referrer (from pool)
     uint256 public withdrawalPenaltyBps = 500;  // 5% penalty on early withdrawal
 
     address public owner;
+    address public pendingOwner;
     bool    public paused;
-    uint256 public poolFunds; // funded reward pool, tracked separately from user deposits
+    uint256 public poolFunds;
 
     // ── Errors ───────────────────────────────────────────────────
 
@@ -44,8 +46,10 @@ contract Kibo {
     error Paused();
     error Unauthorized();
     error NoStreakToRecover();
+    error RecoveryPending();
     error InvalidAddress();
     error BpsOutOfRange();
+    error InvalidTiers();
 
     // ── Storage ──────────────────────────────────────────────────
 
@@ -56,7 +60,7 @@ contract Kibo {
         uint32  streak;
         uint32  longestStreak;
         uint32  lastClaimedStreak;
-        uint32  brokenStreak;   // streak value before last break, used for recovery
+        uint32  brokenStreak;
         uint40  lastDeposit;
         bool    isDepositor;
         uint8   shields;
@@ -66,10 +70,10 @@ contract Kibo {
     enum Badge { None, Bronze, Silver, Gold, Diamond }
 
     mapping(address => UserData) public users;
-    mapping(address => address)  public referrer;              // user => referrer address
-    mapping(address => uint256)  public pendingReferralReward; // accrued, pull-pattern
+    mapping(address => address)  public referrer;
+    mapping(address => uint256)  public pendingReferralReward;
     mapping(address => uint128)  public savingsGoal;
-    mapping(address => uint256)  public totalRewardsClaimed;   // lifetime rewards received per user
+    mapping(address => uint256)  public totalRewardsClaimed;
 
     address[] public depositors;
 
@@ -90,6 +94,8 @@ contract Kibo {
     event GoalReached(address indexed user, uint128 totalDeposited);
     event BadgeEarned(address indexed user, Badge badge);
     event RewardTiersUpdated(uint256 t1, uint256 t2, uint256 t3, uint256 t4);
+    event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     // ── Modifiers ────────────────────────────────────────────────
 
@@ -112,12 +118,22 @@ contract Kibo {
     function pause() external onlyOwner { paused = true; }
     function unpause() external onlyOwner { paused = false; }
 
+    // 2-step ownership transfer — prevents accidental loss of contract control
     function transferOwnership(address newOwner) external onlyOwner {
         if (newOwner == address(0)) revert InvalidAddress();
-        owner = newOwner;
+        pendingOwner = newOwner;
+        emit OwnershipTransferStarted(owner, newOwner);
+    }
+
+    function acceptOwnership() external {
+        if (msg.sender != pendingOwner) revert Unauthorized();
+        emit OwnershipTransferred(owner, msg.sender);
+        owner = msg.sender;
+        pendingOwner = address(0);
     }
 
     function setRewardTiers(uint256 t1, uint256 t2, uint256 t3, uint256 t4) external onlyOwner {
+        if (t1 == 0 || t2 <= t1 || t3 <= t2 || t4 <= t3) revert InvalidTiers();
         rewardTier1 = t1; rewardTier2 = t2; rewardTier3 = t3; rewardTier4 = t4;
         emit RewardTiersUpdated(t1, t2, t3, t4);
     }
@@ -135,7 +151,7 @@ contract Kibo {
     // ── Deposit ──────────────────────────────────────────────────
 
     // ref = referrer address; pass address(0) if none.
-    // Referrer is locked on first deposit and cannot change.
+    // Referrer locked on first deposit and cannot change.
     function deposit(uint256 amount, address ref) external notPaused {
         if (amount < MIN_DEPOSIT || amount > MAX_DEPOSIT) revert AmountOutOfRange();
 
@@ -143,33 +159,60 @@ contract Kibo {
         uint40 ts = uint40(block.timestamp);
         if (ts < u.lastDeposit + COOLDOWN) revert TooSoon();
 
+        bool isFirst = !u.isDepositor;
+
         // Register referrer on very first deposit.
         // Block self-referral and circular referral (A→B→A).
-        if (!u.isDepositor && ref != address(0) && ref != msg.sender
+        if (isFirst && ref != address(0) && ref != msg.sender
             && referrer[ref] != msg.sender) {
             referrer[msg.sender] = ref;
         }
 
         if (!cUSD.transferFrom(msg.sender, address(this), amount)) revert TransferFailed();
         _processDeposit(msg.sender, amount, ts);
-        emit Deposited(msg.sender, users[msg.sender].streak, ts);
+
+        // Accrue referral reward on first deposit — 5% of deposit from pool (pull pattern).
+        // Silently skips if pool is insufficient rather than reverting.
+        if (isFirst) {
+            address r = referrer[msg.sender];
+            uint256 refBps = referralRewardBps;
+            if (r != address(0) && refBps > 0) {
+                uint256 refAmount = (amount * refBps) / 10_000;
+                if (poolFunds >= refAmount) {
+                    unchecked { poolFunds -= refAmount; }
+                    unchecked { pendingReferralReward[r] += refAmount; }
+                    emit ReferralRewardAccrued(r, msg.sender, refAmount);
+                }
+            }
+        }
+
+        emit Deposited(msg.sender, u.streak, ts);
     }
 
-    // Anyone can deposit on behalf of a beneficiary (enables automation / scheduled bots)
+    // Anyone can deposit on behalf of a beneficiary (enables automation / scheduled bots).
+    // Cannot be used while beneficiary has a pending streak recovery — prevents griefing.
     function depositFor(address beneficiary, uint256 amount) external notPaused {
         if (beneficiary == address(0)) revert InvalidAddress();
         if (amount < MIN_DEPOSIT || amount > MAX_DEPOSIT) revert AmountOutOfRange();
 
+        UserData storage ub = users[beneficiary];
+        if (ub.brokenStreak > 0 && ub.streak == 0) revert RecoveryPending();
+
         uint40 ts = uint40(block.timestamp);
-        if (ts < users[beneficiary].lastDeposit + COOLDOWN) revert TooSoon();
+        if (ts < ub.lastDeposit + COOLDOWN) revert TooSoon();
 
         if (!cUSD.transferFrom(msg.sender, address(this), amount)) revert TransferFailed();
         _processDeposit(beneficiary, amount, ts);
-        emit DepositedFor(msg.sender, beneficiary, users[beneficiary].streak, ts);
+        emit DepositedFor(msg.sender, beneficiary, ub.streak, ts);
     }
 
     function _processDeposit(address user, uint256 amount, uint40 ts) internal {
         UserData storage u = users[user];
+
+        // Auto-route 0.5% to reward pool; user's balance tracks net amount
+        uint256 fee = (amount * POOL_FEE_BPS) / 10_000;
+        unchecked { poolFunds += fee; }
+        uint256 net = amount - fee;
 
         // Missed a day — shield absorbs the break if available
         if (u.lastDeposit != 0 && ts > u.lastDeposit + 48 hours) {
@@ -177,7 +220,7 @@ contract Kibo {
                 unchecked { u.shields--; }
                 emit ShieldUsed(user, u.streak, u.shields);
             } else {
-                u.brokenStreak = u.streak; // save for potential recovery
+                u.brokenStreak = u.streak;
                 emit StreakBroken(user, u.streak);
                 u.streak = 0;
             }
@@ -193,7 +236,7 @@ contract Kibo {
 
         unchecked { u.streak++; }
         u.lastDeposit = ts;
-        u.totalDeposited += uint128(amount);
+        u.totalDeposited += uint128(net);
 
         if (u.streak > u.longestStreak) {
             u.longestStreak = u.streak;
@@ -205,7 +248,6 @@ contract Kibo {
             depositors.push(user);
         }
 
-        // Fire goal event when target first crossed
         uint128 goal = savingsGoal[user];
         if (goal > 0 && u.totalDeposited >= goal) {
             savingsGoal[user] = 0;
@@ -217,42 +259,28 @@ contract Kibo {
 
     function claimReward() external notPaused {
         UserData storage u = users[msg.sender];
-        if (u.streak < STREAK_THRESHOLD || u.streak % STREAK_THRESHOLD != 0) revert NeedMilestone();
-        if (u.streak <= u.lastClaimedStreak) revert AlreadyClaimed();
+        uint32 streak = u.streak; // cache to avoid multiple SLOADs
+        if (streak < STREAK_THRESHOLD || streak % STREAK_THRESHOLD != 0) revert NeedMilestone();
+        if (streak <= u.lastClaimedStreak) revert AlreadyClaimed();
 
-        uint256 reward = _rewardAmount(u.streak);
-
-        bool isFirstClaim = u.lastClaimedStreak == 0;
-
-        // Pre-calculate referral amount so we can reserve pool funds atomically
-        address ref = referrer[msg.sender];
-        uint256 refAmount = 0;
-        if (isFirstClaim && ref != address(0) && referralRewardBps > 0) {
-            refAmount = (reward * referralRewardBps) / 10_000;
-        }
-
-        // Single pool check covering reward + referral bonus
-        if (poolFunds < reward + refAmount) revert PoolEmpty();
+        uint256 reward = _rewardAmount(streak);
+        if (poolFunds < reward) revert PoolEmpty();
 
         // CEI: all state updates before external calls
-        u.lastClaimedStreak = uint32(u.streak);
+        u.lastClaimedStreak = streak;
         if (u.shields < MAX_SHIELDS) { unchecked { u.shields++; } }
-        unchecked { poolFunds -= reward + refAmount; }
+        unchecked { poolFunds -= reward; }
         unchecked { totalRewardsClaimed[msg.sender] += reward; }
 
-        if (refAmount > 0) {
-            unchecked { pendingReferralReward[ref] += refAmount; }
-            emit ReferralRewardAccrued(ref, msg.sender, refAmount);
-        }
-
         if (!cUSD.transfer(msg.sender, reward)) revert TransferFailed();
-        emit RewardClaimed(msg.sender, u.streak, reward);
+        emit RewardClaimed(msg.sender, streak, reward);
     }
 
     // ── Streak recovery ──────────────────────────────────────────
 
-    // Restore a broken streak by paying fee = brokenStreak × MIN_DEPOSIT (capped at MAX_RECOVERY_FEE).
+    // Restore broken streak by paying fee = brokenStreak × MIN_DEPOSIT (capped at MAX_RECOVERY_FEE).
     // Only available while current streak is 0 (before starting a new streak after the break).
+    // Recovery fee goes entirely to the pool — not counted as user deposit.
     function recoverStreak() external notPaused {
         UserData storage u = users[msg.sender];
         if (u.brokenStreak == 0 || u.streak > 0) revert NoStreakToRecover();
@@ -265,7 +293,6 @@ contract Kibo {
 
         u.streak = recovered;
         u.brokenStreak = 0;
-        u.totalDeposited += uint128(fee);
         unchecked { poolFunds += fee; }
 
         emit StreakRecovered(msg.sender, recovered, fee);
@@ -286,22 +313,23 @@ contract Kibo {
         bool isCommittedSaver = u.lastClaimedStreak > 0 && uint256(amount) > earned;
 
         uint256 penaltyBps = isCommittedSaver
-            ? withdrawalPenaltyBps / 5   // 1% (1/5 of default 5%)
-            : withdrawalPenaltyBps;       // 5% full penalty
+            ? withdrawalPenaltyBps / 5
+            : withdrawalPenaltyBps;
 
         uint256 penalty = (uint256(amount) * penaltyBps) / 10_000;
         uint256 payout  = uint256(amount) - penalty;
 
-        // CEI
+        // CEI — full state reset including longestStreak so badges re-earn on return
         u.totalDeposited    = 0;
         u.streak            = 0;
+        u.longestStreak     = 0;
         u.lastDeposit       = 0;
         u.shields           = 0;
         u.lastClaimedStreak = 0;
         u.brokenStreak      = 0;
         totalRewardsClaimed[msg.sender] = 0;
 
-        if (penalty > 0) unchecked { poolFunds += penalty; }
+        if (penalty > 0) { unchecked { poolFunds += penalty; } }
 
         if (!cUSD.transfer(msg.sender, payout)) revert TransferFailed();
         emit Withdrawn(msg.sender, payout, penalty);
@@ -335,22 +363,22 @@ contract Kibo {
 
     function _rewardAmount(uint32 streak) internal view returns (uint256) {
         if (streak >= 49) return rewardTier4;
-        if (streak >= 30) return rewardTier3;
+        if (streak >= 35) return rewardTier3;
         if (streak >= 14) return rewardTier2;
         return rewardTier1;
     }
 
     function _getBadge(uint32 longest) internal pure returns (Badge) {
         if (longest >= 365) return Badge.Diamond;
-        if (longest >= 100) return Badge.Gold;
-        if (longest >= 30)  return Badge.Silver;
-        if (longest >= 7)   return Badge.Bronze;
+        if (longest >= 180) return Badge.Gold;
+        if (longest >= 90)  return Badge.Silver;
+        if (longest >= 30)  return Badge.Bronze;
         return Badge.None;
     }
 
     // Emits BadgeEarned only on exact threshold crossing (longestStreak is monotonic)
     function _checkBadge(address user, uint32 longest) internal {
-        if (longest == 7 || longest == 30 || longest == 100 || longest == 365) {
+        if (longest == 30 || longest == 90 || longest == 180 || longest == 365) {
             emit BadgeEarned(user, _getBadge(longest));
         }
     }
@@ -424,14 +452,20 @@ contract Kibo {
             unchecked { i++; }
         }
 
-        addrs   = new address[](count);
-        streaks = new uint256[](count);
-        totals  = new uint256[](count);
-        for (uint256 i; i < count;) {
-            addrs[i]   = a[i];
-            streaks[i] = s[i];
-            totals[i]  = t[i];
-            unchecked { i++; }
+        if (count == scope) {
+            addrs   = a;
+            streaks = s;
+            totals  = t;
+        } else {
+            addrs   = new address[](count);
+            streaks = new uint256[](count);
+            totals  = new uint256[](count);
+            for (uint256 i; i < count;) {
+                addrs[i]   = a[i];
+                streaks[i] = s[i];
+                totals[i]  = t[i];
+                unchecked { i++; }
+            }
         }
     }
 

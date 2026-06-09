@@ -28,37 +28,79 @@ export interface KiboInterface extends Interface {
     nameOrSignature:
       | "COOLDOWN"
       | "MAX_DEPOSIT"
+      | "MAX_RECOVERY_FEE"
       | "MAX_SHIELDS"
       | "MIN_DEPOSIT"
-      | "REWARD_TIER1"
-      | "REWARD_TIER2"
-      | "REWARD_TIER3"
+      | "POOL_FEE_BPS"
+      | "PRECISION_WINDOW"
       | "STREAK_THRESHOLD"
+      | "acceptOwnership"
       | "cUSD"
+      | "claimReferralReward"
       | "claimReward"
       | "deposit"
+      | "depositFor"
       | "depositors"
       | "fundPool"
+      | "getBadge"
       | "getLeaderboard"
       | "getUser"
+      | "owner"
+      | "pause"
+      | "paused"
+      | "pendingOwner"
+      | "pendingReferralReward"
       | "poolBalance"
+      | "poolFunds"
+      | "recoverStreak"
+      | "referralRewardBps"
+      | "referrer"
+      | "rewardTier1"
+      | "rewardTier2"
+      | "rewardTier3"
+      | "rewardTier4"
+      | "savingsGoal"
+      | "setGoal"
+      | "setReferralRewardBps"
+      | "setRewardTiers"
+      | "setWithdrawalPenaltyBps"
       | "totalDepositors"
+      | "totalRewardsClaimed"
+      | "transferOwnership"
+      | "unpause"
       | "users"
       | "withdraw"
+      | "withdrawalPenaltyBps"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
+      | "BadgeEarned"
       | "Deposited"
+      | "DepositedFor"
+      | "GoalReached"
+      | "GoalSet"
+      | "OwnershipTransferStarted"
+      | "OwnershipTransferred"
       | "PoolFunded"
+      | "PrecisionShield"
+      | "ReferralRewardAccrued"
+      | "ReferralRewardClaimed"
       | "RewardClaimed"
+      | "RewardTiersUpdated"
       | "ShieldUsed"
       | "StreakBroken"
+      | "StreakRecovered"
+      | "Withdrawn"
   ): EventFragment;
 
   encodeFunctionData(functionFragment: "COOLDOWN", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "MAX_DEPOSIT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MAX_RECOVERY_FEE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -70,29 +112,37 @@ export interface KiboInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "REWARD_TIER1",
+    functionFragment: "POOL_FEE_BPS",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "REWARD_TIER2",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "REWARD_TIER3",
+    functionFragment: "PRECISION_WINDOW",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "STREAK_THRESHOLD",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "acceptOwnership",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "cUSD", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "claimReferralReward",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "claimReward",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
-    values: [BigNumberish]
+    values: [BigNumberish, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "depositFor",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositors",
@@ -103,6 +153,10 @@ export interface KiboInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getBadge",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getLeaderboard",
     values: [BigNumberish]
   ): string;
@@ -110,20 +164,97 @@ export interface KiboInterface extends Interface {
     functionFragment: "getUser",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "pendingOwner",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "pendingReferralReward",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "poolBalance",
     values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "poolFunds", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "recoverStreak",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "referralRewardBps",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "referrer",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rewardTier1",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rewardTier2",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rewardTier3",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rewardTier4",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "savingsGoal",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setGoal",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setReferralRewardBps",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setRewardTiers",
+    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setWithdrawalPenaltyBps",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "totalDepositors",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "totalRewardsClaimed",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferOwnership",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(functionFragment: "users", values: [AddressLike]): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "withdrawalPenaltyBps",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(functionFragment: "COOLDOWN", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "MAX_DEPOSIT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "MAX_RECOVERY_FEE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -135,44 +266,130 @@ export interface KiboInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "REWARD_TIER1",
+    functionFragment: "POOL_FEE_BPS",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "REWARD_TIER2",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "REWARD_TIER3",
+    functionFragment: "PRECISION_WINDOW",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "STREAK_THRESHOLD",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "acceptOwnership",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "cUSD", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimReferralReward",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "claimReward",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "depositFor", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "depositors", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "fundPool", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getBadge", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getLeaderboard",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getUser", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pendingOwner",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "pendingReferralReward",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "poolBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "poolFunds", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "recoverStreak",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "referralRewardBps",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "referrer", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardTier1",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardTier2",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardTier3",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardTier4",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "savingsGoal",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setGoal", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setReferralRewardBps",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setRewardTiers",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setWithdrawalPenaltyBps",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "totalDepositors",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalRewardsClaimed",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "users", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawalPenaltyBps",
+    data: BytesLike
+  ): Result;
+}
+
+export namespace BadgeEarnedEvent {
+  export type InputTuple = [user: AddressLike, badge: BigNumberish];
+  export type OutputTuple = [user: string, badge: bigint];
+  export interface OutputObject {
+    user: string;
+    badge: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace DepositedEvent {
@@ -193,11 +410,132 @@ export namespace DepositedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace DepositedForEvent {
+  export type InputTuple = [
+    payer: AddressLike,
+    beneficiary: AddressLike,
+    streak: BigNumberish,
+    timestamp: BigNumberish
+  ];
+  export type OutputTuple = [
+    payer: string,
+    beneficiary: string,
+    streak: bigint,
+    timestamp: bigint
+  ];
+  export interface OutputObject {
+    payer: string;
+    beneficiary: string;
+    streak: bigint;
+    timestamp: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GoalReachedEvent {
+  export type InputTuple = [user: AddressLike, totalDeposited: BigNumberish];
+  export type OutputTuple = [user: string, totalDeposited: bigint];
+  export interface OutputObject {
+    user: string;
+    totalDeposited: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GoalSetEvent {
+  export type InputTuple = [user: AddressLike, target: BigNumberish];
+  export type OutputTuple = [user: string, target: bigint];
+  export interface OutputObject {
+    user: string;
+    target: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OwnershipTransferStartedEvent {
+  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+  export type OutputTuple = [previousOwner: string, newOwner: string];
+  export interface OutputObject {
+    previousOwner: string;
+    newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OwnershipTransferredEvent {
+  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+  export type OutputTuple = [previousOwner: string, newOwner: string];
+  export interface OutputObject {
+    previousOwner: string;
+    newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace PoolFundedEvent {
   export type InputTuple = [funder: AddressLike, amount: BigNumberish];
   export type OutputTuple = [funder: string, amount: bigint];
   export interface OutputObject {
     funder: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace PrecisionShieldEvent {
+  export type InputTuple = [user: AddressLike, shields: BigNumberish];
+  export type OutputTuple = [user: string, shields: bigint];
+  export interface OutputObject {
+    user: string;
+    shields: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ReferralRewardAccruedEvent {
+  export type InputTuple = [
+    ref: AddressLike,
+    referee: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [ref: string, referee: string, amount: bigint];
+  export interface OutputObject {
+    ref: string;
+    referee: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ReferralRewardClaimedEvent {
+  export type InputTuple = [ref: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [ref: string, amount: bigint];
+  export interface OutputObject {
+    ref: string;
     amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -217,6 +555,26 @@ export namespace RewardClaimedEvent {
     user: string;
     streak: bigint;
     reward: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RewardTiersUpdatedEvent {
+  export type InputTuple = [
+    t1: BigNumberish,
+    t2: BigNumberish,
+    t3: BigNumberish,
+    t4: BigNumberish
+  ];
+  export type OutputTuple = [t1: bigint, t2: bigint, t3: bigint, t4: bigint];
+  export interface OutputObject {
+    t1: bigint;
+    t2: bigint;
+    t3: bigint;
+    t4: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -248,6 +606,42 @@ export namespace StreakBrokenEvent {
   export interface OutputObject {
     user: string;
     oldStreak: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace StreakRecoveredEvent {
+  export type InputTuple = [
+    user: AddressLike,
+    streak: BigNumberish,
+    fee: BigNumberish
+  ];
+  export type OutputTuple = [user: string, streak: bigint, fee: bigint];
+  export interface OutputObject {
+    user: string;
+    streak: bigint;
+    fee: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace WithdrawnEvent {
+  export type InputTuple = [
+    user: AddressLike,
+    payout: BigNumberish,
+    penalty: BigNumberish
+  ];
+  export type OutputTuple = [user: string, payout: bigint, penalty: bigint];
+  export interface OutputObject {
+    user: string;
+    payout: bigint;
+    penalty: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -302,27 +696,43 @@ export interface Kibo extends BaseContract {
 
   MAX_DEPOSIT: TypedContractMethod<[], [bigint], "view">;
 
+  MAX_RECOVERY_FEE: TypedContractMethod<[], [bigint], "view">;
+
   MAX_SHIELDS: TypedContractMethod<[], [bigint], "view">;
 
   MIN_DEPOSIT: TypedContractMethod<[], [bigint], "view">;
 
-  REWARD_TIER1: TypedContractMethod<[], [bigint], "view">;
+  POOL_FEE_BPS: TypedContractMethod<[], [bigint], "view">;
 
-  REWARD_TIER2: TypedContractMethod<[], [bigint], "view">;
-
-  REWARD_TIER3: TypedContractMethod<[], [bigint], "view">;
+  PRECISION_WINDOW: TypedContractMethod<[], [bigint], "view">;
 
   STREAK_THRESHOLD: TypedContractMethod<[], [bigint], "view">;
 
+  acceptOwnership: TypedContractMethod<[], [void], "nonpayable">;
+
   cUSD: TypedContractMethod<[], [string], "view">;
+
+  claimReferralReward: TypedContractMethod<[], [void], "nonpayable">;
 
   claimReward: TypedContractMethod<[], [void], "nonpayable">;
 
-  deposit: TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
+  deposit: TypedContractMethod<
+    [amount: BigNumberish, ref: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  depositFor: TypedContractMethod<
+    [beneficiary: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   depositors: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
 
   fundPool: TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
+
+  getBadge: TypedContractMethod<[user: AddressLike], [bigint], "view">;
 
   getLeaderboard: TypedContractMethod<
     [limit: BigNumberish],
@@ -339,7 +749,18 @@ export interface Kibo extends BaseContract {
   getUser: TypedContractMethod<
     [user: AddressLike],
     [
-      [bigint, bigint, bigint, bigint, boolean, bigint, bigint] & {
+      [
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        boolean,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint
+      ] & {
         streak: bigint;
         lastDeposit: bigint;
         totalDeposited: bigint;
@@ -347,22 +768,92 @@ export interface Kibo extends BaseContract {
         canDeposit: boolean;
         lastClaimedStreak: bigint;
         shields: bigint;
+        brokenStreak: bigint;
+        badge: bigint;
+        rewardsClaimed: bigint;
       }
     ],
     "view"
   >;
 
+  owner: TypedContractMethod<[], [string], "view">;
+
+  pause: TypedContractMethod<[], [void], "nonpayable">;
+
+  paused: TypedContractMethod<[], [boolean], "view">;
+
+  pendingOwner: TypedContractMethod<[], [string], "view">;
+
+  pendingReferralReward: TypedContractMethod<
+    [arg0: AddressLike],
+    [bigint],
+    "view"
+  >;
+
   poolBalance: TypedContractMethod<[], [bigint], "view">;
 
+  poolFunds: TypedContractMethod<[], [bigint], "view">;
+
+  recoverStreak: TypedContractMethod<[], [void], "nonpayable">;
+
+  referralRewardBps: TypedContractMethod<[], [bigint], "view">;
+
+  referrer: TypedContractMethod<[arg0: AddressLike], [string], "view">;
+
+  rewardTier1: TypedContractMethod<[], [bigint], "view">;
+
+  rewardTier2: TypedContractMethod<[], [bigint], "view">;
+
+  rewardTier3: TypedContractMethod<[], [bigint], "view">;
+
+  rewardTier4: TypedContractMethod<[], [bigint], "view">;
+
+  savingsGoal: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  setGoal: TypedContractMethod<[target: BigNumberish], [void], "nonpayable">;
+
+  setReferralRewardBps: TypedContractMethod<
+    [bps: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setRewardTiers: TypedContractMethod<
+    [t1: BigNumberish, t2: BigNumberish, t3: BigNumberish, t4: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setWithdrawalPenaltyBps: TypedContractMethod<
+    [bps: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   totalDepositors: TypedContractMethod<[], [bigint], "view">;
+
+  totalRewardsClaimed: TypedContractMethod<
+    [arg0: AddressLike],
+    [bigint],
+    "view"
+  >;
+
+  transferOwnership: TypedContractMethod<
+    [newOwner: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  unpause: TypedContractMethod<[], [void], "nonpayable">;
 
   users: TypedContractMethod<
     [arg0: AddressLike],
     [
-      [bigint, bigint, bigint, bigint, boolean, bigint, bigint] & {
+      [bigint, bigint, bigint, bigint, bigint, boolean, bigint, bigint] & {
         streak: bigint;
         longestStreak: bigint;
         lastClaimedStreak: bigint;
+        brokenStreak: bigint;
         lastDeposit: bigint;
         isDepositor: boolean;
         shields: bigint;
@@ -373,6 +864,8 @@ export interface Kibo extends BaseContract {
   >;
 
   withdraw: TypedContractMethod<[], [void], "nonpayable">;
+
+  withdrawalPenaltyBps: TypedContractMethod<[], [bigint], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
@@ -385,38 +878,58 @@ export interface Kibo extends BaseContract {
     nameOrSignature: "MAX_DEPOSIT"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "MAX_RECOVERY_FEE"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "MAX_SHIELDS"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "MIN_DEPOSIT"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "REWARD_TIER1"
+    nameOrSignature: "POOL_FEE_BPS"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "REWARD_TIER2"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "REWARD_TIER3"
+    nameOrSignature: "PRECISION_WINDOW"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "STREAK_THRESHOLD"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "acceptOwnership"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "cUSD"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "claimReferralReward"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "claimReward"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "deposit"
-  ): TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
+  ): TypedContractMethod<
+    [amount: BigNumberish, ref: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "depositFor"
+  ): TypedContractMethod<
+    [beneficiary: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "depositors"
   ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
   getFunction(
     nameOrSignature: "fundPool"
   ): TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "getBadge"
+  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "getLeaderboard"
   ): TypedContractMethod<
@@ -435,7 +948,18 @@ export interface Kibo extends BaseContract {
   ): TypedContractMethod<
     [user: AddressLike],
     [
-      [bigint, bigint, bigint, bigint, boolean, bigint, bigint] & {
+      [
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        boolean,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint
+      ] & {
         streak: bigint;
         lastDeposit: bigint;
         totalDeposited: bigint;
@@ -443,25 +967,96 @@ export interface Kibo extends BaseContract {
         canDeposit: boolean;
         lastClaimedStreak: bigint;
         shields: bigint;
+        brokenStreak: bigint;
+        badge: bigint;
+        rewardsClaimed: bigint;
       }
     ],
     "view"
   >;
   getFunction(
+    nameOrSignature: "owner"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "pause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "paused"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "pendingOwner"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "pendingReferralReward"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "poolBalance"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "poolFunds"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "recoverStreak"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "referralRewardBps"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "referrer"
+  ): TypedContractMethod<[arg0: AddressLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "rewardTier1"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "rewardTier2"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "rewardTier3"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "rewardTier4"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "savingsGoal"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "setGoal"
+  ): TypedContractMethod<[target: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setReferralRewardBps"
+  ): TypedContractMethod<[bps: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setRewardTiers"
+  ): TypedContractMethod<
+    [t1: BigNumberish, t2: BigNumberish, t3: BigNumberish, t4: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setWithdrawalPenaltyBps"
+  ): TypedContractMethod<[bps: BigNumberish], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "totalDepositors"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "totalRewardsClaimed"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "transferOwnership"
+  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "unpause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "users"
   ): TypedContractMethod<
     [arg0: AddressLike],
     [
-      [bigint, bigint, bigint, bigint, boolean, bigint, bigint] & {
+      [bigint, bigint, bigint, bigint, bigint, boolean, bigint, bigint] & {
         streak: bigint;
         longestStreak: bigint;
         lastClaimedStreak: bigint;
+        brokenStreak: bigint;
         lastDeposit: bigint;
         isDepositor: boolean;
         shields: bigint;
@@ -473,13 +1068,58 @@ export interface Kibo extends BaseContract {
   getFunction(
     nameOrSignature: "withdraw"
   ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "withdrawalPenaltyBps"
+  ): TypedContractMethod<[], [bigint], "view">;
 
+  getEvent(
+    key: "BadgeEarned"
+  ): TypedContractEvent<
+    BadgeEarnedEvent.InputTuple,
+    BadgeEarnedEvent.OutputTuple,
+    BadgeEarnedEvent.OutputObject
+  >;
   getEvent(
     key: "Deposited"
   ): TypedContractEvent<
     DepositedEvent.InputTuple,
     DepositedEvent.OutputTuple,
     DepositedEvent.OutputObject
+  >;
+  getEvent(
+    key: "DepositedFor"
+  ): TypedContractEvent<
+    DepositedForEvent.InputTuple,
+    DepositedForEvent.OutputTuple,
+    DepositedForEvent.OutputObject
+  >;
+  getEvent(
+    key: "GoalReached"
+  ): TypedContractEvent<
+    GoalReachedEvent.InputTuple,
+    GoalReachedEvent.OutputTuple,
+    GoalReachedEvent.OutputObject
+  >;
+  getEvent(
+    key: "GoalSet"
+  ): TypedContractEvent<
+    GoalSetEvent.InputTuple,
+    GoalSetEvent.OutputTuple,
+    GoalSetEvent.OutputObject
+  >;
+  getEvent(
+    key: "OwnershipTransferStarted"
+  ): TypedContractEvent<
+    OwnershipTransferStartedEvent.InputTuple,
+    OwnershipTransferStartedEvent.OutputTuple,
+    OwnershipTransferStartedEvent.OutputObject
+  >;
+  getEvent(
+    key: "OwnershipTransferred"
+  ): TypedContractEvent<
+    OwnershipTransferredEvent.InputTuple,
+    OwnershipTransferredEvent.OutputTuple,
+    OwnershipTransferredEvent.OutputObject
   >;
   getEvent(
     key: "PoolFunded"
@@ -489,11 +1129,39 @@ export interface Kibo extends BaseContract {
     PoolFundedEvent.OutputObject
   >;
   getEvent(
+    key: "PrecisionShield"
+  ): TypedContractEvent<
+    PrecisionShieldEvent.InputTuple,
+    PrecisionShieldEvent.OutputTuple,
+    PrecisionShieldEvent.OutputObject
+  >;
+  getEvent(
+    key: "ReferralRewardAccrued"
+  ): TypedContractEvent<
+    ReferralRewardAccruedEvent.InputTuple,
+    ReferralRewardAccruedEvent.OutputTuple,
+    ReferralRewardAccruedEvent.OutputObject
+  >;
+  getEvent(
+    key: "ReferralRewardClaimed"
+  ): TypedContractEvent<
+    ReferralRewardClaimedEvent.InputTuple,
+    ReferralRewardClaimedEvent.OutputTuple,
+    ReferralRewardClaimedEvent.OutputObject
+  >;
+  getEvent(
     key: "RewardClaimed"
   ): TypedContractEvent<
     RewardClaimedEvent.InputTuple,
     RewardClaimedEvent.OutputTuple,
     RewardClaimedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RewardTiersUpdated"
+  ): TypedContractEvent<
+    RewardTiersUpdatedEvent.InputTuple,
+    RewardTiersUpdatedEvent.OutputTuple,
+    RewardTiersUpdatedEvent.OutputObject
   >;
   getEvent(
     key: "ShieldUsed"
@@ -509,8 +1177,33 @@ export interface Kibo extends BaseContract {
     StreakBrokenEvent.OutputTuple,
     StreakBrokenEvent.OutputObject
   >;
+  getEvent(
+    key: "StreakRecovered"
+  ): TypedContractEvent<
+    StreakRecoveredEvent.InputTuple,
+    StreakRecoveredEvent.OutputTuple,
+    StreakRecoveredEvent.OutputObject
+  >;
+  getEvent(
+    key: "Withdrawn"
+  ): TypedContractEvent<
+    WithdrawnEvent.InputTuple,
+    WithdrawnEvent.OutputTuple,
+    WithdrawnEvent.OutputObject
+  >;
 
   filters: {
+    "BadgeEarned(address,uint8)": TypedContractEvent<
+      BadgeEarnedEvent.InputTuple,
+      BadgeEarnedEvent.OutputTuple,
+      BadgeEarnedEvent.OutputObject
+    >;
+    BadgeEarned: TypedContractEvent<
+      BadgeEarnedEvent.InputTuple,
+      BadgeEarnedEvent.OutputTuple,
+      BadgeEarnedEvent.OutputObject
+    >;
+
     "Deposited(address,uint32,uint40)": TypedContractEvent<
       DepositedEvent.InputTuple,
       DepositedEvent.OutputTuple,
@@ -520,6 +1213,61 @@ export interface Kibo extends BaseContract {
       DepositedEvent.InputTuple,
       DepositedEvent.OutputTuple,
       DepositedEvent.OutputObject
+    >;
+
+    "DepositedFor(address,address,uint32,uint40)": TypedContractEvent<
+      DepositedForEvent.InputTuple,
+      DepositedForEvent.OutputTuple,
+      DepositedForEvent.OutputObject
+    >;
+    DepositedFor: TypedContractEvent<
+      DepositedForEvent.InputTuple,
+      DepositedForEvent.OutputTuple,
+      DepositedForEvent.OutputObject
+    >;
+
+    "GoalReached(address,uint128)": TypedContractEvent<
+      GoalReachedEvent.InputTuple,
+      GoalReachedEvent.OutputTuple,
+      GoalReachedEvent.OutputObject
+    >;
+    GoalReached: TypedContractEvent<
+      GoalReachedEvent.InputTuple,
+      GoalReachedEvent.OutputTuple,
+      GoalReachedEvent.OutputObject
+    >;
+
+    "GoalSet(address,uint128)": TypedContractEvent<
+      GoalSetEvent.InputTuple,
+      GoalSetEvent.OutputTuple,
+      GoalSetEvent.OutputObject
+    >;
+    GoalSet: TypedContractEvent<
+      GoalSetEvent.InputTuple,
+      GoalSetEvent.OutputTuple,
+      GoalSetEvent.OutputObject
+    >;
+
+    "OwnershipTransferStarted(address,address)": TypedContractEvent<
+      OwnershipTransferStartedEvent.InputTuple,
+      OwnershipTransferStartedEvent.OutputTuple,
+      OwnershipTransferStartedEvent.OutputObject
+    >;
+    OwnershipTransferStarted: TypedContractEvent<
+      OwnershipTransferStartedEvent.InputTuple,
+      OwnershipTransferStartedEvent.OutputTuple,
+      OwnershipTransferStartedEvent.OutputObject
+    >;
+
+    "OwnershipTransferred(address,address)": TypedContractEvent<
+      OwnershipTransferredEvent.InputTuple,
+      OwnershipTransferredEvent.OutputTuple,
+      OwnershipTransferredEvent.OutputObject
+    >;
+    OwnershipTransferred: TypedContractEvent<
+      OwnershipTransferredEvent.InputTuple,
+      OwnershipTransferredEvent.OutputTuple,
+      OwnershipTransferredEvent.OutputObject
     >;
 
     "PoolFunded(address,uint256)": TypedContractEvent<
@@ -533,6 +1281,39 @@ export interface Kibo extends BaseContract {
       PoolFundedEvent.OutputObject
     >;
 
+    "PrecisionShield(address,uint8)": TypedContractEvent<
+      PrecisionShieldEvent.InputTuple,
+      PrecisionShieldEvent.OutputTuple,
+      PrecisionShieldEvent.OutputObject
+    >;
+    PrecisionShield: TypedContractEvent<
+      PrecisionShieldEvent.InputTuple,
+      PrecisionShieldEvent.OutputTuple,
+      PrecisionShieldEvent.OutputObject
+    >;
+
+    "ReferralRewardAccrued(address,address,uint256)": TypedContractEvent<
+      ReferralRewardAccruedEvent.InputTuple,
+      ReferralRewardAccruedEvent.OutputTuple,
+      ReferralRewardAccruedEvent.OutputObject
+    >;
+    ReferralRewardAccrued: TypedContractEvent<
+      ReferralRewardAccruedEvent.InputTuple,
+      ReferralRewardAccruedEvent.OutputTuple,
+      ReferralRewardAccruedEvent.OutputObject
+    >;
+
+    "ReferralRewardClaimed(address,uint256)": TypedContractEvent<
+      ReferralRewardClaimedEvent.InputTuple,
+      ReferralRewardClaimedEvent.OutputTuple,
+      ReferralRewardClaimedEvent.OutputObject
+    >;
+    ReferralRewardClaimed: TypedContractEvent<
+      ReferralRewardClaimedEvent.InputTuple,
+      ReferralRewardClaimedEvent.OutputTuple,
+      ReferralRewardClaimedEvent.OutputObject
+    >;
+
     "RewardClaimed(address,uint32,uint256)": TypedContractEvent<
       RewardClaimedEvent.InputTuple,
       RewardClaimedEvent.OutputTuple,
@@ -542,6 +1323,17 @@ export interface Kibo extends BaseContract {
       RewardClaimedEvent.InputTuple,
       RewardClaimedEvent.OutputTuple,
       RewardClaimedEvent.OutputObject
+    >;
+
+    "RewardTiersUpdated(uint256,uint256,uint256,uint256)": TypedContractEvent<
+      RewardTiersUpdatedEvent.InputTuple,
+      RewardTiersUpdatedEvent.OutputTuple,
+      RewardTiersUpdatedEvent.OutputObject
+    >;
+    RewardTiersUpdated: TypedContractEvent<
+      RewardTiersUpdatedEvent.InputTuple,
+      RewardTiersUpdatedEvent.OutputTuple,
+      RewardTiersUpdatedEvent.OutputObject
     >;
 
     "ShieldUsed(address,uint32,uint8)": TypedContractEvent<
@@ -564,6 +1356,28 @@ export interface Kibo extends BaseContract {
       StreakBrokenEvent.InputTuple,
       StreakBrokenEvent.OutputTuple,
       StreakBrokenEvent.OutputObject
+    >;
+
+    "StreakRecovered(address,uint32,uint256)": TypedContractEvent<
+      StreakRecoveredEvent.InputTuple,
+      StreakRecoveredEvent.OutputTuple,
+      StreakRecoveredEvent.OutputObject
+    >;
+    StreakRecovered: TypedContractEvent<
+      StreakRecoveredEvent.InputTuple,
+      StreakRecoveredEvent.OutputTuple,
+      StreakRecoveredEvent.OutputObject
+    >;
+
+    "Withdrawn(address,uint256,uint256)": TypedContractEvent<
+      WithdrawnEvent.InputTuple,
+      WithdrawnEvent.OutputTuple,
+      WithdrawnEvent.OutputObject
+    >;
+    Withdrawn: TypedContractEvent<
+      WithdrawnEvent.InputTuple,
+      WithdrawnEvent.OutputTuple,
+      WithdrawnEvent.OutputObject
     >;
   };
 }

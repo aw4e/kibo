@@ -1,9 +1,9 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "C:\\Users\\awe\\Downloads\\Compressed\\Hackathon\\kibo\\packages\\hardhat\\contracts\\Kibo.sol": {
-      "lastModificationDate": 1780987918328,
-      "contentHash": "49d8eafafa9b2056e92ed38a50ca57ce",
+    "C:\\Users\\awe\\Downloads\\Compressed\\Hackathon\\kibo\\sc\\contracts\\Kibo.sol": {
+      "lastModificationDate": 1781019989240,
+      "contentHash": "ce5ceb1d78a7ec0230ab4b6864d0d7d2",
       "sourceName": "contracts/Kibo.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -12,6 +12,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {

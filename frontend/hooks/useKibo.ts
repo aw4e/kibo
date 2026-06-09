@@ -284,8 +284,8 @@ function parseContractError(e: unknown): string {
     if (msg.includes("AlreadyClaimed")) return "Reward already claimed for this streak.";
     if (msg.includes("NothingToWithdraw")) return "No balance to withdraw.";
     if (msg.includes("AmountOutOfRange")) return "Deposit amount out of range.";
-    if (msg.includes("StreakNotBroken")) return "No broken streak to recover.";
-    if (msg.includes("RecoveryFeeTooHigh")) return "Recovery fee too high.";
+    if (msg.includes("NoStreakToRecover")) return "No broken streak to recover.";
+    if (msg.includes("RecoveryPending")) return "Beneficiary has a pending streak recovery.";
     if (msg.includes("Paused")) return "Contract is paused. Try again later.";
     if (msg) return msg.slice(0, 120);
   }
