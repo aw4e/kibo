@@ -227,6 +227,30 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Streak Recovery */}
+            {!isLoading && brokenStreak > 0 && streak === 0 && (
+              <div className="section">
+                <div className="recovery-card">
+                  <div className="recovery-header">
+                    <span className="recovery-icon">💔</span>
+                    <div>
+                      <p className="recovery-title">Streak broken</p>
+                      <p className="recovery-sub">
+                        Pay {Math.min(brokenStreak * 0.01, 0.1).toFixed(3)} cUSD to restore your {brokenStreak}-day streak
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    className="btn-warning"
+                    onClick={recoverStreak}
+                    disabled={isTxLoading}
+                  >
+                    {isTxLoading ? "Processing…" : `Recover ${brokenStreak}-day streak`}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="section">
               <div className="btn-stack">
