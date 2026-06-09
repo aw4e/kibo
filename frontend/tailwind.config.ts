@@ -147,10 +147,9 @@ const config: Config = {
           "sans-serif",
         ],
         display: [
-          "var(--font-cormorant)",
-          "Georgia",
-          "Times New Roman",
-          "serif",
+          "var(--font-space-grotesk)",
+          "system-ui",
+          "sans-serif",
         ],
         serif: [
           "var(--font-cormorant)",
