@@ -136,18 +136,31 @@ const config: Config = {
       },
       maxWidth: {
         app: "480px",
+        content: "1280px",
       },
       fontFamily: {
         sans: [
-          "var(--font-space-grotesk)",
+          "var(--font-dm-sans)",
           "-apple-system",
           "BlinkMacSystemFont",
           "system-ui",
           "sans-serif",
         ],
+        display: [
+          "var(--font-cormorant)",
+          "Georgia",
+          "Times New Roman",
+          "serif",
+        ],
+        serif: [
+          "var(--font-cormorant)",
+          "Georgia",
+          "serif",
+        ],
         jakarta: [
-          "var(--font-plus-jakarta)",
-          "var(--font-space-grotesk)",
+          "var(--font-dm-sans)",
+          "-apple-system",
+          "system-ui",
           "sans-serif",
         ],
       },

@@ -97,20 +97,13 @@
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
-/* ── Desktop centering ────────────────────────────────────── */
-@media (min-width: 480px) {
-  html {
-    overflow-x: clip;
-  }
-  body {
-    background: #ECEAE6;
-    overflow-x: clip;
-  }
-  .app-shell {
-    border-left: 3px solid #09090B;
-    border-right: 3px solid #09090B;
-    box-shadow: 8px 8px 0 #09090B;
-  }
+/* ── Web layout ───────────────────────────────────────────── */
+html {
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {
