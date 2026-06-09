@@ -5,24 +5,20 @@ import { injected } from "wagmi/connectors";
 import { useKibo } from "../hooks/useKibo";
 import { formatUnits, parseUnits } from "viem";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardRow } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, X, Copy, Check } from "lucide-react";
+import { AlertCircle, X, Copy, Check, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BADGE_LABEL = ["—", "Bronze", "Silver", "Gold", "Diamond"] as const;
-const BADGE_COLOR = [
-  "",
-  "bg-[#CD7F32]",
-  "bg-[#C0C0C0]",
-  "bg-[#FFD700]",
-  "bg-[#B9F2FF]",
-] as const;
+const BADGE_BG    = ["", "bg-[#FDE68A]", "bg-[#E5E7EB]", "bg-[#FDE68A]", "bg-[#BAE6FD]"] as const;
+const BADGE_EMOJI = ["", "🥉", "🥈", "🥇", "💎"] as const;
 
-const R = 54;
+const R = 52;
 const CIRCUMFERENCE = 2 * Math.PI * R;
 
 function formatCountdown(ms: number): string | null {
@@ -40,7 +36,7 @@ function StreakRing({ streak }: { streak: number }) {
   const isComplete = streak > 0 && streak % milestone === 0;
 
   return (
-    <div className="relative w-[180px] h-[180px]">
+    <div className="relative w-[176px] h-[176px]">
       <svg className="ring-svg absolute inset-0" viewBox="0 0 120 120" aria-hidden="true">
         <circle className="ring-track" cx="60" cy="60" r={R} />
         <circle
@@ -50,14 +46,16 @@ function StreakRing({ streak }: { streak: number }) {
           strokeDashoffset={offset}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-[2px]">
-        <span className="text-[1.5rem] leading-none animate-flame-pulse" role="img" aria-label="fire">🔥</span>
-        <span className="font-black text-[3.25rem] tracking-[-0.06em] tabular-nums leading-none text-white"
-              style={{ textShadow: "2px 2px 0 rgba(0,0,0,0.3)" }}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-[1.375rem] leading-none animate-flame-pulse mb-1">🔥</span>
+        <span
+          className="font-black text-[3rem] tracking-[-0.06em] tabular-nums leading-none text-white"
+          style={{ textShadow: "2px 2px 0 rgba(0,0,0,0.25)" }}
+        >
           {streak}
         </span>
-        <span className="text-[0.65rem] font-black uppercase tracking-[0.16em] text-white/60">
-          days
+        <span className="text-[0.625rem] font-black uppercase tracking-[0.18em] text-white/55 mt-0.5">
+          day streak
         </span>
       </div>
     </div>
@@ -69,19 +67,19 @@ function SkeletonRow() {
     <CardRow>
       <div className="flex items-center gap-3">
         <span className="skeleton w-[32px] h-[32px] rounded-lg" />
-        <span className="skeleton w-[100px] h-[14px]" />
+        <span className="skeleton w-[96px] h-[13px]" />
       </div>
-      <span className="skeleton w-[70px] h-[14px]" />
+      <span className="skeleton w-[64px] h-[13px]" />
     </CardRow>
   );
 }
 
-function RowIcon({ children, color }: { children: string; color: string }) {
+function RowIcon({ children, bg = "bg-[#F3F4F6]" }: { children: string; bg?: string }) {
   return (
     <span className={cn(
       "w-[32px] h-[32px] rounded-lg flex items-center justify-center text-base flex-shrink-0",
       "border-[1.5px] border-[#09090B] shadow-[1.5px_1.5px_0_#09090B]",
-      color
+      bg
     )}>
       {children}
     </span>
@@ -90,9 +88,9 @@ function RowIcon({ children, color }: { children: string; color: string }) {
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <div className="flex items-center gap-2 mb-2 px-1">
-      <div className="w-2.5 h-2.5 bg-[#FFE500] rounded-sm border border-[#09090B] flex-shrink-0" />
-      <p className="text-[0.6875rem] font-black uppercase tracking-[0.14em] text-[#09090B]">
+    <div className="flex items-center gap-2 mb-2.5 px-1">
+      <div className="w-2 h-2 bg-[#FFE500] rounded-[3px] border border-[#09090B] flex-shrink-0" />
+      <p className="text-[0.6875rem] font-black uppercase tracking-[0.14em] text-[#09090B]/70">
         {children}
       </p>
     </div>
@@ -149,113 +147,150 @@ export default function Home() {
     depositFor,
   } = useKibo();
 
-  const countdown = formatCountdown(nextDepositIn);
-  const savedAmount = parseFloat(formatUnits(totalDeposited, 18));
-  const balanceAmount = cUSDBalance
-    ? parseFloat(formatUnits(cUSDBalance, 18)).toFixed(2)
-    : "—";
-  const goalPct =
-    savingsGoal > BigInt(0)
-      ? Math.min(100, Number((totalDeposited * BigInt(100)) / savingsGoal))
-      : 0;
+  const countdown     = formatCountdown(nextDepositIn);
+  const savedAmount   = parseFloat(formatUnits(totalDeposited, 18));
+  const balanceAmount = cUSDBalance ? parseFloat(formatUnits(cUSDBalance, 18)).toFixed(2) : "—";
+  const goalPct       = savingsGoal > BigInt(0)
+    ? Math.min(100, Number((totalDeposited * BigInt(100)) / savingsGoal))
+    : 0;
 
-  /* ── CONNECT PAGE ──────────────────────────────────────────────── */
+  /* ── CONNECT PAGE ────────────────────────────────────────── */
   if (!isConnected) {
     return (
-      <div className="relative min-h-dvh bg-[#0B0614] overflow-hidden flex flex-col items-center justify-center px-6 py-12">
-        {/* Gradient orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute top-[-15%] left-[-10%] w-[55vw] h-[55vw] max-w-[380px] max-h-[380px] rounded-full bg-violet-600/30 blur-[90px]" />
-          <div className="absolute top-[25%] right-[-12%] w-[48vw] h-[48vw] max-w-[340px] max-h-[340px] rounded-full bg-blue-500/25 blur-[80px]" />
-          <div className="absolute bottom-[-8%] left-[15%] w-[42vw] h-[42vw] max-w-[300px] max-h-[300px] rounded-full bg-purple-600/20 blur-[80px]" />
-          <div className="absolute top-[55%] left-[-5%] w-[30vw] h-[30vw] max-w-[200px] max-h-[200px] rounded-full bg-indigo-400/15 blur-[60px]" />
+      <div className="relative min-h-dvh bg-[#0B0614] overflow-hidden flex flex-col">
+
+        {/* Gradient mesh */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          <div className="absolute top-[-20%] left-[-15%] w-[70vw] h-[70vw] max-w-[500px] max-h-[500px] rounded-full bg-violet-700/35 blur-[100px]" />
+          <div className="absolute top-[30%] right-[-15%] w-[55vw] h-[55vw] max-w-[400px] max-h-[400px] rounded-full bg-blue-600/25 blur-[90px]" />
+          <div className="absolute bottom-[-10%] left-[10%] w-[50vw] h-[50vw] max-w-[360px] max-h-[360px] rounded-full bg-indigo-500/20 blur-[80px]" />
+          {/* Fine grid overlay */}
+          <div className="absolute inset-0 opacity-[0.04]"
+               style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         </div>
 
-        {/* Floating Web3 icons */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
-          <span className="absolute top-[10%] left-[7%]  text-3xl animate-float"        style={{ animationDelay: "0s" }}>💰</span>
-          <span className="absolute top-[15%] right-[8%] text-2xl animate-spin-slow"    style={{ animationDelay: "0s" }}>🪙</span>
-          <span className="absolute top-[36%] left-[5%]  text-xl  animate-sparkle"      style={{ animationDelay: "1.5s" }}>✦</span>
-          <span className="absolute top-[56%] right-[6%] text-3xl animate-float"        style={{ animationDelay: "0.7s" }}>💎</span>
-          <span className="absolute bottom-[26%] left-[9%] text-2xl animate-float-sm"   style={{ animationDelay: "2s" }}>🔗</span>
-          <span className="absolute bottom-[14%] right-[13%] text-2xl animate-sparkle"  style={{ animationDelay: "0.4s" }}>⭐</span>
-          <span className="absolute top-[50%] right-[4%]  text-xl  animate-float-sm"    style={{ animationDelay: "2.8s" }}>◈</span>
-          <span className="absolute top-[7%]   right-[25%] text-xl  animate-sparkle"    style={{ animationDelay: "1.1s" }}>✨</span>
-          <span className="absolute bottom-[40%] right-[18%] text-xl animate-float"     style={{ animationDelay: "3.2s" }}>◆</span>
-          <span className="absolute bottom-[55%] left-[18%] text-lg animate-spin-slow-r" style={{ animationDelay: "0s" }}>⬡</span>
+        {/* Floating ambient icons */}
+        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+          <span className="absolute top-[9%]  left-[6%]   text-2xl opacity-50 animate-float"         style={{ animationDelay: "0s" }}>💰</span>
+          <span className="absolute top-[14%] right-[7%]  text-xl  opacity-40 animate-spin-slow"     style={{ animationDelay: "0s" }}>🪙</span>
+          <span className="absolute top-[38%] left-[4%]   text-lg  opacity-35 animate-sparkle"       style={{ animationDelay: "1.5s" }}>✦</span>
+          <span className="absolute top-[54%] right-[5%]  text-2xl opacity-45 animate-float"         style={{ animationDelay: "0.8s" }}>💎</span>
+          <span className="absolute bottom-[28%] left-[7%] text-xl opacity-35 animate-float-sm"      style={{ animationDelay: "2.1s" }}>🔗</span>
+          <span className="absolute bottom-[16%] right-[11%] text-xl opacity-40 animate-sparkle"     style={{ animationDelay: "0.3s" }}>⭐</span>
+          <span className="absolute top-[48%] right-[3%]  text-base opacity-30 animate-float-sm"     style={{ animationDelay: "2.9s" }}>◈</span>
+          <span className="absolute top-[6%]  right-[24%] text-base opacity-30 animate-sparkle"      style={{ animationDelay: "1.2s" }}>✨</span>
+          <span className="absolute bottom-[42%] right-[17%] text-base opacity-25 animate-float"     style={{ animationDelay: "3.4s" }}>◆</span>
+          <span className="absolute bottom-[58%] left-[17%] text-base opacity-20 animate-spin-slow-r" style={{ animationDelay: "0s" }}>⬡</span>
         </div>
 
-        {/* Main content */}
-        <div className="relative z-10 flex flex-col items-center text-center w-full max-w-sm">
-          {/* Logo card */}
-          <div className="animate-float mb-7" style={{ animationDelay: "0s" }}>
-            <div className="w-20 h-20 bg-[#FFE500] rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] flex items-center justify-center text-4xl">
-              ⛰️
+        {/* Main */}
+        <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-12 text-center">
+
+          {/* Mascot with glow */}
+          <div className="relative mb-6 animate-float">
+            {/* Outer glow ring */}
+            <div className="absolute inset-[-18px] rounded-full bg-blue-400/20 blur-2xl animate-pulse-glow" />
+            {/* Inner halo */}
+            <div className="absolute inset-[-8px] rounded-full border-[2px] border-white/10" />
+            <div className="relative w-28 h-28 rounded-3xl overflow-hidden border-[3px] border-white/20 shadow-[0_0_40px_rgba(139,92,246,0.5)]">
+              <Image
+                src="/kibo.png"
+                alt="Kibo mascot"
+                fill
+                sizes="112px"
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
 
           {/* Title */}
           <h1
-            className="text-[5.5rem] font-black tracking-[-0.05em] text-white leading-none mb-3"
-            style={{ textShadow: "3px 3px 0 rgba(0,0,0,0.35)" }}
+            className="text-[5.25rem] font-black tracking-[-0.055em] text-white leading-[0.9] mb-1"
+            style={{ textShadow: "0 4px 24px rgba(139,92,246,0.6), 3px 3px 0 rgba(0,0,0,0.4)" }}
           >
             KIBO
           </h1>
-
-          {/* Tagline */}
-          <p className="text-white/70 text-[1rem] font-semibold leading-relaxed mb-8">
-            Save daily on Celo.<br />Build streaks. Earn rewards.
+          <p className="text-white/40 text-[0.75rem] font-bold uppercase tracking-[0.2em] mb-4">
+            Daily Savings · Celo Network
           </p>
 
-          {/* Feature pills */}
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
+          {/* Tagline */}
+          <p className="text-white/70 text-[1.0625rem] font-semibold leading-relaxed mb-8 max-w-[260px]">
+            Save small. Build habits.<br />Earn rewards every 7 days.
+          </p>
+
+          {/* Feature grid */}
+          <div className="grid grid-cols-2 gap-2 w-full max-w-[300px] mb-8">
             {[
-              { icon: "🔥", label: "Daily Streaks" },
-              { icon: "🏆", label: "Rewards" },
-              { icon: "🛡️", label: "Shields" },
-              { icon: "💎", label: "Badges" },
-              { icon: "👥", label: "Referrals" },
-            ].map(({ icon, label }) => (
-              <span
+              { icon: "🔥", label: "Daily Streaks",  desc: "20h cooldown" },
+              { icon: "🏆", label: "Rewards",         desc: "Every 7 days" },
+              { icon: "🛡️", label: "Streak Shields",  desc: "Miss without reset" },
+              { icon: "💎", label: "On-chain Badges",  desc: "30/90/180/365d" },
+            ].map(({ icon, label, desc }) => (
+              <div
                 key={label}
-                className="bg-white/10 backdrop-blur-sm text-white text-[0.8125rem] font-semibold px-3 py-1.5 rounded-full border border-white/20"
+                className="bg-white/7 backdrop-blur-sm rounded-2xl border border-white/12 px-3 py-3 text-left"
               >
-                {icon} {label}
-              </span>
+                <span className="text-xl block mb-1">{icon}</span>
+                <p className="text-white text-[0.8125rem] font-bold leading-tight">{label}</p>
+                <p className="text-white/45 text-[0.6875rem] font-medium mt-0.5">{desc}</p>
+              </div>
             ))}
           </div>
 
-          {/* CTA button */}
-          <button
-            onClick={() => connect({ connector: injected() })}
-            className="w-full h-14 bg-[#FFE500] text-[#09090B] font-black text-[1.0625rem] rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[3px_3px_0_#09090B] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all duration-75 flex items-center justify-center gap-2 mb-3"
-          >
-            <span className="text-xl">🔗</span>
-            Connect Wallet
-          </button>
+          {/* CTA */}
+          <div className="w-full max-w-[300px] flex flex-col gap-3">
+            <button
+              onClick={() => connect({ connector: injected() })}
+              className="w-full h-[52px] bg-[#FFE500] text-[#09090B] font-black text-[1.0625rem] rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[3px_3px_0_#09090B] active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all duration-75 flex items-center justify-center gap-2.5"
+            >
+              <Wallet className="w-5 h-5" />
+              Connect Wallet
+            </button>
+            <p className="text-white/25 text-[0.6875rem] font-semibold text-center tracking-wide">
+              Non-custodial · Open source · Celo Mainnet
+            </p>
+          </div>
+        </div>
 
-          <p className="text-white/30 text-[0.75rem] font-medium">
-            Powered by Celo · Non-custodial · Open source
-          </p>
+        {/* Bottom strip */}
+        <div className="relative z-10 flex items-center justify-center gap-6 pb-8 pt-2">
+          {["🔥 Save Daily", "🏔️ Reach Summit", "💰 Earn Rewards"].map((t) => (
+            <span key={t} className="text-white/25 text-[0.6875rem] font-bold">{t}</span>
+          ))}
         </div>
       </div>
     );
   }
 
-  /* ── MAIN APP ──────────────────────────────────────────────────── */
-  return (
-    <div className="app-shell flex flex-col max-w-app mx-auto min-h-dvh bg-background relative overflow-hidden">
+  /* ── MAIN APP ────────────────────────────────────────────── */
+  const isNewUser = !isLoading && streak === 0 && savedAmount === 0;
 
+  return (
+    <div
+      className="app-shell flex flex-col max-w-app mx-auto min-h-dvh relative overflow-hidden"
+      style={{
+        background: "#FAFAF5",
+        backgroundImage: "radial-gradient(circle, rgba(9,9,11,0.055) 1px, transparent 1px)",
+        backgroundSize: "22px 22px",
+      }}
+    >
       {/* Navbar */}
-      <nav className="sticky top-0 z-[100] flex items-center justify-between px-5 py-3 bg-white border-b-[3px] border-[#09090B]">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#FFE500] rounded-lg border-[2px] border-[#09090B] shadow-[2px_2px_0_#09090B] flex items-center justify-center text-base leading-none">
-            ⛰️
+      <nav className="sticky top-0 z-[100] flex items-center justify-between px-4 py-2.5 bg-white border-b-[3px] border-[#09090B]">
+        <div className="flex items-center gap-2.5">
+          <div className="relative w-9 h-9 rounded-xl overflow-hidden border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] flex-shrink-0">
+            <Image src="/kibo.png" alt="Kibo" fill sizes="36px" className="object-cover" />
           </div>
-          <span className="text-[1.25rem] font-black tracking-[-0.03em]">KIBO</span>
+          <span className="text-[1.1875rem] font-black tracking-[-0.03em]">KIBO</span>
+          {streak > 0 && (
+            <span className="bg-[#FFE500] text-[#09090B] text-[0.625rem] font-black px-2 py-0.5 rounded-md border border-[#09090B] shadow-[1px_1px_0_#09090B]">
+              🔥 {streak}d
+            </span>
+          )}
         </div>
         <button
-          className="bg-[#FFE500] text-[#09090B] rounded-xl px-3 py-1.5 text-[0.75rem] font-black border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0_#09090B] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-75"
+          className="bg-[#09090B] text-white rounded-xl px-3 py-1.5 text-[0.6875rem] font-black border-2 border-[#09090B] shadow-[2px_2px_0_rgba(0,0,0,0.25)] hover:bg-[#1a1a1a] active:scale-[0.97] transition-all duration-75 font-mono tracking-wide"
           onClick={() => disconnect()}
         >
           {address?.slice(0, 6)}…{address?.slice(-4)}
@@ -273,139 +308,101 @@ export default function Home() {
         </div>
       )}
 
-      {/* Content */}
+      {/* Scrollable content */}
       <div
         className="flex-1 overflow-y-auto overscroll-contain"
-        style={{ paddingBottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 1rem)" }}
+        style={{ paddingBottom: "calc(64px + env(safe-area-inset-bottom, 0px) + 1rem)" }}
       >
 
-        {/* ── HOME ──────────────────────────────────────────── */}
+        {/* ── HOME ───────────────────────────────────────────── */}
         {tab === "home" && (
           <>
-            {/* Streak hero card */}
-            <div className="mx-5 mt-5 mb-4">
-              <div className="rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] overflow-hidden">
-                <div className="bg-gradient-to-br from-[#7C3AED] via-[#5B21B6] to-[#2563EB] px-6 pt-6 pb-5 flex flex-col items-center gap-3">
-                  <StreakRing streak={streak} />
-                  <p className="text-[1.0625rem] font-bold text-white text-center">
-                    {isLoading
-                      ? " "
-                      : streak === 0
-                      ? "Start your streak today 🚀"
-                      : streak % 7 === 0
-                      ? "Milestone reached! 🎉"
-                      : `${7 - (streak % 7)} day${7 - (streak % 7) > 1 ? "s" : ""} to next milestone`}
-                  </p>
-                  {canClaim && (
-                    <Badge variant="milestone">🏆 Reward ready!</Badge>
-                  )}
+            {/* Hero card */}
+            <div className="mx-4 mt-4 mb-4">
+              {isNewUser ? (
+                /* New user onboarding card */
+                <div className="rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] overflow-hidden bg-gradient-to-br from-[#EDE9FE] via-[#DDD6FE] to-[#DBEAFE]">
+                  <div className="px-6 pt-6 pb-5 flex flex-col items-center gap-3 text-center">
+                    <div className="animate-float">
+                      <Image src="/kibo.png" alt="Kibo" width={80} height={80} className="drop-shadow-lg" />
+                    </div>
+                    <div>
+                      <p className="text-[1.25rem] font-black text-[#09090B]">Welcome to Kibo!</p>
+                      <p className="text-[0.875rem] text-[#09090B]/55 font-medium mt-1 leading-relaxed">
+                        Deposit 0.01 cUSD to start your savings streak.<br />
+                        Earn rewards every 7 days. 🏔️
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Overview */}
-            <div className="px-5 pb-4">
-              <SectionLabel>Overview</SectionLabel>
-              <Card>
-                <CardContent>
-                  {isLoading ? (
-                    <><SkeletonRow /><SkeletonRow /><SkeletonRow /><SkeletonRow /></>
-                  ) : (
-                    <>
-                      <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color="bg-[#EDE9FE]">💰</RowIcon>
-                          <span className="font-semibold">Total saved</span>
-                        </div>
-                        <span className="font-black text-[#7C3AED] tabular-nums">{savedAmount.toFixed(3)} cUSD</span>
-                      </CardRow>
-                      <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color="bg-[#FEF9C3]">🏆</RowIcon>
-                          <span className="font-semibold">Best streak</span>
-                        </div>
-                        <span className="font-black tabular-nums">{longestStreak} days</span>
-                      </CardRow>
-                      <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color="bg-[#DCFCE7]">💵</RowIcon>
-                          <span className="font-semibold">cUSD balance</span>
-                        </div>
-                        <span className="font-semibold text-[#09090B]/50 tabular-nums">{balanceAmount}</span>
-                      </CardRow>
-                      <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color="bg-[#DBEAFE]">🛡️</RowIcon>
-                          <span className="font-semibold">Streak shields</span>
-                        </div>
-                        <span className="font-black tabular-nums">
-                          {"🛡️".repeat(shields) || "—"}
-                          <span className="text-[0.8125rem] font-semibold text-[#09090B]/40"> {shields}/3</span>
-                        </span>
-                      </CardRow>
-                      <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color={badge > 0 ? BADGE_COLOR[badge] : "bg-[#F3F4F6]"}>
-                            {badge > 0 ? ["", "🥉", "🥈", "🥇", "💎"][badge] : "🏅"}
-                          </RowIcon>
-                          <span className="font-semibold">Badge</span>
-                        </div>
-                        <span className={cn("font-black", badge > 0 ? "text-[#7C3AED]" : "text-[#09090B]/40 font-semibold")}>
-                          {badge > 0 ? BADGE_LABEL[badge] : "None yet"}
-                        </span>
-                      </CardRow>
-                      {parseFloat(formatUnits(rewardsClaimed, 18)) > 0 && (
-                        <CardRow>
-                          <div className="flex items-center gap-3">
-                            <RowIcon color="bg-[#DCFCE7]">🎁</RowIcon>
-                            <span className="font-semibold">Rewards earned</span>
-                          </div>
-                          <span className="font-black text-[#16A34A] tabular-nums">
-                            {parseFloat(formatUnits(rewardsClaimed, 18)).toFixed(4)} cUSD
-                          </span>
-                        </CardRow>
-                      )}
-                    </>
-                  )}
-                </CardContent>
-              </Card>
+              ) : (
+                /* Active streak card */
+                <div className="rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] overflow-hidden">
+                  <div className="bg-gradient-to-br from-[#6D28D9] via-[#5B21B6] to-[#1D4ED8] px-6 pt-6 pb-5 flex flex-col items-center gap-3">
+                    {isLoading ? (
+                      <div className="w-[176px] h-[176px] rounded-full skeleton" />
+                    ) : (
+                      <StreakRing streak={streak} />
+                    )}
+                    <p className="text-[1rem] font-bold text-white/90 text-center">
+                      {isLoading ? " " : streak % 7 === 0 && streak > 0
+                        ? "Milestone reached! 🎉"
+                        : `${7 - (streak % 7)} day${7 - (streak % 7) !== 1 ? "s" : ""} to next milestone`}
+                    </p>
+                    {canClaim && <Badge variant="milestone">🏆 Reward ready!</Badge>}
+                  </div>
+                  {/* Mini stats strip */}
+                  <div className="bg-white grid grid-cols-3 divide-x-2 divide-[#09090B] border-t-[2px] border-[#09090B]">
+                    {[
+                      { label: "Best",    value: `${longestStreak}d` },
+                      { label: "Shields", value: `${"🛡️".repeat(shields) || "—"}` },
+                      { label: "Saved",   value: `${savedAmount.toFixed(2)}` },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="flex flex-col items-center py-3 gap-0.5">
+                        <span className="text-[0.875rem] font-black text-[#09090B]">{value}</span>
+                        <span className="text-[0.5625rem] font-black uppercase tracking-[0.12em] text-[#09090B]/40">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Streak Recovery */}
             {!isLoading && brokenStreak > 0 && streak === 0 && (
-              <div className="px-5 pb-4">
-                <Card className="border-[#F59E0B] shadow-[4px_4px_0_#F59E0B] bg-[#FEF9C3]">
-                  <CardContent className="p-5 flex flex-col gap-4">
+              <div className="mx-4 mb-4">
+                <div className="rounded-2xl border-[3px] border-[#F59E0B] shadow-[4px_4px_0_#F59E0B] bg-[#FFFBEB] overflow-hidden">
+                  <div className="p-5 flex flex-col gap-4">
                     <div className="flex items-start gap-4">
-                      <span className="text-2xl flex-shrink-0 mt-0.5">💔</span>
+                      <span className="text-2xl flex-shrink-0">💔</span>
                       <div>
-                        <p className="text-[0.9375rem] font-black">Streak broken</p>
-                        <p className="text-[0.8125rem] text-[#09090B]/60 mt-0.5">
+                        <p className="text-[0.9375rem] font-black text-[#09090B]">Streak broken</p>
+                        <p className="text-[0.8125rem] text-[#09090B]/55 mt-0.5">
                           Pay {Math.min(brokenStreak * 0.01, 0.1).toFixed(3)} cUSD to restore your {brokenStreak}-day streak
                         </p>
                       </div>
                     </div>
                     <Button variant="warning" onClick={recoverStreak} disabled={isTxLoading}>
-                      {isTxLoading ? "Processing…" : `Recover ${brokenStreak}-day streak`}
+                      {isTxLoading ? "Processing…" : `⚡ Recover ${brokenStreak}-day streak`}
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Actions */}
-            <div className="px-5 pb-4 flex flex-col gap-3">
+            <div className="px-4 pb-4 flex flex-col gap-2.5">
               {canClaim && (
                 <Button variant="success" onClick={claimReward} disabled={isTxLoading}>
-                  🎁 Claim 7-day reward
+                  🎁 Claim milestone reward
                 </Button>
               )}
               <Button onClick={() => deposit(undefined, refParam)} disabled={!canDeposit || isTxLoading}>
-                {isTxLoading ? "Processing…" : "Deposit 0.01 cUSD"}
+                {isTxLoading ? "Processing…" : canDeposit ? "💰 Deposit 0.01 cUSD" : "💰 Deposit 0.01 cUSD"}
               </Button>
               {!canDeposit && countdown && (
-                <div className="flex items-center justify-center gap-2 py-1">
-                  <span className="text-[0.8125rem] font-semibold text-[#09090B]/50">Next deposit in</span>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-[0.8125rem] font-semibold text-[#09090B]/45">Next deposit in</span>
                   <span className="bg-[#FFE500] text-[#09090B] text-[0.75rem] font-black px-2.5 py-0.5 rounded-lg border-[1.5px] border-[#09090B] shadow-[1.5px_1.5px_0_#09090B]">
                     ⏱ {countdown}
                   </span>
@@ -418,8 +415,61 @@ export default function Home() {
               )}
             </div>
 
+            {/* Overview */}
+            <div className="px-4 pb-4">
+              <SectionLabel>Overview</SectionLabel>
+              <Card>
+                <CardContent>
+                  {isLoading ? (
+                    <><SkeletonRow /><SkeletonRow /><SkeletonRow /><SkeletonRow /></>
+                  ) : (
+                    <>
+                      <CardRow>
+                        <div className="flex items-center gap-3"><RowIcon bg="bg-[#EDE9FE]">💰</RowIcon><span className="font-semibold">Total saved</span></div>
+                        <span className="font-black text-[#6D28D9] tabular-nums">{savedAmount.toFixed(3)} <span className="font-semibold text-[#09090B]/40">cUSD</span></span>
+                      </CardRow>
+                      <CardRow>
+                        <div className="flex items-center gap-3"><RowIcon bg="bg-[#FEF9C3]">🏆</RowIcon><span className="font-semibold">Best streak</span></div>
+                        <span className="font-black tabular-nums">{longestStreak} <span className="font-semibold text-[#09090B]/40">days</span></span>
+                      </CardRow>
+                      <CardRow>
+                        <div className="flex items-center gap-3"><RowIcon bg="bg-[#DCFCE7]">💵</RowIcon><span className="font-semibold">cUSD balance</span></div>
+                        <span className="font-semibold text-[#09090B]/50 tabular-nums">{balanceAmount}</span>
+                      </CardRow>
+                      <CardRow>
+                        <div className="flex items-center gap-3"><RowIcon bg="bg-[#DBEAFE]">🛡️</RowIcon><span className="font-semibold">Shields</span></div>
+                        <span className="font-black">
+                          {"🛡️".repeat(shields) || "—"}
+                          <span className="text-[0.8125rem] font-semibold text-[#09090B]/35 ml-1">{shields}/3</span>
+                        </span>
+                      </CardRow>
+                      <CardRow>
+                        <div className="flex items-center gap-3">
+                          <RowIcon bg={badge > 0 ? BADGE_BG[badge] : "bg-[#F3F4F6]"}>
+                            {badge > 0 ? BADGE_EMOJI[badge] : "🏅"}
+                          </RowIcon>
+                          <span className="font-semibold">Badge</span>
+                        </div>
+                        <span className={cn("font-black", badge > 0 ? "text-[#6D28D9]" : "text-[#09090B]/35 font-semibold")}>
+                          {badge > 0 ? BADGE_LABEL[badge] : "None yet"}
+                        </span>
+                      </CardRow>
+                      {parseFloat(formatUnits(rewardsClaimed, 18)) > 0 && (
+                        <CardRow>
+                          <div className="flex items-center gap-3"><RowIcon bg="bg-[#DCFCE7]">🎁</RowIcon><span className="font-semibold">Rewards earned</span></div>
+                          <span className="font-black text-[#15803D] tabular-nums">
+                            +{parseFloat(formatUnits(rewardsClaimed, 18)).toFixed(4)} <span className="font-semibold text-[#09090B]/40">cUSD</span>
+                          </span>
+                        </CardRow>
+                      )}
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Progress */}
-            <div className="px-5 pb-4">
+            <div className="px-4 pb-4">
               <SectionLabel>Progress</SectionLabel>
               <Card>
                 <CardContent>
@@ -428,25 +478,33 @@ export default function Home() {
                   ) : (
                     <>
                       <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color="bg-[#F5F3FF]">🎯</RowIcon>
-                          <span className="font-semibold">Next milestone</span>
-                        </div>
+                        <div className="flex items-center gap-3"><RowIcon bg="bg-[#F5F3FF]">🎯</RowIcon><span className="font-semibold">Next milestone</span></div>
                         <span className="font-black tabular-nums">Day {streak === 0 ? 7 : Math.ceil((streak + 1) / 7) * 7}</span>
                       </CardRow>
                       <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color="bg-[#EDE9FE]">✨</RowIcon>
-                          <span className="font-semibold">Milestones hit</span>
-                        </div>
-                        <span className="font-black text-[#7C3AED] tabular-nums">{Math.floor(streak / 7)}</span>
+                        <div className="flex items-center gap-3"><RowIcon bg="bg-[#EDE9FE]">✨</RowIcon><span className="font-semibold">Milestones hit</span></div>
+                        <span className="font-black text-[#6D28D9] tabular-nums">{Math.floor(streak / 7)}</span>
                       </CardRow>
                       <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color="bg-[#FEF9C3]">📅</RowIcon>
-                          <span className="font-semibold">Days this cycle</span>
+                        <div className="flex items-center gap-3"><RowIcon bg="bg-[#FEF9C3]">📅</RowIcon><span className="font-semibold">Days this cycle</span></div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex gap-0.5">
+                            {Array.from({ length: 7 }).map((_, i) => (
+                              <div
+                                key={i}
+                                className={cn(
+                                  "w-2.5 h-2.5 rounded-[3px] border border-[#09090B]",
+                                  i < (streak % 7 || (streak > 0 ? 7 : 0))
+                                    ? "bg-[#FFE500]"
+                                    : "bg-white"
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <span className="font-black tabular-nums text-[0.875rem]">
+                            {streak % 7 || (streak > 0 ? 7 : 0)}/7
+                          </span>
                         </div>
-                        <span className="font-black tabular-nums">{streak % 7 || (streak > 0 ? 7 : 0)} / 7</span>
                       </CardRow>
                     </>
                   )}
@@ -455,33 +513,28 @@ export default function Home() {
             </div>
 
             {/* Savings Goal */}
-            <div className="px-5 pb-4">
+            <div className="px-4 pb-4">
               <SectionLabel>Savings Goal</SectionLabel>
               <Card>
                 <CardContent>
                   {savingsGoal > BigInt(0) ? (
-                    <div className="px-5 py-4 flex flex-col gap-3 border-b-2 border-[#09090B]">
+                    <div className="px-5 py-4 border-b-2 border-[#09090B] flex flex-col gap-3">
                       <div className="flex justify-between text-[0.75rem]">
-                        <span className="font-black text-[#7C3AED]">
-                          {parseFloat(formatUnits(totalDeposited, 18)).toFixed(3)} cUSD
-                        </span>
-                        <span className="font-semibold text-[#09090B]/50">
-                          Goal: {parseFloat(formatUnits(savingsGoal, 18)).toFixed(2)} cUSD
-                        </span>
+                        <span className="font-black text-[#6D28D9]">{parseFloat(formatUnits(totalDeposited, 18)).toFixed(3)} cUSD</span>
+                        <span className="font-semibold text-[#09090B]/45">Goal: {parseFloat(formatUnits(savingsGoal, 18)).toFixed(2)} cUSD</span>
                       </div>
                       <Progress value={goalPct} />
+                      <p className="text-[0.6875rem] font-black text-[#6D28D9] text-right">{goalPct}% complete</p>
                     </div>
                   ) : (
-                    <p className="px-5 py-4 text-[0.8125rem] font-semibold text-[#09090B]/40 border-b-2 border-[#09090B]">
-                      No goal set yet.
+                    <p className="px-5 py-4 text-[0.8125rem] font-semibold text-[#09090B]/35 border-b-2 border-[#09090B]">
+                      No goal set yet. Set a target to track your progress.
                     </p>
                   )}
                   <div className="flex gap-2 px-5 py-4">
                     <Input
-                      type="number"
-                      min="0.01"
-                      step="0.01"
-                      placeholder="Target (cUSD)"
+                      type="number" min="0.01" step="0.01"
+                      placeholder="Target in cUSD"
                       value={goalInput}
                       onChange={(e) => setGoalInput(e.target.value)}
                       className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -505,47 +558,37 @@ export default function Home() {
             </div>
 
             {/* Referral */}
-            <div className="px-5 pb-4">
+            <div className="px-4 pb-4">
               <SectionLabel>Referral</SectionLabel>
               <Card>
                 <CardContent>
                   {referrer && (
                     <CardRow>
-                      <div className="flex items-center gap-3">
-                        <RowIcon color="bg-[#F5F3FF]">👥</RowIcon>
-                        <span className="font-semibold">Referred by</span>
-                      </div>
-                      <span className="font-mono text-[0.75rem] text-[#09090B]/50">
-                        {referrer.slice(0, 6)}…{referrer.slice(-4)}
-                      </span>
+                      <div className="flex items-center gap-3"><RowIcon bg="bg-[#F5F3FF]">👥</RowIcon><span className="font-semibold">Referred by</span></div>
+                      <span className="font-mono text-[0.75rem] text-[#09090B]/45">{referrer.slice(0, 6)}…{referrer.slice(-4)}</span>
                     </CardRow>
                   )}
                   {refParam !== "0x0000000000000000000000000000000000000000" && !referrer && (
-                    <div className="flex items-center gap-2 mx-5 my-3 px-3 py-2 bg-[#EDE9FE] rounded-xl border-[1.5px] border-[#09090B] text-[0.8125rem] text-[#7C3AED] font-bold">
+                    <div className="flex items-center gap-2 mx-5 my-3 px-3 py-2 bg-[#EDE9FE] rounded-xl border-[1.5px] border-[#09090B] text-[0.8125rem] text-[#6D28D9] font-bold">
                       <span>🔗</span>
-                      <span>Invite code applied: {refParam.slice(0, 6)}…{refParam.slice(-4)}</span>
+                      <span>Invite code: {refParam.slice(0, 6)}…{refParam.slice(-4)}</span>
                     </div>
                   )}
                   {pendingReferralReward > BigInt(0) && (
                     <>
                       <CardRow>
-                        <div className="flex items-center gap-3">
-                          <RowIcon color="bg-[#DCFCE7]">💸</RowIcon>
-                          <span className="font-semibold">Referral reward</span>
-                        </div>
-                        <span className="font-black text-[#16A34A] tabular-nums">
-                          {parseFloat(formatUnits(pendingReferralReward, 18)).toFixed(4)} cUSD
-                        </span>
+                        <div className="flex items-center gap-3"><RowIcon bg="bg-[#DCFCE7]">💸</RowIcon><span className="font-semibold">Referral reward</span></div>
+                        <span className="font-black text-[#15803D] tabular-nums">+{parseFloat(formatUnits(pendingReferralReward, 18)).toFixed(4)} cUSD</span>
                       </CardRow>
                       <div className="px-5 pb-4 pt-1">
-                        <Button variant="success" onClick={claimReferralReward} disabled={isTxLoading}>
-                          Claim referral reward
-                        </Button>
+                        <Button variant="success" onClick={claimReferralReward} disabled={isTxLoading}>Claim referral reward</Button>
                       </div>
                     </>
                   )}
                   <div className="px-5 py-4 border-t-2 border-[#09090B]">
-                    <p className="text-[0.75rem] font-bold text-[#09090B]/50 mb-3">Your invite link</p>
+                    <p className="text-[0.75rem] font-bold text-[#09090B]/45 mb-3">
+                      Earn 5% of your friend&apos;s first deposit when they use your link.
+                    </p>
                     <Button
                       variant="ghost"
                       onClick={() => {
@@ -556,9 +599,7 @@ export default function Home() {
                       }}
                       disabled={!address}
                     >
-                      {copied
-                        ? <><Check className="h-4 w-4" /> Copied!</>
-                        : <><Copy className="h-4 w-4" /> Copy invite link</>}
+                      {copied ? <><Check className="h-4 w-4" /> Link copied!</> : <><Copy className="h-4 w-4" /> Copy invite link</>}
                     </Button>
                   </div>
                 </CardContent>
@@ -566,16 +607,16 @@ export default function Home() {
             </div>
 
             {/* Sponsor */}
-            <div className="px-5 pb-4">
+            <div className="px-4 pb-4">
               <SectionLabel>Sponsor a Friend</SectionLabel>
               <Card>
                 <CardContent>
-                  <p className="px-5 pt-4 pb-3 text-[0.8125rem] font-semibold text-[#09090B]/50 leading-relaxed border-b-2 border-[#09090B]">
-                    Deposit 0.01 cUSD on behalf of another address to boost their streak.
+                  <p className="px-5 pt-4 pb-3 text-[0.8125rem] font-medium text-[#09090B]/50 leading-relaxed border-b-2 border-[#09090B]">
+                    Pay 0.01 cUSD on behalf of another address — boosts their streak without them spending anything.
                   </p>
                   <div className="px-5 py-4 flex flex-col gap-3">
                     <Input
-                      placeholder="0x… friend's address"
+                      placeholder="0x… wallet address"
                       value={sponsorAddr}
                       onChange={(e) => setSponsorAddr(e.target.value)}
                       error={!!(sponsorAddr && !sponsorAddrValid)}
@@ -593,7 +634,7 @@ export default function Home() {
                       }}
                       disabled={isTxLoading || !sponsorAddrValid}
                     >
-                      {isTxLoading ? "Processing…" : "Sponsor deposit"}
+                      {isTxLoading ? "Processing…" : "👥 Sponsor deposit"}
                     </Button>
                   </div>
                 </CardContent>
@@ -602,9 +643,9 @@ export default function Home() {
           </>
         )}
 
-        {/* ── LEADERBOARD ───────────────────────────────────── */}
+        {/* ── LEADERBOARD ─────────────────────────────────────── */}
         {tab === "leaderboard" && (
-          <div className="pt-5 px-5 pb-5">
+          <div className="pt-4 px-4 pb-4">
             <SectionLabel>Top Savers</SectionLabel>
             {leaderboard && leaderboard[0].length > 0 ? (
               <Card>
@@ -612,24 +653,27 @@ export default function Home() {
                   {leaderboard[0].map((addr, i) => (
                     <div
                       key={addr}
-                      className="flex items-center gap-3 px-5 py-3 min-h-[56px] border-t-2 border-[#09090B] first:border-t-0"
+                      className={cn(
+                        "flex items-center gap-3 px-5 py-3 min-h-[56px] border-t-2 border-[#09090B] first:border-t-0",
+                        i === 0 && "bg-[#FFFBEB]",
+                        i === 1 && "bg-[#F9FAFB]",
+                        i === 2 && "bg-[#FFF7ED]",
+                      )}
                     >
                       <span className={cn(
-                        "w-8 text-center text-[0.9375rem] font-black flex-shrink-0",
-                        i < 3 ? "text-[#7C3AED]" : "text-[#09090B]/40"
+                        "w-8 text-center text-[1rem] font-black flex-shrink-0",
+                        i < 3 ? "" : "text-[#09090B]/35 text-[0.875rem]"
                       )}>
                         {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
                       </span>
-                      <div className="w-9 h-9 rounded-xl bg-[#EDE9FE] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] flex items-center justify-center text-[0.6875rem] font-black text-[#7C3AED] tracking-wide flex-shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-[#EDE9FE] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] flex items-center justify-center text-[0.6875rem] font-black text-[#6D28D9] flex-shrink-0">
                         {addr.slice(2, 4).toUpperCase()}
                       </div>
-                      <span className="flex-1 text-[0.9375rem] font-semibold tabular-nums truncate min-w-0 text-[#09090B]/70">
+                      <span className="flex-1 text-[0.875rem] font-semibold tabular-nums truncate min-w-0 text-[#09090B]/60">
                         {addr.slice(0, 6)}…{addr.slice(-4)}
                       </span>
-                      <div className="flex items-center gap-1 bg-[#FFE500] rounded-lg border-[1.5px] border-[#09090B] shadow-[1.5px_1.5px_0_#09090B] px-2 py-0.5">
-                        <span className="text-[0.875rem] font-black text-[#09090B] tabular-nums">
-                          {Number(leaderboard[1][i])}
-                        </span>
+                      <div className="flex items-center gap-1 bg-[#FFE500] rounded-lg border-[1.5px] border-[#09090B] shadow-[1.5px_1.5px_0_#09090B] px-2 py-0.5 flex-shrink-0">
+                        <span className="text-[0.875rem] font-black text-[#09090B] tabular-nums">{Number(leaderboard[1][i])}</span>
                         <span className="text-sm">🔥</span>
                       </div>
                     </div>
@@ -637,79 +681,67 @@ export default function Home() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="text-center py-16 text-[#09090B]/40 font-semibold">
-                No deposits yet.<br />
-                <span className="text-2xl mt-2 block">🔥</span>
-                Be the first!
+              <div className="flex flex-col items-center py-16 gap-4">
+                <Image src="/kibo.png" alt="Kibo" width={64} height={64} className="opacity-40" />
+                <p className="text-center text-[#09090B]/35 font-semibold text-sm">
+                  No deposits yet.<br />Be the first to reach the summit! 🏔️
+                </p>
               </div>
             )}
           </div>
         )}
 
-        {/* ── SETTINGS ──────────────────────────────────────── */}
+        {/* ── SETTINGS ────────────────────────────────────────── */}
         {tab === "settings" && (
-          <div className="pt-5 px-5 pb-5 flex flex-col gap-5">
+          <div className="pt-4 px-4 pb-4 flex flex-col gap-4">
+
+            {/* Mascot card */}
+            <div className="rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] overflow-hidden bg-gradient-to-br from-[#EDE9FE] to-[#DBEAFE]">
+              <div className="flex items-center gap-4 px-5 py-4">
+                <Image src="/kibo.png" alt="Kibo mascot" width={56} height={56} className="flex-shrink-0" />
+                <div>
+                  <p className="font-black text-[#09090B] text-[0.9375rem]">Kibo</p>
+                  <p className="text-[0.8125rem] text-[#09090B]/55 font-medium leading-relaxed mt-0.5">
+                    Save 0.01–1 cUSD daily on Celo. Build habits. Earn rewards every 7 days.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div>
               <SectionLabel>How it works</SectionLabel>
               <Card>
                 <CardContent>
-                  <CardRow>
-                    <div className="flex items-center gap-3">
-                      <RowIcon color="bg-[#DBEAFE]">📅</RowIcon>
-                      <span className="font-semibold">Daily deposit</span>
-                    </div>
-                    <span className="font-bold text-[#09090B]/50">0.0001–1 cUSD</span>
-                  </CardRow>
-                  <CardRow>
-                    <div className="flex items-center gap-3">
-                      <RowIcon color="bg-[#FEF9C3]">⏱️</RowIcon>
-                      <span className="font-semibold">Cooldown</span>
-                    </div>
-                    <span className="font-bold text-[#09090B]/50">20 hours</span>
-                  </CardRow>
-                  <CardRow>
-                    <div className="flex items-center gap-3">
-                      <RowIcon color="bg-[#DBEAFE]">🛡️</RowIcon>
-                      <span className="font-semibold">Shields</span>
-                    </div>
-                    <span className="font-bold text-[#09090B]/50">Skip 1 day</span>
-                  </CardRow>
-                  <CardRow>
-                    <div className="flex items-center gap-3">
-                      <RowIcon color="bg-[#F5F3FF]">👥</RowIcon>
-                      <span className="font-semibold">Referral</span>
-                    </div>
-                    <span className="font-bold text-[#09090B]/50">5% of deposit</span>
-                  </CardRow>
+                  {[
+                    { bg: "bg-[#DBEAFE]", icon: "📅", label: "Daily deposit", val: "0.0001–1 cUSD" },
+                    { bg: "bg-[#FEF9C3]", icon: "⏱️", label: "Cooldown",       val: "20 hours" },
+                    { bg: "bg-[#DBEAFE]", icon: "🛡️", label: "Shields",        val: "Skip 1 day" },
+                    { bg: "bg-[#F5F3FF]", icon: "👥", label: "Referral",        val: "5% of deposit" },
+                    { bg: "bg-[#DCFCE7]", icon: "💔", label: "Recovery fee",   val: "streak × 0.01" },
+                  ].map(({ bg, icon, label, val }) => (
+                    <CardRow key={label}>
+                      <div className="flex items-center gap-3"><RowIcon bg={bg}>{icon}</RowIcon><span className="font-semibold">{label}</span></div>
+                      <span className="font-bold text-[#09090B]/50">{val}</span>
+                    </CardRow>
+                  ))}
                 </CardContent>
               </Card>
             </div>
 
             <div>
-              <SectionLabel>Rewards</SectionLabel>
+              <SectionLabel>Reward Tiers</SectionLabel>
               <Card>
                 <CardContent>
-                  <CardRow>
-                    <div className="flex items-center gap-3">
-                      <RowIcon color="bg-[#DCFCE7]">🏅</RowIcon>
-                      <span className="font-semibold">Day 7 milestone</span>
-                    </div>
-                    <span className="font-black text-[#16A34A]">+0.005 cUSD</span>
-                  </CardRow>
-                  <CardRow>
-                    <div className="flex items-center gap-3">
-                      <RowIcon color="bg-[#DCFCE7]">🥈</RowIcon>
-                      <span className="font-semibold">Day 14+ milestone</span>
-                    </div>
-                    <span className="font-black text-[#16A34A]">+0.012 cUSD</span>
-                  </CardRow>
-                  <CardRow>
-                    <div className="flex items-center gap-3">
-                      <RowIcon color="bg-[#FEF9C3]">🏆</RowIcon>
-                      <span className="font-semibold">Day 35+ milestone</span>
-                    </div>
-                    <span className="font-black text-[#16A34A]">+0.025 cUSD</span>
-                  </CardRow>
+                  {[
+                    { bg: "bg-[#DCFCE7]", icon: "🏅", label: "Day 7",   val: "+0.005 cUSD" },
+                    { bg: "bg-[#DCFCE7]", icon: "🥈", label: "Day 14+", val: "+0.012 cUSD" },
+                    { bg: "bg-[#FEF9C3]", icon: "🏆", label: "Day 35+", val: "+0.025 cUSD" },
+                  ].map(({ bg, icon, label, val }) => (
+                    <CardRow key={label}>
+                      <div className="flex items-center gap-3"><RowIcon bg={bg}>{icon}</RowIcon><span className="font-semibold">{label}</span></div>
+                      <span className="font-black text-[#15803D]">{val}</span>
+                    </CardRow>
+                  ))}
                 </CardContent>
               </Card>
             </div>
@@ -719,17 +751,14 @@ export default function Home() {
               <Card>
                 <CardContent>
                   {[
-                    { icon: "🥉", label: "Bronze", days: 30 },
-                    { icon: "🥈", label: "Silver", days: 90 },
-                    { icon: "🥇", label: "Gold",   days: 180 },
+                    { icon: "🥉", label: "Bronze",  days: 30 },
+                    { icon: "🥈", label: "Silver",  days: 90 },
+                    { icon: "🥇", label: "Gold",    days: 180 },
                     { icon: "💎", label: "Diamond", days: 365 },
                   ].map(({ icon, label, days }) => (
                     <CardRow key={label}>
-                      <div className="flex items-center gap-3">
-                        <RowIcon color="bg-[#F3F4F6]">{icon}</RowIcon>
-                        <span className="font-semibold">{label}</span>
-                      </div>
-                      <span className="font-bold text-[#09090B]/50">{days} days</span>
+                      <div className="flex items-center gap-3"><RowIcon bg="bg-[#F3F4F6]">{icon}</RowIcon><span className="font-semibold">{label}</span></div>
+                      <span className="font-bold text-[#09090B]/50">{days} day streak</span>
                     </CardRow>
                   ))}
                 </CardContent>
@@ -740,9 +769,12 @@ export default function Home() {
               <SectionLabel>Contract</SectionLabel>
               <Card>
                 <CardContent>
-                  <div className="px-5 py-4 flex flex-col gap-1">
-                    <span className="font-bold text-[#09090B]/50 text-sm">Celo Mainnet</span>
-                    <span className="font-mono text-[0.75rem] text-[#09090B]/50 break-all">
+                  <div className="px-5 py-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[0.75rem] font-bold text-[#09090B]/50">Celo Mainnet</span>
+                      <span className="bg-[#DCFCE7] text-[#15803D] text-[0.625rem] font-black px-2 py-0.5 rounded-md border border-[#09090B]">Live</span>
+                    </div>
+                    <span className="font-mono text-[0.6875rem] text-[#09090B]/40 break-all leading-relaxed">
                       0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12
                     </span>
                   </div>
@@ -756,7 +788,7 @@ export default function Home() {
       {/* Tab bar */}
       <div
         className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-app flex items-start justify-around bg-white border-t-[3px] border-[#09090B] z-[200]"
-        style={{ height: "calc(60px + env(safe-area-inset-bottom, 0px))", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        style={{ height: "calc(64px + env(safe-area-inset-bottom, 0px))", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         role="tablist"
       >
         {([
@@ -766,26 +798,18 @@ export default function Home() {
         ]).map(({ id, icon, label }) => (
           <button
             key={id}
-            className="flex flex-col items-center gap-0.5 flex-1 pt-2 pb-1 border-none bg-transparent transition-all duration-[120ms]"
+            className="flex flex-col items-center gap-0.5 flex-1 pt-2.5 pb-1 transition-all duration-[120ms]"
             onClick={() => setTab(id)}
             role="tab"
             aria-selected={tab === id}
           >
-            <span className={cn(
-              "text-[1.375rem] leading-none transition-all duration-[120ms]",
-              tab !== id && "grayscale opacity-35"
-            )}>
+            <span className={cn("text-[1.375rem] leading-none transition-all duration-[120ms]", tab !== id && "grayscale opacity-30")}>
               {icon}
             </span>
-            <span className={cn(
-              "text-[0.625rem] font-black uppercase tracking-widest transition-colors duration-[120ms]",
-              tab === id ? "text-[#7C3AED]" : "text-[#09090B]/35"
-            )}>
+            <span className={cn("text-[0.5625rem] font-black uppercase tracking-widest transition-all duration-[120ms]", tab === id ? "text-[#6D28D9]" : "text-[#09090B]/30")}>
               {label}
             </span>
-            {tab === id && (
-              <div className="w-1.5 h-1.5 bg-[#FFE500] rounded-full border border-[#09090B] mt-0.5" />
-            )}
+            <div className={cn("h-[3px] w-6 rounded-full mt-0.5 transition-all duration-[120ms]", tab === id ? "bg-[#FFE500] border border-[#09090B]" : "bg-transparent")} />
           </button>
         ))}
       </div>
