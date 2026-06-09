@@ -34,6 +34,7 @@ export const KIBO_ABI = [
       { name: "longestStreak", type: "uint256" },
       { name: "canDeposit", type: "bool" },
       { name: "lastClaimedStreak", type: "uint256" },
+      { name: "shields", type: "uint8" },
     ],
     stateMutability: "view",
     type: "function",
