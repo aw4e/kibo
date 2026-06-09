@@ -1,7 +1,6 @@
 {
-  "totalDeposits": 0,
-  "uniqueUsers": 0,
-  "activeStreaks": 0,
-  "totalRewardsClaimed": 0,
-  "lastUpdated": "2026-06-09T00:00:00Z"
+  "updated": "2026-06-09T12:30:37Z",
+  "block": 0,
+  "network": "celo-mainnet",
+  "contract": "Kibo"
 }
