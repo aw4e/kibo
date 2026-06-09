@@ -556,6 +556,20 @@ export default function Home() {
                     />
                     <span className="font-sans text-[0.875rem] font-black text-[#09090B]/30 uppercase tracking-[0.1em] flex-shrink-0">cUSD</span>
                   </div>
+                  {/* Quick amounts */}
+                  <div className="flex gap-2 px-4 pt-3 pb-2">
+                    {["0.1", "0.5", "1", "5"].map((v) => (
+                      <button key={v}
+                        onClick={() => setDepositInput(v)}
+                        className={cn(
+                          "flex-1 py-2 rounded-xl border-[1.5px] border-[#09090B] font-sans font-black text-[0.8125rem] transition-all",
+                          depositInput === v
+                            ? "bg-[#09090B] text-white"
+                            : "bg-[#F3F4F6] text-[#09090B] shadow-[1.5px_1.5px_0_#09090B] hover:bg-[#E5E7EB]"
+                        )}
+                      >{v}</button>
+                    ))}
+                  </div>
                   {/* Deposit button */}
                   <div className="px-4 py-4">
                     <Button
