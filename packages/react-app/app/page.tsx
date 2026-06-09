@@ -68,6 +68,8 @@ export default function Home() {
   const [refParam, setRefParam] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
   const [copied, setCopied] = useState(false);
   const [goalInput, setGoalInput] = useState("");
+  const [sponsorAddr, setSponsorAddr] = useState("");
+  const sponsorAddrValid = /^0x[0-9a-fA-F]{40}$/.test(sponsorAddr);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -103,6 +105,7 @@ export default function Home() {
     claimReferralReward,
     savingsGoal,
     setGoal,
+    depositFor,
   } = useKibo();
 
   const countdown = formatCountdown(nextDepositIn);
@@ -457,6 +460,39 @@ export default function Home() {
                     disabled={!address}
                   >
                     {copied ? "Copied!" : "📋 Copy invite link"}
+                  </button>
+                </div>
+              </div>
+            </div>
+            {/* Sponsor a Friend */}
+            <div className="section">
+              <p className="section-header">Sponsor a Friend</p>
+              <div className="card-group">
+                <p className="sponsor-desc">
+                  Deposit 0.01 cUSD on behalf of another address to boost their streak.
+                </p>
+                <div className="sponsor-input-wrap">
+                  <input
+                    className={`sponsor-addr-input${sponsorAddr && !sponsorAddrValid ? " is-error" : ""}`}
+                    type="text"
+                    placeholder="0x… friend's address"
+                    value={sponsorAddr}
+                    onChange={(e) => setSponsorAddr(e.target.value)}
+                    spellCheck={false}
+                  />
+                  {sponsorAddr && !sponsorAddrValid && (
+                    <p className="sponsor-error">Invalid address</p>
+                  )}
+                  <button
+                    className="btn-primary"
+                    onClick={() => {
+                      if (!sponsorAddrValid) return;
+                      depositFor(sponsorAddr as `0x${string}`);
+                      setSponsorAddr("");
+                    }}
+                    disabled={isTxLoading || !sponsorAddrValid}
+                  >
+                    {isTxLoading ? "Processing…" : "Sponsor deposit"}
                   </button>
                 </div>
               </div>

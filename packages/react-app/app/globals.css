@@ -755,6 +755,43 @@ button:focus-visible {
 
 .btn-warning:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ─── Sponsor ────────────────────────────────────────────────── */
+.sponsor-desc {
+  padding: var(--space-md) var(--space-lg) var(--space-sm);
+  font-size: var(--text-footnote);
+  color: var(--color-ink-2);
+  line-height: 1.5;
+  border-bottom: 0.5px solid var(--color-separator);
+}
+
+.sponsor-input-wrap {
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sponsor-addr-input {
+  width: 100%;
+  padding: 10px var(--space-md);
+  border: 0.5px solid var(--color-separator);
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  color: var(--color-ink);
+  outline: none;
+}
+
+.sponsor-addr-input:focus { border-color: var(--color-accent); }
+.sponsor-addr-input.is-error { border-color: var(--color-danger); }
+
+.sponsor-error {
+  font-size: var(--text-caption);
+  color: var(--color-danger);
+  margin-top: -4px;
+}
+
 /* ─── Savings Goal ────────────────────────────────────────────── */
 .goal-progress-wrap {
   padding: var(--space-md) var(--space-lg);
