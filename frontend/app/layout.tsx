@@ -31,6 +31,10 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Kibo — Daily Savings Streak",
   description: "Deposit 0.01 cUSD daily, build your streak, earn rewards on Celo.",
+  icons: {
+    icon: "/kibo.png",
+    apple: "/kibo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
