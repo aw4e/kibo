@@ -133,7 +133,7 @@ export default function Home() {
   const [refParam, setRefParam] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
   const [copied, setCopied] = useState(false);
   const [goalInput, setGoalInput] = useState("");
-  const [depositInput, setDepositInput] = useState("0.01");
+  const [depositInput, setDepositInput] = useState("");
   const [sponsorAddr, setSponsorAddr] = useState("");
   const sponsorAddrValid = /^0x[0-9a-fA-F]{40}$/.test(sponsorAddr);
 
@@ -540,46 +540,32 @@ export default function Home() {
                 {/* Deposit amount + button */}
                 <div className="rounded-2xl border-[3px] border-[#09090B] shadow-[4px_4px_0_#09090B] overflow-hidden bg-white">
                   {/* Purple header */}
-                  <div className="flex items-center justify-between px-4 py-3 bg-[#7C3AED]">
+                  <div className="px-4 py-3 bg-[#7C3AED]">
                     <span className="font-sans font-black text-[0.75rem] uppercase tracking-[0.12em] text-white">Deposit Amount</span>
-                    <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.1em] text-white/50">0.01 – 1 cUSD</span>
                   </div>
                   {/* Big amount input */}
-                  <div className="px-4 pt-4 pb-2 flex items-baseline gap-2 border-b-2 border-[#09090B]">
+                  <div className="px-4 pt-4 pb-3 flex items-baseline gap-2 border-b-2 border-[#09090B]">
                     <Input
-                      type="number" min="0.01" max="1" step="0.01"
+                      type="number" min="0" step="any"
                       value={depositInput}
                       onChange={(e) => setDepositInput(e.target.value)}
+                      placeholder="0.00"
                       className="font-display font-bold tracking-[-0.04em] border-0 shadow-none p-0 h-auto bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       style={{ fontSize: "2.25rem", lineHeight: 1 }}
                       disabled={!canDeposit || isTxLoading}
                     />
                     <span className="font-sans text-[0.875rem] font-black text-[#09090B]/30 uppercase tracking-[0.1em] flex-shrink-0">cUSD</span>
                   </div>
-                  {/* Quick preset amounts */}
-                  <div className="flex gap-2 px-4 pt-3 pb-2">
-                    {["0.01", "0.10", "0.50", "1.00"].map((v) => (
-                      <button key={v}
-                        onClick={() => setDepositInput(v)}
-                        className={cn(
-                          "flex-1 py-2 rounded-xl border-[1.5px] border-[#09090B] font-sans font-black text-[0.8125rem] transition-all",
-                          depositInput === v
-                            ? "bg-[#09090B] text-white"
-                            : "bg-[#F3F4F6] text-[#09090B] shadow-[1.5px_1.5px_0_#09090B] hover:bg-[#E5E7EB]"
-                        )}
-                      >{v}</button>
-                    ))}
-                  </div>
                   {/* Deposit button */}
-                  <div className="px-4 pb-4">
+                  <div className="px-4 py-4">
                     <Button
                       className="w-full h-[52px] text-[1rem]"
                       onClick={() => {
                         const v = parseFloat(depositInput);
-                        if (!v || v < 0.01 || v > 1) return;
+                        if (!v || v <= 0) return;
                         deposit(parseUnits(String(v), 18), refParam);
                       }}
-                      disabled={!canDeposit || isTxLoading || !depositInput || parseFloat(depositInput) < 0.01 || parseFloat(depositInput) > 1}
+                      disabled={!canDeposit || isTxLoading || !depositInput || parseFloat(depositInput) <= 0}
                     >
                       <Coins className="w-4 h-4" />
                       {isTxLoading ? "Processing…" : `Deposit ${depositInput || "0"} cUSD`}
