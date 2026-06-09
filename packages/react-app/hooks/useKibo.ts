@@ -3,7 +3,9 @@ import {
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useConfig,
 } from "wagmi";
+import { waitForTransactionReceipt } from "@wagmi/core";
 import { parseUnits, maxUint256 } from "viem";
 import { KIBO_ADDRESS, CUSD_ADDRESS, KIBO_ABI, ERC20_ABI } from "../lib/kibo-abi";
 import { useState, useEffect } from "react";
@@ -13,6 +15,7 @@ const DEFAULT_DEPOSIT = parseUnits("0.0001", 18);
 export function useKibo() {
   const { address } = useAccount();
   const { writeContractAsync } = useWriteContract();
+  const wagmiConfig = useConfig();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
 
   const { data: userData, refetch: refetchUser } = useReadContract({
@@ -66,7 +69,8 @@ export function useKibo() {
         functionName: "approve",
         args: [KIBO_ADDRESS, maxUint256],
       });
-      setTxHash(hash);
+      // Wait for approve to confirm before calling deposit
+      await waitForTransactionReceipt(wagmiConfig, { hash });
       await refetchAllowance();
     }
   }
@@ -106,6 +110,7 @@ export function useKibo() {
   const longestStreak = userData ? Number(userData[3]) : 0;
   const canDeposit = userData ? userData[4] : true;
   const lastClaimedStreak = userData ? Number(userData[5]) : 0;
+  const shields = userData ? Number(userData[6]) : 0;
   const canClaim = streak > 0 && streak % 7 === 0 && streak > lastClaimedStreak;
 
   const nextDepositIn =
@@ -121,6 +126,7 @@ export function useKibo() {
     canClaim,
     nextDepositIn,
     cUSDBalance,
+    shields,
     leaderboard,
     isTxLoading,
     deposit,
