@@ -1,5 +1,5 @@
 {
   "installCommand": "yarn install --frozen-lockfile",
-  "buildCommand": "cd frontend && yarn next build",
+  "buildCommand": "yarn workspace @kibo/react-app build",
   "outputDirectory": "frontend/.next"
 }
