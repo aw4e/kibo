@@ -1,0 +1,16 @@
+{
+  "name": "kibo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "kibo-sdk"
+  ],
+  "scripts": {
+    "dev": "yarn workspace @kibo/react-app dev",
+    "build": "yarn workspace @kibo/react-app build",
+    "compile": "yarn workspace @kibo/hardhat compile",
+    "deploy:alfajores": "yarn workspace @kibo/hardhat deploy:alfajores",
+    "deploy:celo": "yarn workspace @kibo/hardhat deploy:celo"
+  }
+}

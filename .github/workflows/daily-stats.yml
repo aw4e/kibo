@@ -1,0 +1,41 @@
+name: Daily Stats Sync
+
+on:
+  schedule:
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update stats
+        run: |
+          mkdir -p data
+          DEPOSITORS=$(curl -s "https://felo-rpc.celo.org" \
+            -X POST -H "Content-Type: application/json" \
+            -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' \
+            | python3 -c "import sys,json; print(int(json.load(sys.stdin)['result'],16))" 2>/dev/null || echo "0")
+          cat > data/stats.json << EOF
+          {
+            "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "block": $DEPOSITORS,
+            "network": "celo-mainnet",
+            "contract": "Kibo"
+          }
+          EOF
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/stats.json
+          git diff --staged --quiet || git commit -m "chore: sync stats $(date -u +%Y-%m-%d)"
+          git push
