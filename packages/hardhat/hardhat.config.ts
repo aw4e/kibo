@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomicfoundation/hardhat-verify";
+import "hardhat-deploy";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -13,14 +14,17 @@ const config: HardhatUserConfig = {
       optimizer: { enabled: true, runs: 200 },
     },
   },
+  namedAccounts: {
+    deployer: { default: 0 },
+  },
   networks: {
     celo: {
-      url: "https://felo-rpc.celo.org",
+      url: "https://forno.celo.org",
       chainId: 42220,
       accounts: [PRIVATE_KEY],
     },
     alfajores: {
-      url: "https://alfajores-felo-rpc.celo-testnet.org",
+      url: "https://alfajores-forno.celo-testnet.org",
       chainId: 44787,
       accounts: [PRIVATE_KEY],
     },
