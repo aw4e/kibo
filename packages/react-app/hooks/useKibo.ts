@@ -83,7 +83,10 @@ export function useKibo() {
     }
   }
 
-  async function deposit(amount: bigint = DEFAULT_DEPOSIT) {
+  async function deposit(
+    amount: bigint = DEFAULT_DEPOSIT,
+    ref: `0x${string}` = "0x0000000000000000000000000000000000000000",
+  ) {
     setError(null);
     try {
       await ensureApproval(amount);
@@ -91,7 +94,7 @@ export function useKibo() {
         address: KIBO_ADDRESS,
         abi: KIBO_ABI,
         functionName: "deposit",
-        args: [amount],
+        args: [amount, ref],
       });
       setTxHash(hash);
     } catch (e: unknown) {
@@ -137,8 +140,10 @@ export function useKibo() {
   const canClaim = streak > 0 && streak % 7 === 0 && streak > lastClaimedStreak;
   const isLoading = !!address && !userData;
 
+  // Guard: lastDeposit is Unix seconds (~1.7e9). Multiplying by 1000 for ms is safe
+  // as long as value is a plausible timestamp (< year 2100 = 4.1e9 seconds).
   const nextDepositIn =
-    lastDeposit > 0
+    lastDeposit > 0 && lastDeposit < 4_102_444_800
       ? Math.max(0, lastDeposit * 1000 + 20 * 60 * 60 * 1000 - Date.now())
       : 0;
 
