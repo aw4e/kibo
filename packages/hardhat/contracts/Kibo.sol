@@ -19,7 +19,7 @@ contract Kibo {
     // Tiered milestone rewards — scales with commitment
     uint256 public constant REWARD_TIER1 = 0.005 ether;  // day 7
     uint256 public constant REWARD_TIER2 = 0.012 ether;  // day 14+
-    uint256 public constant REWARD_TIER3 = 0.025 ether;  // day 30+
+    uint256 public constant REWARD_TIER3 = 0.025 ether;  // day 35+ (first 7-multiple ≥ 30)
 
     error AmountOutOfRange();
     error TooSoon();
@@ -27,7 +27,6 @@ contract Kibo {
     error NeedMilestone();
     error AlreadyClaimed();
     error NothingToWithdraw();
-    error NotOwner();
     error TransferFailed();
 
     // slot 1: streak(32) + longestStreak(32) + lastClaimedStreak(32) + lastDeposit(40) + isDepositor(8) + shields(8) = 152 bits
@@ -44,22 +43,12 @@ contract Kibo {
 
     mapping(address => UserData) public users;
     address[] public depositors;
-    address public owner;
 
     event Deposited(address indexed user, uint32 streak, uint40 timestamp);
     event StreakBroken(address indexed user, uint32 oldStreak);
     event ShieldUsed(address indexed user, uint32 streak, uint8 shieldsLeft);
     event RewardClaimed(address indexed user, uint32 streak, uint256 reward);
     event PoolFunded(address indexed funder, uint256 amount);
-
-    modifier onlyOwner() {
-        if (msg.sender != owner) revert NotOwner();
-        _;
-    }
-
-    constructor() {
-        owner = msg.sender;
-    }
 
     function deposit(uint256 amount) external {
         if (amount < MIN_DEPOSIT || amount > MAX_DEPOSIT) revert AmountOutOfRange();
@@ -106,7 +95,7 @@ contract Kibo {
 
         // CEI: state before external call; earn a shield on milestone
         u.lastClaimedStreak = uint32(u.streak);
-        if (u.shields < MAX_SHIELDS) unchecked { u.shields++; }
+        if (u.shields < MAX_SHIELDS) { unchecked { u.shields++; } }
 
         if (!cUSD.transfer(msg.sender, reward)) revert TransferFailed();
         emit RewardClaimed(msg.sender, u.streak, reward);
@@ -121,6 +110,7 @@ contract Kibo {
         u.streak = 0;
         u.lastDeposit = 0;
         u.shields = 0;
+        u.lastClaimedStreak = 0;
 
         if (!cUSD.transfer(msg.sender, amount)) revert TransferFailed();
     }
