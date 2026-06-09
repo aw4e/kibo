@@ -10,7 +10,8 @@ interface IERC20 {
 contract Kibo {
     IERC20 public constant cUSD = IERC20(0x765DE816845861e75A25fCA122bb6898B8B1282a);
 
-    uint256 public constant DEPOSIT_AMOUNT = 0.01 ether; // 0.01 cUSD
+    uint256 public constant MIN_DEPOSIT = 0.0001 ether; // 0.0001 cUSD minimum
+    uint256 public constant MAX_DEPOSIT = 1 ether;     // 1 cUSD maximum
     uint256 public constant COOLDOWN = 20 hours;
     uint256 public constant STREAK_REWARD_THRESHOLD = 7;
     uint256 public constant REWARD_AMOUNT = 0.005 ether; // 0.005 cUSD reward per 7-day streak
@@ -20,6 +21,7 @@ contract Kibo {
         uint256 lastDeposit;
         uint256 totalDeposited;
         uint256 longestStreak;
+        uint256 lastClaimedStreak;
     }
 
     mapping(address => UserData) public users;
@@ -42,7 +44,9 @@ contract Kibo {
         owner = msg.sender;
     }
 
-    function deposit() external {
+    function deposit(uint256 amount) external {
+        require(amount >= MIN_DEPOSIT && amount <= MAX_DEPOSIT, "Amount out of range");
+
         UserData storage u = users[msg.sender];
 
         require(
@@ -57,13 +61,13 @@ contract Kibo {
         }
 
         require(
-            cUSD.transferFrom(msg.sender, address(this), DEPOSIT_AMOUNT),
+            cUSD.transferFrom(msg.sender, address(this), amount),
             "cUSD transfer failed"
         );
 
         u.streak++;
         u.lastDeposit = block.timestamp;
-        u.totalDeposited += DEPOSIT_AMOUNT;
+        u.totalDeposited += amount;
 
         if (u.streak > u.longestStreak) {
             u.longestStreak = u.streak;
@@ -80,12 +84,16 @@ contract Kibo {
     function claimReward() external {
         UserData storage u = users[msg.sender];
         require(u.streak >= STREAK_REWARD_THRESHOLD, "Need 7-day streak");
-        require(u.streak % STREAK_REWARD_THRESHOLD == 0, "Already claimed this milestone");
+        require(u.streak % STREAK_REWARD_THRESHOLD == 0, "Not at milestone");
+        require(u.streak > u.lastClaimedStreak, "Already claimed this milestone");
 
         uint256 reward = REWARD_AMOUNT;
         require(cUSD.balanceOf(address(this)) >= reward, "Pool empty");
 
-        cUSD.transfer(msg.sender, reward);
+        // CEI: update state before external call
+        u.lastClaimedStreak = u.streak;
+
+        require(cUSD.transfer(msg.sender, reward), "Reward transfer failed");
         emit RewardClaimed(msg.sender, u.streak, reward);
     }
 
@@ -111,7 +119,8 @@ contract Kibo {
         uint256 lastDeposit,
         uint256 totalDeposited,
         uint256 longestStreak,
-        bool canDeposit
+        bool canDeposit,
+        uint256 lastClaimedStreak
     ) {
         UserData memory u = users[user];
         return (
@@ -119,7 +128,8 @@ contract Kibo {
             u.lastDeposit,
             u.totalDeposited,
             u.longestStreak,
-            block.timestamp >= u.lastDeposit + COOLDOWN
+            block.timestamp >= u.lastDeposit + COOLDOWN,
+            u.lastClaimedStreak
         );
     }
 

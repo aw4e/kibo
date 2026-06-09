@@ -4,7 +4,7 @@ export const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as `0x$
 
 export const KIBO_ABI = [
   {
-    inputs: [],
+    inputs: [{ name: "amount", type: "uint256" }],
     name: "deposit",
     outputs: [],
     stateMutability: "nonpayable",
@@ -33,6 +33,7 @@ export const KIBO_ABI = [
       { name: "totalDeposited", type: "uint256" },
       { name: "longestStreak", type: "uint256" },
       { name: "canDeposit", type: "bool" },
+      { name: "lastClaimedStreak", type: "uint256" },
     ],
     stateMutability: "view",
     type: "function",

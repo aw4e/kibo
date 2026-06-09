@@ -8,7 +8,7 @@ import { parseUnits, maxUint256 } from "viem";
 import { KIBO_ADDRESS, CUSD_ADDRESS, KIBO_ABI, ERC20_ABI } from "../lib/kibo-abi";
 import { useState, useEffect } from "react";
 
-const DEPOSIT_AMOUNT = parseUnits("0.01", 18);
+const DEFAULT_DEPOSIT = parseUnits("0.0001", 18);
 
 export function useKibo() {
   const { address } = useAccount();
@@ -58,8 +58,8 @@ export function useKibo() {
     }
   }, [txConfirmed, refetchUser, refetchAllowance]);
 
-  async function ensureApproval() {
-    if (!allowance || allowance < DEPOSIT_AMOUNT) {
+  async function ensureApproval(amount: bigint) {
+    if (!allowance || allowance < amount) {
       const hash = await writeContractAsync({
         address: CUSD_ADDRESS,
         abi: ERC20_ABI,
@@ -71,12 +71,13 @@ export function useKibo() {
     }
   }
 
-  async function deposit() {
-    await ensureApproval();
+  async function deposit(amount: bigint = DEFAULT_DEPOSIT) {
+    await ensureApproval(amount);
     const hash = await writeContractAsync({
       address: KIBO_ADDRESS,
       abi: KIBO_ABI,
       functionName: "deposit",
+      args: [amount],
     });
     setTxHash(hash);
   }
@@ -104,7 +105,8 @@ export function useKibo() {
   const totalDeposited = userData ? userData[2] : BigInt(0);
   const longestStreak = userData ? Number(userData[3]) : 0;
   const canDeposit = userData ? userData[4] : true;
-  const canClaim = streak > 0 && streak % 7 === 0;
+  const lastClaimedStreak = userData ? Number(userData[5]) : 0;
+  const canClaim = streak > 0 && streak % 7 === 0 && streak > lastClaimedStreak;
 
   const nextDepositIn =
     lastDeposit > 0
