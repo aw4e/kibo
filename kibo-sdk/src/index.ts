@@ -85,6 +85,7 @@ export const KIBO_ABI = [
       { name: "shields",           type: "uint8"   },
       { name: "brokenStreak",      type: "uint256" },
       { name: "badge",             type: "uint8"   },
+      { name: "rewardsClaimed",    type: "uint256" },
     ],
     stateMutability: "view",
     type: "function",
@@ -165,6 +166,7 @@ export interface UserData {
   shields: number;
   brokenStreak: bigint;
   badge: Badge;
+  rewardsClaimed: bigint;
 }
 
 export interface LeaderboardEntry {
@@ -199,6 +201,7 @@ export async function getUser(address: Address, rpcUrl?: string): Promise<UserDa
     shields:           Number(r[6]),
     brokenStreak:      r[7],
     badge:             r[8] as Badge,
+    rewardsClaimed:    r[9],
   };
 }
 
@@ -274,7 +277,7 @@ export async function deposit(
     address: KIBO_ADDRESS,
     abi: KIBO_ABI,
     functionName: "deposit",
-    args: [amount, ref],
+    args: [amount, ref as Address],
     account,
     chain: celo,
   });

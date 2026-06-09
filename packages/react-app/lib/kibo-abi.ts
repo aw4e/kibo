@@ -79,6 +79,7 @@ export const KIBO_ABI = [
       { name: "shields",          type: "uint8"   },
       { name: "brokenStreak",     type: "uint256" },
       { name: "badge",            type: "uint8"   }, // Badge enum as uint8
+      { name: "rewardsClaimed",   type: "uint256" },
     ],
     stateMutability: "view",
     type: "function",
@@ -133,6 +134,13 @@ export const KIBO_ABI = [
     inputs: [{ name: "user", type: "address" }],
     name: "savingsGoal",
     outputs: [{ name: "", type: "uint128" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ name: "user", type: "address" }],
+    name: "totalRewardsClaimed",
+    outputs: [{ name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
