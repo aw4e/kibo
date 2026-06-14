@@ -223,6 +223,8 @@ export default function Home() {
   const prevCanClaim = useRef(false);
   const prevTxConfirmed = useRef(false);
 
+  const isMiniPay = typeof window !== "undefined" && !!(window.ethereum as Record<string, unknown> | undefined)?.isMiniPay;
+
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
@@ -231,13 +233,20 @@ export default function Home() {
     if (r && /^0x[0-9a-fA-F]{40}$/.test(r)) setRefParam(r as `0x${string}`);
   }, []);
 
+  // Auto-connect when running inside MiniPay
+  useEffect(() => {
+    if (isMiniPay && !isConnected) {
+      connect({ connector: injected() });
+    }
+  }, [isMiniPay, isConnected]);
+
   const {
     streak, longestStreak, totalDeposited, canDeposit, canClaim, nextDepositIn,
     cUSDBalance, shields, badge, brokenStreak, rewardsClaimed, leaderboard,
     isTxLoading, isLoading, error, clearError, deposit, claimReward, withdraw,
     recoverStreak, pendingReferralReward, referrer, claimReferralReward,
     savingsGoal, setGoal, depositFor, poolBalance, totalDepositors, depositHistory,
-    txConfirmed,
+    txConfirmed, referralCount, totalReferralEarned,
   } = useKibo();
 
   // Toast on error
@@ -363,11 +372,18 @@ export default function Home() {
                   className="h-[66px] px-10 bg-[#FFE500] text-[#09090B] font-black text-[1.1875rem] rounded-2xl border-[3px] border-[#09090B] shadow-[6px_6px_0_#09090B] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0_#09090B] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all duration-75 flex items-center gap-2.5 flex-shrink-0"
                 >
                   <Wallet className="w-5 h-5" />
-                  Connect Wallet
+                  {isMiniPay ? "Open in MiniPay" : "Connect Wallet"}
                 </button>
-                <p className="font-sans text-[0.8125rem] font-medium text-[#09090B]/35 leading-relaxed">
-                  Works with MiniPay<br className="hidden sm:block" /> or any injected wallet
-                </p>
+                {isMiniPay ? (
+                  <div className="flex items-center gap-2 bg-[#DCFCE7] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] rounded-full px-3 py-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+                    <span className="font-sans text-[0.6875rem] font-black uppercase tracking-[0.1em] text-[#15803D]">MiniPay detected</span>
+                  </div>
+                ) : (
+                  <p className="font-sans text-[0.8125rem] font-medium text-[#09090B]/35 leading-relaxed">
+                    Works with MiniPay<br className="hidden sm:block" /> or any injected wallet
+                  </p>
+                )}
               </div>
             </div>
 
@@ -923,6 +939,24 @@ export default function Home() {
                 <SectionLabel color="#CA8A04">Referral</SectionLabel>
                 <Card>
                   <CardContent>
+                    {referralCount > 0 && (
+                      <>
+                        <CardRow>
+                          <div className="flex items-center gap-3">
+                            <RowIcon bg="bg-[#FEF9C3]"><Users className="w-4 h-4 text-[#CA8A04]" /></RowIcon>
+                            <span className="font-semibold">Friends referred</span>
+                          </div>
+                          <span className="font-black text-[#CA8A04] tabular-nums">{referralCount}</span>
+                        </CardRow>
+                        <CardRow>
+                          <div className="flex items-center gap-3">
+                            <RowIcon bg="bg-[#DCFCE7]"><Coins className="w-4 h-4 text-[#15803D]" /></RowIcon>
+                            <span className="font-semibold">Total earned</span>
+                          </div>
+                          <span className="font-black text-[#15803D] tabular-nums">{fmtAmt(totalReferralEarned)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">cUSD</span></span>
+                        </CardRow>
+                      </>
+                    )}
                     {referrer && (
                       <CardRow>
                         <div className="flex items-center gap-3">
