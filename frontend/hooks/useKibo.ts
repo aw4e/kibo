@@ -4,6 +4,7 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
   useConfig,
+  usePublicClient,
 } from "wagmi";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { parseUnits, maxUint256 } from "viem";
@@ -16,8 +17,14 @@ export function useKibo() {
   const { address } = useAccount();
   const { writeContractAsync } = useWriteContract();
   const wagmiConfig = useConfig();
+  const publicClient = usePublicClient();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
   const [error, setError] = useState<string | null>(null);
+  const [depositHistory, setDepositHistory] = useState<Array<{
+    streak: number;
+    timestamp: number;
+    txHash: `0x${string}`;
+  }>>([]);
   // Force re-render every 30s so countdown ticks while deposit is pending
   const [, setTick] = useState(0);
 
@@ -78,9 +85,10 @@ export function useKibo() {
   });
 
   const { data: poolBalance } = useReadContract({
-    address: KIBO_ADDRESS,
-    abi: KIBO_ABI,
-    functionName: "poolBalance",
+    address: CUSD_ADDRESS,
+    abi: ERC20_ABI,
+    functionName: "balanceOf",
+    args: [KIBO_ADDRESS],
     query: { enabled: !!KIBO_ADDRESS, staleTime: 30_000 },
   });
 
@@ -108,6 +116,29 @@ export function useKibo() {
     const id = setInterval(() => setTick((n) => n + 1), 30_000);
     return () => clearInterval(id);
   }, []);
+
+  // Fetch deposit history from on-chain events
+  useEffect(() => {
+    if (!address || !publicClient || !KIBO_ADDRESS) return;
+    let cancelled = false;
+    publicClient.getContractEvents({
+      address: KIBO_ADDRESS,
+      abi: KIBO_ABI,
+      eventName: "Deposited",
+      args: { user: address },
+      fromBlock: 0n,
+    }).then(logs => {
+      if (cancelled) return;
+      setDepositHistory(
+        [...logs].reverse().map(log => ({
+          streak: Number(log.args.streak),
+          timestamp: Number(log.args.timestamp),
+          txHash: log.transactionHash!,
+        }))
+      );
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [address, publicClient, txConfirmed]);
 
   async function ensureApproval(amount: bigint) {
     if (!allowance || allowance < amount) {
@@ -282,6 +313,8 @@ export function useKibo() {
     savingsGoal: savingsGoal ?? BigInt(0),
     poolBalance: poolBalance ?? BigInt(0),
     totalDepositors: totalDepositors ? Number(totalDepositors) : 0,
+    depositHistory,
+    txConfirmed,
   };
 }
 

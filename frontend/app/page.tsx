@@ -7,21 +7,24 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useKibo } from "../hooks/useKibo";
+import { useToast } from "../hooks/useToast";
 import { formatUnits, parseUnits } from "viem";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardRow } from "@/components/ui/card";
+import { Toaster } from "@/components/ui/toast";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { LottieIcon } from "@/components/ui/lottie-icon";
 import {
-  AlertCircle, X, Copy, Check, Wallet,
+  Copy, Check, Wallet,
   Coins, Gift, HeartCrack, Zap, Trophy, Shield,
   Sparkles, Calendar, Target, DollarSign, Users,
   Award, Clock, Flame, Link, Mountain, Star, Medal,
-  Home as HomeIcon, BarChart2, Settings, Globe,
+  Home as HomeIcon, BarChart2, Settings, Globe, Share2, ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -104,6 +107,81 @@ function SectionLabel({ children, color = "#7C3AED" }: { children: string; color
   );
 }
 
+function StreakCalendar({
+  depositHistory,
+}: {
+  depositHistory: Array<{ streak: number; timestamp: number; txHash: `0x${string}` }>;
+}) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const depositDays = new Set(
+    depositHistory.map((d) => {
+      const date = new Date(d.timestamp * 1000);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime();
+    })
+  );
+
+  const days = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (29 - i));
+    return d;
+  });
+
+  const weekLabels = ["S", "M", "T", "W", "T", "F", "S"];
+
+  return (
+    <div className="px-5 py-4 flex flex-col gap-2">
+      <div className="grid grid-cols-7 gap-1 mb-0.5">
+        {weekLabels.map((l, i) => (
+          <span key={i} className="text-center font-sans text-[0.5625rem] font-bold uppercase text-[#09090B]/25">
+            {l}
+          </span>
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-1.5">
+        {/* offset so first day lands on correct weekday */}
+        {Array.from({ length: days[0].getDay() }).map((_, i) => (
+          <div key={`pad-${i}`} />
+        ))}
+        {days.map((day) => {
+          const isToday = day.getTime() === today.getTime();
+          const has = depositDays.has(day.getTime());
+          return (
+            <div
+              key={day.getTime()}
+              title={day.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+              className={cn(
+                "aspect-square rounded-[4px] transition-colors",
+                has
+                  ? "bg-[#7C3AED] border-2 border-[#5B21B6]"
+                  : isToday
+                  ? "bg-white border-2 border-[#FFE500]"
+                  : "bg-[#F3F4F6] border border-[#E5E7EB]"
+              )}
+            />
+          );
+        })}
+      </div>
+      <div className="flex items-center gap-3 mt-1">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-[3px] bg-[#7C3AED]" />
+          <span className="font-sans text-[0.625rem] text-[#09090B]/40 font-medium">Deposited</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-[3px] bg-white border-2 border-[#FFE500]" />
+          <span className="font-sans text-[0.625rem] text-[#09090B]/40 font-medium">Today</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-[3px] bg-[#F3F4F6] border border-[#E5E7EB]" />
+          <span className="font-sans text-[0.625rem] text-[#09090B]/40 font-medium">Missed</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type Tab = "home" | "leaderboard" | "settings";
 
 const TABS: { id: Tab; Icon: React.ElementType; label: string }[] = [
@@ -136,6 +214,9 @@ export default function Home() {
   const [depositInput, setDepositInput] = useState("");
   const [sponsorAddr, setSponsorAddr] = useState("");
   const sponsorAddrValid = /^0x[0-9a-fA-F]{40}$/.test(sponsorAddr);
+  const { toasts, addToast, removeToast } = useToast();
+  const prevCanClaim = useRef(false);
+  const prevTxConfirmed = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -150,8 +231,30 @@ export default function Home() {
     cUSDBalance, shields, badge, brokenStreak, rewardsClaimed, leaderboard,
     isTxLoading, isLoading, error, clearError, deposit, claimReward, withdraw,
     recoverStreak, pendingReferralReward, referrer, claimReferralReward,
-    savingsGoal, setGoal, depositFor, poolBalance, totalDepositors,
+    savingsGoal, setGoal, depositFor, poolBalance, totalDepositors, depositHistory,
+    txConfirmed,
   } = useKibo();
+
+  // Toast on error
+  useEffect(() => {
+    if (error) { addToast(error, "error"); clearError(); }
+  }, [error]);
+
+  // Toast + confetti on tx success
+  useEffect(() => {
+    if (txConfirmed && !prevTxConfirmed.current) {
+      addToast("Transaction confirmed!", "success");
+    }
+    prevTxConfirmed.current = !!txConfirmed;
+  }, [txConfirmed]);
+
+  // Confetti when milestone unlocked
+  useEffect(() => {
+    if (canClaim && !prevCanClaim.current) {
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 }, colors: ["#7C3AED", "#FFE500", "#22C55E", "#3B82F6"] });
+    }
+    prevCanClaim.current = canClaim;
+  }, [canClaim]);
 
   const countdown     = formatCountdown(nextDepositIn);
   const savedAmount   = parseFloat(formatUnits(totalDeposited, 18));
@@ -431,18 +534,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Error banner */}
-      {error && (
-        <div className="max-w-screen-xl mx-auto px-6 pt-4" role="alert">
-          <div className="flex items-center gap-2 px-4 py-3 bg-[#FEE2E2] border-2 border-[#09090B] shadow-[3px_3px_0_#09090B] rounded-xl animate-slide-down">
-            <AlertCircle className="h-4 w-4 text-[#DC2626] flex-shrink-0" />
-            <span className="font-sans flex-1 text-[0.8125rem] font-bold text-[#DC2626]">{error}</span>
-            <button onClick={clearError} className="text-[#DC2626]/60 p-0.5 rounded" aria-label="Dismiss">
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
+      <Toaster toasts={toasts} onRemove={removeToast} />
 
       {/* Main content */}
       <main className="max-w-screen-xl mx-auto px-6 py-8">
@@ -730,6 +822,18 @@ export default function Home() {
                 </Card>
               </div>
 
+              {/* Streak Calendar */}
+              {depositHistory.length > 0 && (
+                <div className="md:col-span-2">
+                  <SectionLabel color="#7C3AED">30-Day Calendar</SectionLabel>
+                  <Card>
+                    <CardContent>
+                      <StreakCalendar depositHistory={depositHistory} />
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
               {/* Progress */}
               <div>
                 <SectionLabel color="#1D4ED8">Progress</SectionLabel>
@@ -881,6 +985,56 @@ export default function Home() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Deposit History */}
+              {depositHistory.length > 0 && (
+                <div className="md:col-span-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <SectionLabel color="#7C3AED">Deposit History</SectionLabel>
+                    <button
+                      onClick={() => {
+                        if (!address) return;
+                        const text = `🔥 I'm on a ${streak}-day savings streak on Kibo!\nSave daily on Celo → ${window.location.origin}?ref=${address}`;
+                        navigator.clipboard.writeText(text);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="flex items-center gap-1.5 text-[0.75rem] font-bold text-[#7C3AED] hover:opacity-70 transition-opacity mb-3"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+                      {copied ? "Copied!" : "Share streak"}
+                    </button>
+                  </div>
+                  <Card>
+                    <CardContent>
+                      {depositHistory.slice(0, 10).map((entry) => (
+                        <CardRow key={entry.txHash}>
+                          <div className="flex items-center gap-3">
+                            <RowIcon bg="bg-[#EDE9FE]">
+                              <Flame className="w-4 h-4 text-[#7C3AED]" />
+                            </RowIcon>
+                            <div>
+                              <span className="font-semibold">Day {entry.streak}</span>
+                              <span className="font-sans text-[0.75rem] text-[#09090B]/40 ml-2">
+                                {new Date(entry.timestamp * 1000).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                              </span>
+                            </div>
+                          </div>
+                          <a
+                            href={`https://celoscan.io/tx/${entry.txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-[0.75rem] font-bold text-[#7C3AED]/60 hover:text-[#7C3AED] transition-colors"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            <span className="font-mono">{entry.txHash.slice(0, 8)}…</span>
+                          </a>
+                        </CardRow>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
 
             </div>
           </div>

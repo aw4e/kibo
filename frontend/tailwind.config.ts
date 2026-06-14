@@ -94,6 +94,10 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(-8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        "slide-up": {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
         "spin-slow": {
           from: { transform: "rotate(0deg)" },
           to: { transform: "rotate(360deg)" },
@@ -128,6 +132,7 @@ const config: Config = {
         "pop-in": "pop-in 280ms cubic-bezier(0.34,1.56,0.64,1)",
         "bounce-in": "bounce-in 600ms cubic-bezier(0.34,1.56,0.64,1)",
         "slide-down": "slide-down 280ms cubic-bezier(0.25,0.46,0.45,0.94)",
+        "slide-up": "slide-up 280ms cubic-bezier(0.25,0.46,0.45,0.94)",
         "spin-slow": "spin-slow 10s linear infinite",
         "spin-slow-r": "spin-slow-r 13s linear infinite",
         sparkle: "sparkle 3.2s ease-in-out infinite",
