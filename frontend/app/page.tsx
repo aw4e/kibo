@@ -28,6 +28,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+function fmtAmt(v: bigint, maxDp = 5): string {
+  const n = parseFloat(formatUnits(v, 18));
+  return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: maxDp });
+}
+
 const BADGE_LABEL = ["—", "Bronze", "Silver", "Gold", "Diamond"] as const;
 const BADGE_BG    = ["", "bg-[#FDE68A]", "bg-[#E5E7EB]", "bg-[#FDE68A]", "bg-[#BAE6FD]"] as const;
 const BADGE_ICON  = [null, Award, Medal, Trophy, Star] as const;
@@ -258,7 +263,7 @@ export default function Home() {
 
   const countdown     = formatCountdown(nextDepositIn);
   const savedAmount   = parseFloat(formatUnits(totalDeposited, 18));
-  const balanceAmount = cUSDBalance ? parseFloat(formatUnits(cUSDBalance, 18)).toFixed(2) : "—";
+  const balanceAmount = cUSDBalance ? fmtAmt(cUSDBalance) : "—";
   const goalPct       = savingsGoal > BigInt(0)
     ? Math.min(100, Number((totalDeposited * BigInt(100)) / savingsGoal))
     : 0;
@@ -581,7 +586,7 @@ export default function Home() {
                     {[
                       { label: "Best",    value: `${longestStreak}d`,                 bg: "bg-[#EDE9FE]", tc: "text-[#6D28D9]" },
                       { label: "Shields", value: shields > 0 ? `${shields}/3` : "—", bg: "bg-[#DBEAFE]", tc: "text-[#1D4ED8]" },
-                      { label: "Saved",   value: `${savedAmount.toFixed(2)}`,         bg: "bg-[#DCFCE7]", tc: "text-[#15803D]" },
+                      { label: "Saved",   value: fmtAmt(totalDeposited),              bg: "bg-[#DCFCE7]", tc: "text-[#15803D]" },
                     ].map(({ label, value, bg, tc }, i) => (
                       <div key={label} className={cn(
                         "flex flex-col items-center py-4 gap-0.5",
@@ -720,7 +725,7 @@ export default function Home() {
                         <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.12em] text-[#09090B]/50">My Savings</span>
                       </div>
                       <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#6D28D9]">
-                        {savedAmount.toFixed(3)}
+                        {fmtAmt(totalDeposited)}
                         <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">cUSD</span>
                       </span>
                     </div>
@@ -731,7 +736,7 @@ export default function Home() {
                         <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.12em] text-[#09090B]/50">Global Pool</span>
                       </div>
                       <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#1D4ED8]">
-                        {poolBalance ? parseFloat(formatUnits(poolBalance, 18)).toFixed(2) : "—"}
+                        {poolBalance ? fmtAmt(poolBalance) : "—"}
                         <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">cUSD</span>
                       </span>
                     </div>
@@ -764,7 +769,7 @@ export default function Home() {
                             <RowIcon bg="bg-[#EDE9FE]"><Coins className="w-4 h-4 text-[#6D28D9]" /></RowIcon>
                             <span className="font-semibold">Total saved</span>
                           </div>
-                          <span className="font-black text-[#6D28D9] tabular-nums">{savedAmount.toFixed(3)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">cUSD</span></span>
+                          <span className="font-black text-[#6D28D9] tabular-nums">{fmtAmt(totalDeposited)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">cUSD</span></span>
                         </CardRow>
                         <CardRow>
                           <div className="flex items-center gap-3">
@@ -805,14 +810,14 @@ export default function Home() {
                             {badge > 0 ? BADGE_LABEL[badge] : "None yet"}
                           </span>
                         </CardRow>
-                        {parseFloat(formatUnits(rewardsClaimed, 18)) > 0 && (
+                        {rewardsClaimed > BigInt(0) && (
                           <CardRow>
                             <div className="flex items-center gap-3">
                               <RowIcon bg="bg-[#DCFCE7]"><Gift className="w-4 h-4 text-[#15803D]" /></RowIcon>
                               <span className="font-semibold">Rewards earned</span>
                             </div>
                             <span className="font-black text-[#15803D] tabular-nums">
-                              +{parseFloat(formatUnits(rewardsClaimed, 18)).toFixed(4)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">cUSD</span>
+                              +{fmtAmt(rewardsClaimed)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">cUSD</span>
                             </span>
                           </CardRow>
                         )}
@@ -888,8 +893,8 @@ export default function Home() {
                     {savingsGoal > BigInt(0) ? (
                       <div className="px-5 py-4 border-b-2 border-[#09090B] flex flex-col gap-3">
                         <div className="flex justify-between text-[0.75rem]">
-                          <span className="font-black text-[#6D28D9]">{parseFloat(formatUnits(totalDeposited, 18)).toFixed(3)} cUSD</span>
-                          <span className="font-sans font-semibold text-[#09090B]/45">Goal: {parseFloat(formatUnits(savingsGoal, 18)).toFixed(2)} cUSD</span>
+                          <span className="font-black text-[#6D28D9]">{fmtAmt(totalDeposited)} cUSD</span>
+                          <span className="font-sans font-semibold text-[#09090B]/45">Goal: {fmtAmt(savingsGoal)} cUSD</span>
                         </div>
                         <Progress value={goalPct} />
                         <p className="font-sans text-[0.6875rem] font-bold text-[#6D28D9] text-right">{goalPct}% complete</p>
@@ -940,7 +945,7 @@ export default function Home() {
                             <RowIcon bg="bg-[#DCFCE7]"><Coins className="w-4 h-4 text-[#15803D]" /></RowIcon>
                             <span className="font-semibold">Referral reward</span>
                           </div>
-                          <span className="font-black text-[#15803D] tabular-nums">+{parseFloat(formatUnits(pendingReferralReward, 18)).toFixed(4)} cUSD</span>
+                          <span className="font-black text-[#15803D] tabular-nums">+{fmtAmt(pendingReferralReward)} cUSD</span>
                         </CardRow>
                         <div className="px-5 pb-4 pt-1">
                           <Button variant="success" onClick={claimReferralReward} disabled={isTxLoading}>Claim referral reward</Button>

@@ -85,10 +85,9 @@ export function useKibo() {
   });
 
   const { data: poolBalance } = useReadContract({
-    address: CUSD_ADDRESS,
-    abi: ERC20_ABI,
-    functionName: "balanceOf",
-    args: [KIBO_ADDRESS],
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "poolBalance",
     query: { enabled: !!KIBO_ADDRESS, staleTime: 30_000 },
   });
 
