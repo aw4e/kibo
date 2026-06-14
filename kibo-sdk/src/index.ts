@@ -116,9 +116,23 @@ export const KIBO_ABI = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "totalDepositors",
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [{ name: "user", type: "address" }],
     name: "pendingReferralReward",
     outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ name: "user", type: "address" }],
+    name: "referrer",
+    outputs: [{ name: "", type: "address" }],
     stateMutability: "view",
     type: "function",
   },
@@ -234,6 +248,52 @@ export async function getPendingReferralReward(
     functionName: "pendingReferralReward",
     args: [address],
   });
+}
+
+export async function getPoolBalance(rpcUrl?: string): Promise<bigint> {
+  const client = createKiboClient(rpcUrl);
+  return client.readContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "poolBalance",
+  });
+}
+
+export async function getTotalDepositors(rpcUrl?: string): Promise<number> {
+  const client = createKiboClient(rpcUrl);
+  const n = await client.readContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "totalDepositors",
+  });
+  return Number(n);
+}
+
+export async function getSavingsGoal(
+  address: Address,
+  rpcUrl?: string,
+): Promise<bigint> {
+  const client = createKiboClient(rpcUrl);
+  return client.readContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "savingsGoal",
+    args: [address],
+  });
+}
+
+export async function getReferrer(
+  address: Address,
+  rpcUrl?: string,
+): Promise<Address | null> {
+  const client = createKiboClient(rpcUrl);
+  const ref = await client.readContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "referrer",
+    args: [address],
+  });
+  return ref === "0x0000000000000000000000000000000000000000" ? null : ref;
 }
 
 // ── Write helpers ────────────────────────────────────────────────

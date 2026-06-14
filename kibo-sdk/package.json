@@ -1,20 +1,32 @@
 {
-  "name": "kibo-sdk",
+  "name": "@kibo/sdk",
   "version": "1.0.0",
-  "description": "SDK for interacting with Kibo daily savings contract on Celo",
+  "description": "TypeScript SDK for the Kibo daily savings contract on Celo",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsup src/index.ts --format cjs --dts --external viem",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["celo", "minipay", "savings", "streak", "web3"],
+  "keywords": [
+    "celo",
+    "minipay",
+    "savings",
+    "streak",
+    "defi",
+    "web3"
+  ],
   "license": "MIT",
-  "dependencies": {
-    "viem": "^2.21.0"
+  "peerDependencies": {
+    "viem": ">=2.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.6.0"
+    "tsup": "^8.5.1",
+    "typescript": "^5.6.0",
+    "viem": "^2.21.0"
   }
 }
