@@ -57,6 +57,18 @@ function formatCountdown(ms: number): string | null {
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
+function nextMilestone(streak: number) {
+  return Math.ceil((streak + 1) / 7) * 7;
+}
+
+function nextRewardAmt(streak: number): string {
+  const n = nextMilestone(streak);
+  if (n >= 49) return "0.05";
+  if (n >= 35) return "0.025";
+  if (n >= 14) return "0.012";
+  return "0.005";
+}
+
 function StreakRing({ streak, size = 220 }: { streak: number; size?: number }) {
   const milestone = 7;
   const daysIntoMilestone = streak % milestone || (streak > 0 ? milestone : 0);
@@ -641,19 +653,68 @@ export default function Home() {
               ) : (
                 <div className="rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] overflow-hidden">
                   {/* Ring area */}
-                  <div className="bg-gradient-to-br from-[#6D28D9] via-[#5B21B6] to-[#1D4ED8] px-6 pt-8 pb-6 flex flex-col items-center gap-3">
+                  <div className="bg-gradient-to-br from-[#6D28D9] via-[#5B21B6] to-[#1D4ED8] px-6 pt-8 pb-6 flex flex-col items-center gap-4">
                     {isLoading ? (
-                      <div className="w-[220px] h-[220px] rounded-full skeleton" />
+                      <div className="w-[200px] h-[200px] rounded-full skeleton" />
                     ) : (
-                      <StreakRing streak={streak} size={220} />
+                      <StreakRing streak={streak} size={200} />
                     )}
-                    <p className="font-sans text-[0.9375rem] font-bold text-white/90 text-center">
-                      {isLoading ? " " : streak % 7 === 0 && streak > 0
-                        ? "Milestone reached!"
-                        : `${7 - (streak % 7)} day${7 - (streak % 7) !== 1 ? "s" : ""} to next milestone`}
-                    </p>
-                    {canClaim && <Badge variant="milestone">Reward ready!</Badge>}
+
+                    {/* 7-dot cycle tracker */}
+                    {!isLoading && (
+                      <div className="flex items-center gap-[7px]">
+                        {Array.from({ length: 7 }, (_, i) => {
+                          const daysInCycle = streak % 7 || (streak > 0 ? 7 : 0);
+                          const filled = i < daysInCycle;
+                          const isCurrent = i === daysInCycle - 1 && streak > 0;
+                          return (
+                            <div key={i} className="flex flex-col items-center gap-1">
+                              <div className={cn(
+                                "rounded-full transition-all duration-300",
+                                filled
+                                  ? "bg-[#FFE500] w-3 h-3 shadow-[0_0_8px_rgba(255,229,0,0.7)]"
+                                  : "bg-white/20 w-2.5 h-2.5",
+                                isCurrent && "scale-125 ring-2 ring-[#FFE500]/50",
+                              )} />
+                              <span className="font-sans text-[0.5rem] font-bold text-white/30">{i + 1}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Status chip */}
+                    {!isLoading && (
+                      canClaim ? (
+                        <div className="flex items-center gap-2 bg-[#FFE500] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] rounded-full px-4 py-1.5">
+                          <Gift className="w-3.5 h-3.5 text-[#09090B]" />
+                          <span className="font-sans text-[0.8125rem] font-black text-[#09090B]">Reward ready to claim!</span>
+                        </div>
+                      ) : countdown ? (
+                        <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5">
+                          <Clock className="w-3.5 h-3.5 text-white/50" />
+                          <span className="font-sans text-[0.8125rem] font-bold text-white">{countdown}</span>
+                          <span className="font-sans text-[0.75rem] text-white/40">until next deposit</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 bg-[#22C55E]/20 border border-[#22C55E]/50 rounded-full px-4 py-1.5">
+                          <div className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse" />
+                          <span className="font-sans text-[0.8125rem] font-bold text-[#4ADE80]">
+                            {streak === 0 ? "Start your streak!" : "Ready to deposit"}
+                          </span>
+                        </div>
+                      )
+                    )}
+
+                    {/* Next reward hint */}
+                    {!isLoading && !canClaim && (
+                      <p className="font-sans text-[0.6875rem] text-white/35 -mt-1">
+                        Next reward <span className="text-white/60 font-bold">{nextRewardAmt(streak)} cUSD</span>
+                        {" "}at day <span className="text-white/60 font-bold">{nextMilestone(streak)}</span>
+                      </p>
+                    )}
                   </div>
+
                   {/* Colored stat bar */}
                   <div className="grid grid-cols-3 border-t-[2px] border-[#09090B]">
                     {[
