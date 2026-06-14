@@ -20,7 +20,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { LottieIcon } from "@/components/ui/lottie-icon";
 import {
-  Copy, Check, Wallet,
+  Copy, Check, Wallet, Pencil,
   Coins, Gift, HeartCrack, Zap, Trophy, Shield,
   Sparkles, Calendar, Target, DollarSign, Users,
   Award, Clock, Flame, Link, Mountain, Star, Medal,
@@ -224,10 +224,29 @@ export default function Home() {
   const { toasts, addToast, removeToast } = useToast();
   const prevCanClaim = useRef(false);
   const prevTxConfirmed = useRef(false);
+  const [displayName, setDisplayName] = useState("");
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
 
   const isMiniPay = typeof window !== "undefined" && !!(window.ethereum as Record<string, unknown> | undefined)?.isMiniPay;
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    const saved = localStorage.getItem("kibo:displayName");
+    if (saved) setDisplayName(saved);
+  }, []);
+
+  function saveName() {
+    const trimmed = nameInput.trim().slice(0, 20);
+    if (trimmed) {
+      localStorage.setItem("kibo:displayName", trimmed);
+      setDisplayName(trimmed);
+    } else {
+      localStorage.removeItem("kibo:displayName");
+      setDisplayName("");
+    }
+    setEditingName(false);
+  }
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -296,19 +315,19 @@ export default function Home() {
 
         {/* Nav */}
         <header className="border-b-2 border-[#09090B] bg-white sticky top-0 z-20">
-          <div className="max-w-screen-xl mx-auto flex items-center justify-between px-6 h-[68px]">
-            <div className="flex items-center gap-2.5">
-              <Image src="/kibo.png" width={38} height={38} alt="Kibo"
-                className="rounded-[10px] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B]" />
-              <span className="font-display font-bold text-[2rem] tracking-[-0.02em] text-[#09090B]">Kibo</span>
+          <div className="max-w-screen-xl mx-auto flex items-center justify-between px-4 sm:px-6 h-[60px] sm:h-[68px]">
+            <div className="flex items-center gap-2">
+              <Image src="/kibo.png" width={32} height={32} alt="Kibo"
+                className="rounded-[8px] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B]" />
+              <span className="font-display font-bold text-[1.75rem] sm:text-[2rem] tracking-[-0.02em] text-[#09090B]">Kibo</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <span className="hidden sm:inline font-sans text-[0.75rem] font-semibold text-[#09090B]/35 uppercase tracking-[0.12em]">
                 Non-custodial · Open source
               </span>
-              <div className="flex items-center gap-1.5 bg-[#DCFCE7] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] rounded-full px-3 py-1.5">
+              <div className="flex items-center gap-1.5 bg-[#DCFCE7] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] rounded-full px-2.5 sm:px-3 py-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
-                <span className="font-sans text-[0.6875rem] font-black uppercase tracking-[0.1em] text-[#15803D]">
+                <span className="font-sans text-[0.625rem] sm:text-[0.6875rem] font-black uppercase tracking-[0.1em] text-[#15803D]">
                   Live · Celo
                 </span>
               </div>
@@ -473,12 +492,12 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="border-t-2 border-[#09090B] bg-[#F7F5FF]">
-          <div className="max-w-screen-xl mx-auto px-6 py-5 flex items-center justify-between">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Image src="/kibo.png" width={26} height={26} alt="" className="rounded-md opacity-35" />
-              <span className="font-display font-bold text-[#09090B]/30 text-[1.25rem] tracking-[-0.02em]">Kibo</span>
+              <Image src="/kibo.png" width={24} height={24} alt="" className="rounded-md opacity-35" />
+              <span className="font-display font-bold text-[#09090B]/30 text-[1.125rem] tracking-[-0.02em]">Kibo</span>
             </div>
-            <div className="flex items-center gap-5">
+            <div className="hidden sm:flex items-center gap-5">
               {["Non-custodial", "Open source", "Celo Mainnet"].map((item, i) => (
                 <div key={item} className="flex items-center gap-5">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-[#09090B]/15" />}
@@ -486,6 +505,9 @@ export default function Home() {
                 </div>
               ))}
             </div>
+            <span className="sm:hidden font-sans text-[0.625rem] font-bold text-[#09090B]/30 uppercase tracking-[0.12em]">
+              Celo Mainnet
+            </span>
           </div>
         </footer>
       </div>
@@ -508,7 +530,7 @@ export default function Home() {
 
       {/* Top nav */}
       <nav className="sticky top-0 z-[100] bg-white border-b-2 border-[#09090B]">
-        <div className="max-w-screen-xl mx-auto flex items-center justify-between px-6 h-[60px]">
+        <div className="max-w-screen-xl mx-auto flex items-center justify-between px-3 sm:px-6 h-[56px] sm:h-[60px]">
 
           {/* Logo + nav tabs */}
           <div className="flex items-center gap-6 lg:gap-8">
@@ -539,20 +561,43 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right: streak badge + wallet */}
-          <div className="flex items-center gap-2.5">
+          {/* Right: streak badge + profile */}
+          <div className="flex items-center gap-2">
             {streak > 0 && (
               <span className="hidden sm:flex items-center gap-1.5 bg-[#FFE500] border-[1.5px] border-[#09090B] shadow-[1.5px_1.5px_0_#09090B] rounded-xl px-2.5 py-1.5 font-black text-[0.75rem] text-[#09090B]">
                 <Flame className="w-3.5 h-3.5" />
-                {streak}d streak
+                {streak}d
               </span>
             )}
-            <button
-              onClick={() => disconnect()}
-              className="font-mono text-[0.6875rem] font-bold bg-[#09090B] text-white rounded-xl px-3 py-1.5 hover:bg-[#222] transition-colors duration-75 active:scale-95"
-            >
-              {address?.slice(0, 6)}…{address?.slice(-4)}
-            </button>
+            {editingName ? (
+              <input
+                autoFocus
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                onBlur={saveName}
+                onKeyDown={(e) => { if (e.key === "Enter") saveName(); if (e.key === "Escape") setEditingName(false); }}
+                placeholder="Your name…"
+                maxLength={20}
+                className="font-sans text-[0.6875rem] font-bold bg-[#09090B] text-white rounded-xl px-3 py-1.5 w-[110px] outline-none ring-2 ring-[#7C3AED]"
+              />
+            ) : (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => disconnect()}
+                  title="Disconnect wallet"
+                  className="font-sans text-[0.6875rem] font-bold bg-[#09090B] text-white rounded-xl px-3 py-1.5 hover:bg-[#222] transition-colors duration-75 active:scale-95 max-w-[120px] truncate"
+                >
+                  {displayName || `${address?.slice(0, 6)}…${address?.slice(-4)}`}
+                </button>
+                <button
+                  onClick={() => { setNameInput(displayName); setEditingName(true); }}
+                  title="Edit display name"
+                  className="text-[#09090B]/35 hover:text-[#09090B] transition-colors p-1 rounded-lg hover:bg-[#09090B]/5"
+                >
+                  <Pencil className="w-3 h-3" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </nav>
