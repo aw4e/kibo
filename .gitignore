@@ -68,3 +68,13 @@ coverage/
 # Temp
 *.tmp
 *.temp
+
+# pnpm (project uses yarn)
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+# TS incremental build info
+*.tsbuildinfo
+
+# npm lock (project uses yarn)
+package-lock.json
