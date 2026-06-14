@@ -826,15 +826,6 @@ export default function Home() {
                     </Button>
                   </div>
                 </div>
-                {!canDeposit && countdown && (
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="font-sans text-[0.8125rem] font-medium text-[#09090B]/45">Next deposit in</span>
-                    <span className="bg-[#FFE500] text-[#09090B] text-[0.75rem] font-black px-2.5 py-0.5 rounded-lg border-[1.5px] border-[#09090B] shadow-[1.5px_1.5px_0_#09090B] flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {countdown}
-                    </span>
-                  </div>
-                )}
                 {savedAmount > 0 && (
                   <Button variant="ghost" onClick={withdraw} disabled={isTxLoading}>
                     Withdraw savings
