@@ -21,7 +21,7 @@ import {
   Coins, Gift, HeartCrack, Zap, Trophy, Shield,
   Sparkles, Calendar, Target, DollarSign, Users,
   Award, Clock, Flame, Link, Mountain, Star, Medal,
-  Home as HomeIcon, BarChart2, Settings,
+  Home as HomeIcon, BarChart2, Settings, Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -150,7 +150,7 @@ export default function Home() {
     cUSDBalance, shields, badge, brokenStreak, rewardsClaimed, leaderboard,
     isTxLoading, isLoading, error, clearError, deposit, claimReward, withdraw,
     recoverStreak, pendingReferralReward, referrer, claimReferralReward,
-    savingsGoal, setGoal, depositFor,
+    savingsGoal, setGoal, depositFor, poolBalance, totalDepositors,
   } = useKibo();
 
   const countdown     = formatCountdown(nextDepositIn);
@@ -605,6 +605,58 @@ export default function Home() {
 
             {/* Right col: dashboard cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 content-start">
+
+              {/* Stats snapshot - full width */}
+              <div className="md:col-span-2">
+                <div className="rounded-2xl border-[3px] border-[#09090B] shadow-[5px_5px_0_#09090B] overflow-hidden">
+                  <div className="grid grid-cols-2">
+                    {/* My Balance */}
+                    <div className="flex flex-col gap-1 px-5 py-4 bg-[#DCFCE7] border-b-2 border-r-2 border-[#09090B]">
+                      <div className="flex items-center gap-1.5">
+                        <DollarSign className="w-3.5 h-3.5 text-[#15803D]" />
+                        <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.12em] text-[#09090B]/50">My Balance</span>
+                      </div>
+                      <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#15803D]">
+                        {balanceAmount}
+                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">cUSD</span>
+                      </span>
+                    </div>
+                    {/* My Savings */}
+                    <div className="flex flex-col gap-1 px-5 py-4 bg-[#EDE9FE] border-b-2 border-[#09090B]">
+                      <div className="flex items-center gap-1.5">
+                        <Coins className="w-3.5 h-3.5 text-[#6D28D9]" />
+                        <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.12em] text-[#09090B]/50">My Savings</span>
+                      </div>
+                      <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#6D28D9]">
+                        {savedAmount.toFixed(3)}
+                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">cUSD</span>
+                      </span>
+                    </div>
+                    {/* Global Pool */}
+                    <div className="flex flex-col gap-1 px-5 py-4 bg-[#DBEAFE] border-r-2 border-[#09090B]">
+                      <div className="flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-[#1D4ED8]" />
+                        <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.12em] text-[#09090B]/50">Global Pool</span>
+                      </div>
+                      <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#1D4ED8]">
+                        {poolBalance ? parseFloat(formatUnits(poolBalance, 18)).toFixed(2) : "—"}
+                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">cUSD</span>
+                      </span>
+                    </div>
+                    {/* Total Savers */}
+                    <div className="flex flex-col gap-1 px-5 py-4 bg-[#FEF9C3]">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-[#CA8A04]" />
+                        <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.12em] text-[#09090B]/50">Total Savers</span>
+                      </div>
+                      <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#CA8A04]">
+                        {totalDepositors || "—"}
+                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">wallets</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Overview - full width */}
               <div className="md:col-span-2">

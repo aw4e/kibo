@@ -77,6 +77,20 @@ export function useKibo() {
     query: { enabled: !!address && !!KIBO_ADDRESS },
   });
 
+  const { data: poolBalance } = useReadContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "poolBalance",
+    query: { enabled: !!KIBO_ADDRESS, staleTime: 30_000 },
+  });
+
+  const { data: totalDepositors } = useReadContract({
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "totalDepositors",
+    query: { enabled: !!KIBO_ADDRESS, staleTime: 30_000 },
+  });
+
   const { isSuccess: txConfirmed, isLoading: isTxLoading } =
     useWaitForTransactionReceipt({ hash: txHash });
 
@@ -266,6 +280,8 @@ export function useKibo() {
     pendingReferralReward: pendingReferralReward ?? BigInt(0),
     referrer: (referrer && referrer !== "0x0000000000000000000000000000000000000000") ? referrer as string : null,
     savingsGoal: savingsGoal ?? BigInt(0),
+    poolBalance: poolBalance ?? BigInt(0),
+    totalDepositors: totalDepositors ? Number(totalDepositors) : 0,
   };
 }
 
