@@ -177,13 +177,18 @@ export function useKibo() {
     ref: `0x${string}` = "0x0000000000000000000000000000000000000000",
   ) {
     setError(null);
+    // Belt-and-suspenders: contract rejects self-referral, zero it out silently
+    const safeRef: `0x${string}` =
+      ref.toLowerCase() === address?.toLowerCase()
+        ? "0x0000000000000000000000000000000000000000"
+        : ref;
     try {
       await ensureApproval(amount);
       const hash = await writeContractAsync({
         address: KIBO_ADDRESS,
         abi: KIBO_ABI,
         functionName: "deposit",
-        args: [amount, ref],
+        args: [amount, safeRef],
       });
       setTxHash(hash);
     } catch (e: unknown) {

@@ -218,7 +218,9 @@ export default function Home() {
   const [goalInput, setGoalInput] = useState("");
   const [depositInput, setDepositInput] = useState("");
   const [sponsorAddr, setSponsorAddr] = useState("");
-  const sponsorAddrValid = /^0x[0-9a-fA-F]{40}$/.test(sponsorAddr);
+  const sponsorAddrValid =
+    /^0x[0-9a-fA-F]{40}$/.test(sponsorAddr) &&
+    sponsorAddr.toLowerCase() !== address?.toLowerCase();
   const { toasts, addToast, removeToast } = useToast();
   const prevCanClaim = useRef(false);
   const prevTxConfirmed = useRef(false);
@@ -690,7 +692,16 @@ export default function Home() {
                       onClick={() => {
                         const v = parseFloat(depositInput);
                         if (!v || v <= 0) return;
-                        deposit(parseUnits(String(v), 18), refParam);
+                        if (v < 0.01 || v > 1) {
+                          addToast("Amount must be 0.01–1 cUSD", "error");
+                          return;
+                        }
+                        // Self-referral: silently drop ref (hook also guards)
+                        const effectiveRef: `0x${string}` =
+                          refParam.toLowerCase() === address?.toLowerCase()
+                            ? "0x0000000000000000000000000000000000000000"
+                            : refParam;
+                        deposit(parseUnits(String(v), 18), effectiveRef);
                       }}
                       disabled={!canDeposit || isTxLoading || !depositInput || parseFloat(depositInput) <= 0}
                     >
@@ -966,7 +977,9 @@ export default function Home() {
                         <span className="font-mono text-[0.75rem] text-[#09090B]/45">{referrer.slice(0, 6)}…{referrer.slice(-4)}</span>
                       </CardRow>
                     )}
-                    {refParam !== "0x0000000000000000000000000000000000000000" && !referrer && (
+                    {refParam !== "0x0000000000000000000000000000000000000000" &&
+                      refParam.toLowerCase() !== address?.toLowerCase() &&
+                      !referrer && (
                       <div className="flex items-center gap-2 mx-5 my-3 px-3 py-2 bg-[#EDE9FE] rounded-xl border-[1.5px] border-[#09090B] text-[0.8125rem] text-[#6D28D9] font-bold">
                         <Link className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>Invite code: {refParam.slice(0, 6)}…{refParam.slice(-4)}</span>
@@ -991,7 +1004,12 @@ export default function Home() {
                         Earn 5% of your friend&apos;s first deposit when they use your link.
                       </p>
                       <Button variant="ghost"
-                        onClick={() => { if (!address) return; navigator.clipboard.writeText(`${window.location.origin}?ref=${address}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                        onClick={() => {
+                          if (!address) return;
+                          navigator.clipboard.writeText(`${window.location.origin}?ref=${address}`);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
+                        }}
                         disabled={!address}>
                         {copied ? <><Check className="h-4 w-4" /> Link copied!</> : <><Copy className="h-4 w-4" /> Copy invite link</>}
                       </Button>
@@ -1013,7 +1031,11 @@ export default function Home() {
                         onChange={(e) => setSponsorAddr(e.target.value)}
                         error={!!(sponsorAddr && !sponsorAddrValid)} spellCheck={false} className="font-mono text-sm" />
                       {sponsorAddr && !sponsorAddrValid && (
-                        <p className="font-sans text-[0.75rem] font-bold text-[#DC2626]">Invalid address</p>
+                        <p className="font-sans text-[0.75rem] font-bold text-[#DC2626]">
+                          {sponsorAddr.toLowerCase() === address?.toLowerCase()
+                            ? "Cannot sponsor yourself"
+                            : "Invalid address"}
+                        </p>
                       )}
                       <Button onClick={() => { if (!sponsorAddrValid) return; depositFor(sponsorAddr as `0x${string}`); setSponsorAddr(""); }}
                         disabled={isTxLoading || !sponsorAddrValid}>
@@ -1033,7 +1055,9 @@ export default function Home() {
                     <button
                       onClick={() => {
                         if (!address) return;
-                        const text = `🔥 I'm on a ${streak}-day savings streak on Kibo!\nSave daily on Celo → ${window.location.origin}?ref=${address}`;
+                        const origin = window.location.origin;
+                        const refUrl = `${origin}?ref=${address}`;
+                        const text = `🔥 ${streak}-day savings streak on Kibo!\nSaving on Celo every day → ${refUrl}`;
                         navigator.clipboard.writeText(text);
                         setCopied(true);
                         setTimeout(() => setCopied(false), 2000);
