@@ -25,6 +25,8 @@ export function useKibo() {
     timestamp: number;
     txHash: `0x${string}`;
   }>>([]);
+  const [referralCount, setReferralCount] = useState(0);
+  const [totalReferralEarned, setTotalReferralEarned] = useState(BigInt(0));
   // Force re-render every 30s so countdown ticks while deposit is pending
   const [, setTick] = useState(0);
 
@@ -115,6 +117,24 @@ export function useKibo() {
     const id = setInterval(() => setTick((n) => n + 1), 30_000);
     return () => clearInterval(id);
   }, []);
+
+  // Fetch referral stats from on-chain events
+  useEffect(() => {
+    if (!address || !publicClient || !KIBO_ADDRESS) return;
+    let cancelled = false;
+    publicClient.getContractEvents({
+      address: KIBO_ADDRESS,
+      abi: KIBO_ABI,
+      eventName: "ReferralRewardAccrued",
+      args: { ref: address },
+      fromBlock: 0n,
+    }).then(logs => {
+      if (cancelled) return;
+      setReferralCount(logs.length);
+      setTotalReferralEarned(logs.reduce((sum, l) => sum + (l.args.amount ?? BigInt(0)), BigInt(0)));
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [address, publicClient]);
 
   // Fetch deposit history from on-chain events
   useEffect(() => {
@@ -314,6 +334,8 @@ export function useKibo() {
     totalDepositors: totalDepositors ? Number(totalDepositors) : 0,
     depositHistory,
     txConfirmed,
+    referralCount,
+    totalReferralEarned,
   };
 }
 
