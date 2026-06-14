@@ -11,7 +11,7 @@ import { parseUnits, maxUint256 } from "viem";
 import { KIBO_ADDRESS, CUSD_ADDRESS, KIBO_ABI, ERC20_ABI } from "../lib/kibo-abi";
 import { useState, useEffect } from "react";
 
-const DEFAULT_DEPOSIT = parseUnits("0.01", 18);
+const DEFAULT_DEPOSIT = parseUnits("0.0001", 18);
 
 export function useKibo() {
   const { address } = useAccount();

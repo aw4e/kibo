@@ -364,7 +364,7 @@ export default function Home() {
               </p>
 
               <p className="font-sans text-[1.0625rem] font-medium text-[#09090B]/50 leading-[1.7] mt-6 max-w-[36ch]">
-                Save 0.01–1 cUSD daily. Build a streak.<br />
+                Save 0.0001–1 cUSD daily. Build a streak.<br />
                 Earn rewards every 7 days on Celo mainnet.
               </p>
 
@@ -424,7 +424,7 @@ export default function Home() {
               {/* Stat cards — staggered float */}
               <div className="grid grid-cols-2 gap-3 w-full max-w-[360px]">
                 {[
-                  { val: "0.01 cUSD", sub: "daily minimum", bg: "bg-[#FFFBEB]", tc: "text-[#CA8A04]" },
+                  { val: "0.0001 cUSD", sub: "daily minimum", bg: "bg-[#FFFBEB]", tc: "text-[#CA8A04]" },
                   { val: "7 days",    sub: "per cycle",      bg: "bg-[#EDE9FE]", tc: "text-[#7C3AED]" },
                   { val: "20 hours",  sub: "cooldown",        bg: "bg-[#DBEAFE]", tc: "text-[#1D4ED8]" },
                   { val: "3 shields", sub: "protection",      bg: "bg-[#DCFCE7]", tc: "text-[#15803D]" },
@@ -451,7 +451,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
               {[
-                { num: "01", heading: "Connect & deposit", body: "Deposit 0.01–1 cUSD daily. 20-hour cooldown between deposits keeps it intentional.", color: "#7C3AED" },
+                { num: "01", heading: "Connect & deposit", body: "Deposit 0.0001–1 cUSD daily. 20-hour cooldown between deposits keeps it intentional.", color: "#7C3AED" },
                 { num: "02", heading: "Build your streak",  body: "Every day you deposit extends your streak. Miss a day? Use a shield to protect it safely.", color: "#3B82F6" },
                 { num: "03", heading: "Claim rewards",      body: "Reach 7-day milestones to claim cUSD rewards. Longer streaks earn bigger bonuses.", color: "#22C55E" },
               ].map(({ num, heading, body, color }) => (
@@ -578,7 +578,7 @@ export default function Home() {
                     <div>
                       <p className="font-display font-bold text-[1.625rem] tracking-[-0.025em] text-[#09090B]">Welcome to Kibo!</p>
                       <p className="font-sans text-[0.875rem] text-[#09090B]/55 font-medium mt-1.5 leading-relaxed">
-                        Deposit 0.01 cUSD to start your<br />savings streak. Earn every 7 days.
+                        Deposit as little as 0.0001 cUSD to<br />start your streak. Earn every 7 days.
                       </p>
                     </div>
                   </div>
@@ -673,7 +673,7 @@ export default function Home() {
                   </div>
                   {/* Quick amounts */}
                   <div className="flex gap-2 px-4 pt-3 pb-2">
-                    {["0.1", "0.5", "1", "5"].map((v) => (
+                    {["0.001", "0.01", "0.1", "1"].map((v) => (
                       <button key={v}
                         onClick={() => setDepositInput(v)}
                         className={cn(
@@ -692,8 +692,8 @@ export default function Home() {
                       onClick={() => {
                         const v = parseFloat(depositInput);
                         if (!v || v <= 0) return;
-                        if (v < 0.01 || v > 1) {
-                          addToast("Amount must be 0.01–1 cUSD", "error");
+                        if (v < 0.0001 || v > 1) {
+                          addToast("Amount must be 0.0001–1 cUSD", "error");
                           return;
                         }
                         // Self-referral: silently drop ref (hook also guards)
@@ -1024,7 +1024,7 @@ export default function Home() {
                 <Card>
                   <CardContent>
                     <p className="font-sans px-5 pt-4 pb-3 text-[0.8125rem] font-medium text-[#09090B]/50 leading-relaxed border-b-2 border-[#09090B]">
-                      Pay 0.01 cUSD on behalf of another address — boosts their streak without them spending anything.
+                      Pay cUSD on behalf of another address — boosts their streak without them spending anything.
                     </p>
                     <div className="px-5 py-4 flex flex-col gap-3">
                       <Input placeholder="0x… wallet address" value={sponsorAddr}
@@ -1178,7 +1178,7 @@ export default function Home() {
                   <h2 className="font-display font-bold text-white text-[2.25rem] leading-none tracking-[-0.02em]">Kibo</h2>
                   <p className="font-serif italic text-[#FFE500] text-[1.375rem] leading-none mt-1.5">Daily savings, on Celo.</p>
                   <p className="font-sans text-white/60 text-[0.875rem] font-medium mt-2.5 leading-relaxed">
-                    0.01–1 cUSD daily · 7-day streak cycles · Earn rewards
+                    0.0001–1 cUSD daily · 7-day streak cycles · Earn rewards
                   </p>
                 </div>
               </div>
@@ -1194,7 +1194,7 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Calendar,  color: "text-[#1D4ED8]", label: "Daily deposit", val: "0.01–1 cUSD" },
+                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Calendar,  color: "text-[#1D4ED8]", label: "Daily deposit", val: "0.0001–1 cUSD" },
                   { bg: "bg-[#FEF9C3]", border: "border-[#CA8A04]", Icon: Clock,      color: "text-[#CA8A04]", label: "Cooldown",      val: "20 hours" },
                   { bg: "bg-[#DCFCE7]", border: "border-[#15803D]", Icon: Shield,     color: "text-[#15803D]", label: "Shields",       val: "Skip 1 day" },
                   { bg: "bg-[#F5F3FF]", border: "border-[#6D28D9]", Icon: Users,      color: "text-[#6D28D9]", label: "Referral",      val: "5% of deposit" },
