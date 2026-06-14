@@ -33,6 +33,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kibo.vercel.app";
 export const metadata: Metadata = {
   title: "Kibo — Daily Savings Streak",
   description: "Deposit 0.01 cUSD daily, build your streak, earn rewards on Celo.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/kibo.png",
     apple: "/kibo.png",

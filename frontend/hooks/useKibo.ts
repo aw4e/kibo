@@ -27,6 +27,12 @@ export function useKibo() {
   }>>([]);
   const [referralCount, setReferralCount] = useState(0);
   const [totalReferralEarned, setTotalReferralEarned] = useState(BigInt(0));
+  const [activityFeed, setActivityFeed] = useState<Array<{
+    user: `0x${string}`;
+    streak: number;
+    timestamp: number;
+    txHash: `0x${string}`;
+  }>>([]);
   // Force re-render every 30s so countdown ticks while deposit is pending
   const [, setTick] = useState(0);
 
@@ -160,6 +166,29 @@ export function useKibo() {
     }).catch(() => {});
     return () => { cancelled = true; };
   }, [address, publicClient, txConfirmed]);
+
+  // Global activity feed — last 20 deposits across all users
+  useEffect(() => {
+    if (!publicClient || !KIBO_ADDRESS) return;
+    let cancelled = false;
+    publicClient.getContractEvents({
+      address: KIBO_ADDRESS,
+      abi: KIBO_ABI,
+      eventName: "Deposited",
+      fromBlock: 0n,
+    }).then(logs => {
+      if (cancelled) return;
+      setActivityFeed(
+        [...logs].reverse().slice(0, 20).map(log => ({
+          user: log.args.user!,
+          streak: Number(log.args.streak),
+          timestamp: Number(log.args.timestamp),
+          txHash: log.transactionHash!,
+        }))
+      );
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [publicClient, txConfirmed]);
 
   async function ensureApproval(amount: bigint) {
     if (!allowance || allowance < amount) {
@@ -343,6 +372,7 @@ export function useKibo() {
     txConfirmed,
     referralCount,
     totalReferralEarned,
+    activityFeed,
   };
 }
 
