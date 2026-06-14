@@ -30,7 +30,9 @@ import { cn } from "@/lib/utils";
 
 function fmtAmt(v: bigint, maxDp = 5): string {
   const n = parseFloat(formatUnits(v, 18));
-  return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: maxDp });
+  if (n === 0) return "0";
+  // toFixed for consistent cross-locale output, parseFloat strips trailing zeros
+  return parseFloat(n.toFixed(maxDp)).toString();
 }
 
 const BADGE_LABEL = ["—", "Bronze", "Silver", "Gold", "Diamond"] as const;

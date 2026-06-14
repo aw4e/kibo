@@ -86,10 +86,12 @@ export function useKibo() {
     query: { enabled: !!address && !!KIBO_ADDRESS },
   });
 
+  // Total cUSD held by contract (user deposits + reward pool combined)
   const { data: poolBalance } = useReadContract({
-    address: KIBO_ADDRESS,
-    abi: KIBO_ABI,
-    functionName: "poolBalance",
+    address: CUSD_ADDRESS,
+    abi: ERC20_ABI,
+    functionName: "balanceOf",
+    args: [KIBO_ADDRESS],
     query: { enabled: !!KIBO_ADDRESS, staleTime: 30_000 },
   });
 
