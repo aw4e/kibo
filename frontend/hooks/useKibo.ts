@@ -92,13 +92,30 @@ export function useKibo() {
     query: { enabled: !!address && !!KIBO_ADDRESS },
   });
 
-  // Total cUSD held by contract (user deposits + reward pool combined)
+  // Actual reward pool funds (poolFunds tracking in contract)
   const { data: poolBalance } = useReadContract({
-    address: CUSD_ADDRESS,
-    abi: ERC20_ABI,
-    functionName: "balanceOf",
-    args: [KIBO_ADDRESS],
+    address: KIBO_ADDRESS,
+    abi: KIBO_ABI,
+    functionName: "poolBalance",
     query: { enabled: !!KIBO_ADDRESS, staleTime: 30_000 },
+  });
+
+  // Reward tiers for pool-sufficiency guard
+  const { data: rewardTier1 } = useReadContract({
+    address: KIBO_ADDRESS, abi: KIBO_ABI, functionName: "rewardTier1",
+    query: { enabled: !!KIBO_ADDRESS, staleTime: 60_000 },
+  });
+  const { data: rewardTier2 } = useReadContract({
+    address: KIBO_ADDRESS, abi: KIBO_ABI, functionName: "rewardTier2",
+    query: { enabled: !!KIBO_ADDRESS, staleTime: 60_000 },
+  });
+  const { data: rewardTier3 } = useReadContract({
+    address: KIBO_ADDRESS, abi: KIBO_ABI, functionName: "rewardTier3",
+    query: { enabled: !!KIBO_ADDRESS, staleTime: 60_000 },
+  });
+  const { data: rewardTier4 } = useReadContract({
+    address: KIBO_ADDRESS, abi: KIBO_ABI, functionName: "rewardTier4",
+    query: { enabled: !!KIBO_ADDRESS, staleTime: 60_000 },
   });
 
   const { data: totalDepositors } = useReadContract({
@@ -265,7 +282,16 @@ export function useKibo() {
   const brokenStreak = userData ? Number(userData[7]) : 0;
   const badge = userData ? Number(userData[8]) : 0;
   const rewardsClaimed = userData ? userData[9] : BigInt(0);
-  const canClaim = streak > 0 && streak % 7 === 0 && streak > lastClaimedStreak;
+  const expectedReward =
+    streak >= 49 ? (rewardTier4 ?? BigInt(0)) :
+    streak >= 35 ? (rewardTier3 ?? BigInt(0)) :
+    streak >= 14 ? (rewardTier2 ?? BigInt(0)) :
+    (rewardTier1 ?? BigInt(0));
+  const canClaim =
+    streak > 0 &&
+    streak % 7 === 0 &&
+    streak > lastClaimedStreak &&
+    (poolBalance ?? BigInt(0)) >= expectedReward;
   const isLoading = !!address && !userData;
 
   // Guard: lastDeposit is Unix seconds (~1.7e9). Multiplying by 1000 for ms is safe
@@ -394,6 +420,8 @@ function parseContractError(e: unknown): string {
     if (msg.includes("NoStreakToRecover")) return "No broken streak to recover.";
     if (msg.includes("RecoveryPending")) return "Beneficiary has a pending streak recovery.";
     if (msg.includes("Paused")) return "Contract is paused. Try again later.";
+    if (msg.includes("#1002") || msg.includes('"1002"'))
+      return "Insufficient cUSD for gas fees. Please add cUSD to your wallet.";
     if (msg) return msg.slice(0, 120);
   }
   return "Transaction failed. Please try again.";

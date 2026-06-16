@@ -117,6 +117,34 @@ export const KIBO_ABI = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "rewardTier1",
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "rewardTier2",
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "rewardTier3",
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "rewardTier4",
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [{ name: "user", type: "address" }],
     name: "referrer",
     outputs: [{ name: "", type: "address" }],
@@ -222,6 +250,21 @@ export const KIBO_ABI = [
     ],
     name: "GoalReached",
     type: "event",
+  },
+  {
+    inputs: [],
+    name: "PoolEmpty",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NeedMilestone",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "AlreadyClaimed",
+    type: "error",
   },
 ] as const;
 
