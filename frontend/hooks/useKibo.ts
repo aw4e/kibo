@@ -421,7 +421,7 @@ function parseContractError(e: unknown): string {
     if (msg.includes("RecoveryPending")) return "Beneficiary has a pending streak recovery.";
     if (msg.includes("Paused")) return "Contract is paused. Try again later.";
     if (msg.includes("#1002") || msg.includes('"1002"'))
-      return "Insufficient cUSD for gas fees. Please add cUSD to your wallet.";
+      return "Insufficient tBNB for gas fees. Get tBNB from the BNB testnet faucet.";
     if (msg) return msg.slice(0, 120);
   }
   return "Transaction failed. Please try again.";

@@ -5,7 +5,6 @@ import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import type { Kibo, MockERC20 } from "../typechain-types";
 
-const CUSD_ADDR   = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
 const COOLDOWN         = 20 * 3600;          // 20h in seconds
 const PRECISION_WINDOW = 2 * 3600;           // 2h precision bonus window
 const LATE             = 48 * 3600 + 1;      // > 48h triggers break
@@ -66,15 +65,11 @@ describe("Kibo", () => {
   beforeEach(async () => {
     [owner, alice, bob, carol] = await ethers.getSigners();
 
-    // Patch hardcoded cUSD address with mock bytecode
     const MockFactory = await ethers.getContractFactory("MockERC20");
-    const mockDeploy  = await MockFactory.deploy();
-    const mockCode    = await ethers.provider.getCode(await mockDeploy.getAddress());
-    await ethers.provider.send("hardhat_setCode", [CUSD_ADDR, mockCode]);
-    cusd = MockFactory.attach(CUSD_ADDR) as MockERC20;
+    cusd = (await MockFactory.deploy()) as MockERC20;
 
     const KiboFactory = await ethers.getContractFactory("Kibo");
-    kibo    = await KiboFactory.deploy();
+    kibo    = await KiboFactory.deploy(await cusd.getAddress());
     kiboAddr = await kibo.getAddress();
 
     // Seed reward pool
@@ -209,7 +204,7 @@ describe("Kibo", () => {
     it("emits ReferralRewardSkipped when pool insufficient", async () => {
       // Deploy fresh Kibo with empty pool
       const KF = await ethers.getContractFactory("Kibo");
-      const k2 = await KF.deploy();
+      const k2 = await KF.deploy(await cusd.getAddress());
       const k2Addr = await k2.getAddress();
 
       // Bob deposits first so referrer registration is possible
@@ -388,7 +383,7 @@ describe("Kibo", () => {
 
     it("reverts PoolEmpty when pool has insufficient funds", async () => {
       const KF = await ethers.getContractFactory("Kibo");
-      const k2 = await KF.deploy();
+      const k2 = await KF.deploy(await cusd.getAddress());
       const k2Addr = await k2.getAddress();
       for (let i = 0; i < 7; i++) {
         await cusd.mint(alice.address, MIN);

@@ -8,7 +8,7 @@ interface IERC20 {
 }
 
 contract Kibo {
-    IERC20 public constant cUSD = IERC20(0x765DE816845861e75A25fCA122bb6898B8B1282a);
+    IERC20 public immutable cUSD; // savings token, set per network at deploy
 
     uint256 public constant MIN_DEPOSIT      = 0.0001 ether;
     uint256 public constant MAX_DEPOSIT      = 1 ether;
@@ -118,7 +118,9 @@ contract Kibo {
         _;
     }
 
-    constructor() {
+    constructor(address token) {
+        if (token == address(0)) revert InvalidAddress();
+        cUSD = IERC20(token);
         owner = msg.sender;
     }
 

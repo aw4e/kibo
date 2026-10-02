@@ -69,7 +69,7 @@ export async function GET(request: Request) {
             }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
               <span style={{ fontSize: 14, fontWeight: 900, color: "#15803D", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-                Live · Celo
+                Live · BNB
               </span>
             </div>
           </div>
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
               <div>
                 <p style={{ fontSize: 18, color: "rgba(9,9,11,0.4)", fontWeight: 600, margin: 0 }}>Total saved</p>
                 <p style={{ fontSize: 40, fontWeight: 900, color: "#7C3AED", margin: 0, letterSpacing: "-0.03em" }}>
-                  {saved} cUSD
+                  {saved} tUSD
                 </p>
               </div>
               <div>
@@ -115,7 +115,7 @@ export async function GET(request: Request) {
           {/* Footer */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <p style={{ fontSize: 20, fontWeight: 600, color: "rgba(9,9,11,0.4)", margin: 0 }}>
-              Daily savings on Celo · Earn every 7 days
+              Daily savings on BNB · Earn every 7 days
             </p>
             {short && (
               <div style={{

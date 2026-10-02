@@ -11,8 +11,8 @@
     "dev": "yarn workspace @kibo/react-app dev",
     "build": "yarn workspace @kibo/react-app build",
     "compile": "yarn workspace @kibo/hardhat compile",
-    "deploy:celoSepolia": "yarn workspace @kibo/hardhat deploy:celoSepolia",
-    "deploy:celo": "yarn workspace @kibo/hardhat deploy:celo",
-    "verify:celo": "yarn workspace @kibo/hardhat verify:celo"
+    "deploy": "yarn workspace @kibo/hardhat deploy",
+    "deploy:bnbTestnet": "yarn workspace @kibo/hardhat deploy:bnbTestnet",
+    "verify": "yarn workspace @kibo/hardhat verify"
   }
 }

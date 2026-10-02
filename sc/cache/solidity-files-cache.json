@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\awe\\Downloads\\Compressed\\Hackathon\\kibo\\sc\\contracts\\Kibo.sol": {
-      "lastModificationDate": 1781020804760,
-      "contentHash": "726d0b3eb02cd3606bd35df701e567ab",
+      "lastModificationDate": 1790905940205,
+      "contentHash": "98784ff92277062c79d656c4757d63f3",
       "sourceName": "contracts/Kibo.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -47,8 +47,8 @@
       ]
     },
     "C:\\Users\\awe\\Downloads\\Compressed\\Hackathon\\kibo\\sc\\contracts\\mocks\\MockERC20.sol": {
-      "lastModificationDate": 1781020826557,
-      "contentHash": "d162eb12ba46436e6ea10c8f6384a7dc",
+      "lastModificationDate": 1782936036142,
+      "contentHash": "15220c82442d958a8e5bd5cf4200f447",
       "sourceName": "contracts/mocks/MockERC20.sol",
       "solcConfig": {
         "version": "0.8.20",

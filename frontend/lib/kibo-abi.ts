@@ -1,5 +1,5 @@
 export const KIBO_ADDRESS = process.env.NEXT_PUBLIC_KIBO_ADDRESS as `0x${string}`;
-export const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as `0x${string}`;
+export const CUSD_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
 
 export const KIBO_ABI = [
   // Write functions

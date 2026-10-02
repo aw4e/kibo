@@ -350,7 +350,7 @@ export default function Home() {
               <div className="flex items-center gap-1.5 bg-[#DCFCE7] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] rounded-full px-2.5 sm:px-3 py-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
                 <span className="font-sans text-[0.625rem] sm:text-[0.6875rem] font-black uppercase tracking-[0.1em] text-[#15803D]">
-                  Live · Celo
+                  Live · BNB
                 </span>
               </div>
             </div>
@@ -380,7 +380,7 @@ export default function Home() {
               <div className="inline-flex items-center gap-2 bg-[#EDE9FE] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] rounded-full px-4 py-1.5 mb-5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED]" />
                 <span className="font-sans text-[0.6875rem] font-black uppercase tracking-[0.16em] text-[#6D28D9]">
-                  DeFi Savings · Celo Network
+                  DeFi Savings · BNB Testnet
                 </span>
               </div>
 
@@ -401,12 +401,12 @@ export default function Home() {
                 className="font-serif italic font-semibold text-[#7C3AED] leading-tight mt-6"
                 style={{ fontSize: "clamp(1.5rem, 4vw, 3.25rem)" }}
               >
-                On Celo.
+                On BNB.
               </p>
 
               <p className="font-sans text-[1.0625rem] font-medium text-[#09090B]/50 leading-[1.7] mt-6 max-w-[36ch]">
-                Save 0.0001–1 cUSD daily. Build a streak.<br />
-                Earn rewards every 7 days on Celo mainnet.
+                Save 0.0001–1 tUSD daily. Build a streak.<br />
+                Earn rewards every 7 days on BNB testnet.
               </p>
 
               <div className="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-5">
@@ -434,11 +434,11 @@ export default function Home() {
             <div className="flex flex-col items-center lg:items-end gap-6">
               {/* Mascot with floating token chips */}
               <div className="relative">
-                {/* cUSD chip */}
+                {/* tUSD chip */}
                 <div className="absolute -top-5 -left-8 z-10 animate-float-sm">
                   <div className="bg-white border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] rounded-full px-3 py-1.5 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
-                    <span className="font-display font-black text-[0.75rem] text-[#09090B]">cUSD</span>
+                    <span className="font-display font-black text-[0.75rem] text-[#09090B]">tUSD</span>
                   </div>
                 </div>
                 {/* Streak chip */}
@@ -448,10 +448,10 @@ export default function Home() {
                     <span className="font-display font-black text-[0.75rem] text-[#7C3AED]">Streak</span>
                   </div>
                 </div>
-                {/* Celo chip */}
+                {/* BNB chip */}
                 <div className="absolute -bottom-4 -right-6 z-10 animate-float" style={{ animationDelay: "1.2s" }}>
                   <div className="bg-[#FFE500] border-2 border-[#09090B] shadow-[2px_2px_0_#09090B] rounded-full px-3 py-1.5">
-                    <span className="font-display font-black text-[0.75rem] text-[#09090B]">Celo ↗</span>
+                    <span className="font-display font-black text-[0.75rem] text-[#09090B]">BNB ↗</span>
                   </div>
                 </div>
 
@@ -465,7 +465,7 @@ export default function Home() {
               {/* Stat cards — staggered float */}
               <div className="grid grid-cols-2 gap-3 w-full max-w-[360px]">
                 {[
-                  { val: "0.0001 cUSD", sub: "daily minimum", bg: "bg-[#FFFBEB]", tc: "text-[#CA8A04]" },
+                  { val: "0.0001 tUSD", sub: "daily minimum", bg: "bg-[#FFFBEB]", tc: "text-[#CA8A04]" },
                   { val: "7 days",    sub: "per cycle",      bg: "bg-[#EDE9FE]", tc: "text-[#7C3AED]" },
                   { val: "20 hours",  sub: "cooldown",        bg: "bg-[#DBEAFE]", tc: "text-[#1D4ED8]" },
                   { val: "3 shields", sub: "protection",      bg: "bg-[#DCFCE7]", tc: "text-[#15803D]" },
@@ -492,9 +492,9 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
               {[
-                { num: "01", heading: "Connect & deposit", body: "Deposit 0.0001–1 cUSD daily. 20-hour cooldown between deposits keeps it intentional.", color: "#7C3AED" },
+                { num: "01", heading: "Connect & deposit", body: "Deposit 0.0001–1 tUSD daily. 20-hour cooldown between deposits keeps it intentional.", color: "#7C3AED" },
                 { num: "02", heading: "Build your streak",  body: "Every day you deposit extends your streak. Miss a day? Use a shield to protect it safely.", color: "#3B82F6" },
-                { num: "03", heading: "Claim rewards",      body: "Reach 7-day milestones to claim cUSD rewards. Longer streaks earn bigger bonuses.", color: "#22C55E" },
+                { num: "03", heading: "Claim rewards",      body: "Reach 7-day milestones to claim tUSD rewards. Longer streaks earn bigger bonuses.", color: "#22C55E" },
               ].map(({ num, heading, body, color }) => (
                 <div key={num} className="flex flex-col gap-3">
                   <div className="flex items-end gap-3 mb-1">
@@ -520,7 +520,7 @@ export default function Home() {
               <span className="font-display font-bold text-[#09090B]/30 text-[1.125rem] tracking-[-0.02em]">Kibo</span>
             </div>
             <div className="hidden sm:flex items-center gap-5">
-              {["Non-custodial", "Open source", "Celo Mainnet"].map((item, i) => (
+              {["Non-custodial", "Open source", "BNB Testnet"].map((item, i) => (
                 <div key={item} className="flex items-center gap-5">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-[#09090B]/15" />}
                   <span className="font-sans text-[0.6875rem] font-bold text-[#09090B]/30 uppercase tracking-[0.12em]">{item}</span>
@@ -528,7 +528,7 @@ export default function Home() {
               ))}
             </div>
             <span className="sm:hidden font-sans text-[0.625rem] font-bold text-[#09090B]/30 uppercase tracking-[0.12em]">
-              Celo Mainnet
+              BNB Testnet
             </span>
           </div>
         </footer>
@@ -645,7 +645,7 @@ export default function Home() {
                     <div>
                       <p className="font-display font-bold text-[1.625rem] tracking-[-0.025em] text-[#09090B]">Welcome to Kibo!</p>
                       <p className="font-sans text-[0.875rem] text-[#09090B]/55 font-medium mt-1.5 leading-relaxed">
-                        Deposit as little as 0.0001 cUSD to<br />start your streak. Earn every 7 days.
+                        Deposit as little as 0.0001 tUSD to<br />start your streak. Earn every 7 days.
                       </p>
                     </div>
                   </div>
@@ -709,7 +709,7 @@ export default function Home() {
                     {/* Next reward hint */}
                     {!isLoading && !canClaim && (
                       <p className="font-sans text-[0.6875rem] text-white/35 -mt-1">
-                        Next reward <span className="text-white/60 font-bold">{nextRewardAmt(streak)} cUSD</span>
+                        Next reward <span className="text-white/60 font-bold">{nextRewardAmt(streak)} tUSD</span>
                         {" "}at day <span className="text-white/60 font-bold">{nextMilestone(streak)}</span>
                       </p>
                     )}
@@ -748,7 +748,7 @@ export default function Home() {
                       <div>
                         <p className="font-display font-bold text-[1.125rem] text-[#09090B]">Streak broken</p>
                         <p className="font-sans text-[0.8125rem] text-[#09090B]/55 mt-0.5">
-                          Pay {Math.min(brokenStreak * 0.01, 0.1).toFixed(3)} cUSD to restore your {brokenStreak}-day streak
+                          Pay {Math.min(brokenStreak * 0.01, 0.1).toFixed(3)} tUSD to restore your {brokenStreak}-day streak
                         </p>
                       </div>
                     </div>
@@ -785,7 +785,7 @@ export default function Home() {
                       style={{ fontSize: "2.25rem", lineHeight: 1 }}
                       disabled={!canDeposit || isTxLoading}
                     />
-                    <span className="font-sans text-[0.875rem] font-black text-[#09090B]/30 uppercase tracking-[0.1em] flex-shrink-0">cUSD</span>
+                    <span className="font-sans text-[0.875rem] font-black text-[#09090B]/30 uppercase tracking-[0.1em] flex-shrink-0">tUSD</span>
                   </div>
                   {/* Quick amounts */}
                   <div className="flex gap-2 px-4 pt-3 pb-2">
@@ -809,7 +809,7 @@ export default function Home() {
                         const v = parseFloat(depositInput);
                         if (!v || v <= 0) return;
                         if (v < 0.0001 || v > 1) {
-                          addToast("Amount must be 0.0001–1 cUSD", "error");
+                          addToast("Amount must be 0.0001–1 tUSD", "error");
                           return;
                         }
                         // Self-referral: silently drop ref (hook also guards)
@@ -822,7 +822,7 @@ export default function Home() {
                       disabled={!canDeposit || isTxLoading || !depositInput || parseFloat(depositInput) <= 0}
                     >
                       <Coins className="w-4 h-4" />
-                      {isTxLoading ? "Processing…" : `Deposit ${depositInput || "0"} cUSD`}
+                      {isTxLoading ? "Processing…" : `Deposit ${depositInput || "0"} tUSD`}
                     </Button>
                   </div>
                 </div>
@@ -849,7 +849,7 @@ export default function Home() {
                       </div>
                       <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#15803D]">
                         {balanceAmount}
-                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">cUSD</span>
+                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">tUSD</span>
                       </span>
                     </div>
                     {/* My Savings */}
@@ -860,7 +860,7 @@ export default function Home() {
                       </div>
                       <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#6D28D9]">
                         {fmtAmt(totalDeposited)}
-                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">cUSD</span>
+                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">tUSD</span>
                       </span>
                     </div>
                     {/* Global Pool */}
@@ -871,7 +871,7 @@ export default function Home() {
                       </div>
                       <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#1D4ED8]">
                         {poolBalance ? fmtAmt(poolBalance) : "—"}
-                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">cUSD</span>
+                        <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">tUSD</span>
                       </span>
                     </div>
                     {/* Total Savers */}
@@ -903,7 +903,7 @@ export default function Home() {
                             <RowIcon bg="bg-[#EDE9FE]"><Coins className="w-4 h-4 text-[#6D28D9]" /></RowIcon>
                             <span className="font-semibold">Total saved</span>
                           </div>
-                          <span className="font-black text-[#6D28D9] tabular-nums">{fmtAmt(totalDeposited)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">cUSD</span></span>
+                          <span className="font-black text-[#6D28D9] tabular-nums">{fmtAmt(totalDeposited)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">tUSD</span></span>
                         </CardRow>
                         <CardRow>
                           <div className="flex items-center gap-3">
@@ -915,7 +915,7 @@ export default function Home() {
                         <CardRow>
                           <div className="flex items-center gap-3">
                             <RowIcon bg="bg-[#DCFCE7]"><DollarSign className="w-4 h-4 text-[#15803D]" /></RowIcon>
-                            <span className="font-semibold">cUSD balance</span>
+                            <span className="font-semibold">tUSD balance</span>
                           </div>
                           <span className="font-sans font-semibold text-[#09090B]/50 tabular-nums">{balanceAmount}</span>
                         </CardRow>
@@ -951,7 +951,7 @@ export default function Home() {
                               <span className="font-semibold">Rewards earned</span>
                             </div>
                             <span className="font-black text-[#15803D] tabular-nums">
-                              +{fmtAmt(rewardsClaimed)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">cUSD</span>
+                              +{fmtAmt(rewardsClaimed)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">tUSD</span>
                             </span>
                           </CardRow>
                         )}
@@ -1027,8 +1027,8 @@ export default function Home() {
                     {savingsGoal > BigInt(0) ? (
                       <div className="px-5 py-4 border-b-2 border-[#09090B] flex flex-col gap-3">
                         <div className="flex justify-between text-[0.75rem]">
-                          <span className="font-black text-[#6D28D9]">{fmtAmt(totalDeposited)} cUSD</span>
-                          <span className="font-sans font-semibold text-[#09090B]/45">Goal: {fmtAmt(savingsGoal)} cUSD</span>
+                          <span className="font-black text-[#6D28D9]">{fmtAmt(totalDeposited)} tUSD</span>
+                          <span className="font-sans font-semibold text-[#09090B]/45">Goal: {fmtAmt(savingsGoal)} tUSD</span>
                         </div>
                         <Progress value={goalPct} />
                         <p className="font-sans text-[0.6875rem] font-bold text-[#6D28D9] text-right">{goalPct}% complete</p>
@@ -1039,7 +1039,7 @@ export default function Home() {
                       </p>
                     )}
                     <div className="flex gap-2 px-5 py-4">
-                      <Input type="number" min="0.01" step="0.01" placeholder="Target in cUSD"
+                      <Input type="number" min="0.01" step="0.01" placeholder="Target in tUSD"
                         value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
                         className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                       <Button size="sm" className="px-5 flex-shrink-0"
@@ -1071,7 +1071,7 @@ export default function Home() {
                             <RowIcon bg="bg-[#DCFCE7]"><Coins className="w-4 h-4 text-[#15803D]" /></RowIcon>
                             <span className="font-semibold">Total earned</span>
                           </div>
-                          <span className="font-black text-[#15803D] tabular-nums">{fmtAmt(totalReferralEarned)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">cUSD</span></span>
+                          <span className="font-black text-[#15803D] tabular-nums">{fmtAmt(totalReferralEarned)} <span className="font-sans font-semibold text-[#09090B]/40 text-[0.8125rem]">tUSD</span></span>
                         </CardRow>
                       </>
                     )}
@@ -1099,7 +1099,7 @@ export default function Home() {
                             <RowIcon bg="bg-[#DCFCE7]"><Coins className="w-4 h-4 text-[#15803D]" /></RowIcon>
                             <span className="font-semibold">Referral reward</span>
                           </div>
-                          <span className="font-black text-[#15803D] tabular-nums">+{fmtAmt(pendingReferralReward)} cUSD</span>
+                          <span className="font-black text-[#15803D] tabular-nums">+{fmtAmt(pendingReferralReward)} tUSD</span>
                         </CardRow>
                         <div className="px-5 pb-4 pt-1">
                           <Button variant="success" onClick={claimReferralReward} disabled={isTxLoading}>Claim referral reward</Button>
@@ -1131,7 +1131,7 @@ export default function Home() {
                 <Card>
                   <CardContent>
                     <p className="font-sans px-5 pt-4 pb-3 text-[0.8125rem] font-medium text-[#09090B]/50 leading-relaxed border-b-2 border-[#09090B]">
-                      Pay cUSD on behalf of another address — boosts their streak without them spending anything.
+                      Pay tUSD on behalf of another address — boosts their streak without them spending anything.
                     </p>
                     <div className="px-5 py-4 flex flex-col gap-3">
                       <Input placeholder="0x… wallet address" value={sponsorAddr}
@@ -1166,7 +1166,7 @@ export default function Home() {
                           if (!address) return;
                           const origin = window.location.origin;
                           const refUrl = `${origin}?ref=${address}`;
-                          const text = `🔥 ${streak}-day savings streak on Kibo!\nSaving on Celo every day → ${refUrl}`;
+                          const text = `🔥 ${streak}-day savings streak on Kibo!\nSaving on BNB every day → ${refUrl}`;
                           navigator.clipboard.writeText(text);
                           setCopied(true);
                           setTimeout(() => setCopied(false), 2000);
@@ -1178,7 +1178,7 @@ export default function Home() {
                       </button>
                       {/* WhatsApp */}
                       <a
-                        href={`https://wa.me/?text=${encodeURIComponent(`🔥 ${streak}-day savings streak on Kibo! Save daily on Celo → ${typeof window !== "undefined" ? window.location.origin : ""}?ref=${address}`)}`}
+                        href={`https://wa.me/?text=${encodeURIComponent(`🔥 ${streak}-day savings streak on Kibo! Save daily on BNB → ${typeof window !== "undefined" ? window.location.origin : ""}?ref=${address}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1 text-[0.75rem] font-bold text-[#25D366] hover:opacity-70 transition-opacity border-l border-[#09090B]/10 pl-2"
@@ -1188,7 +1188,7 @@ export default function Home() {
                       </a>
                       {/* Telegram */}
                       <a
-                        href={`https://t.me/share/url?url=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}?ref=${address}`)}&text=${encodeURIComponent(`🔥 ${streak}-day savings streak on Kibo! Save daily on Celo and earn every 7 days.`)}`}
+                        href={`https://t.me/share/url?url=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}?ref=${address}`)}&text=${encodeURIComponent(`🔥 ${streak}-day savings streak on Kibo! Save daily on BNB and earn every 7 days.`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1 text-[0.75rem] font-bold text-[#229ED9] hover:opacity-70 transition-opacity border-l border-[#09090B]/10 pl-2"
@@ -1214,7 +1214,7 @@ export default function Home() {
                             </div>
                           </div>
                           <a
-                            href={`https://celoscan.io/tx/${entry.txHash}`}
+                            href={`https://testnet.bscscan.com/tx/${entry.txHash}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 text-[0.75rem] font-bold text-[#7C3AED]/60 hover:text-[#7C3AED] transition-colors"
@@ -1337,9 +1337,9 @@ export default function Home() {
                 <Image src="/kibo.png" alt="Kibo" width={80} height={80} className="flex-shrink-0 drop-shadow-xl" />
                 <div>
                   <h2 className="font-display font-bold text-white text-[2.25rem] leading-none tracking-[-0.02em]">Kibo</h2>
-                  <p className="font-serif italic text-[#FFE500] text-[1.375rem] leading-none mt-1.5">Daily savings, on Celo.</p>
+                  <p className="font-serif italic text-[#FFE500] text-[1.375rem] leading-none mt-1.5">Daily savings, on BNB.</p>
                   <p className="font-sans text-white/60 text-[0.875rem] font-medium mt-2.5 leading-relaxed">
-                    0.0001–1 cUSD daily · 7-day streak cycles · Earn rewards
+                    0.0001–1 tUSD daily · 7-day streak cycles · Earn rewards
                   </p>
                 </div>
               </div>
@@ -1355,7 +1355,7 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Calendar,  color: "text-[#1D4ED8]", label: "Daily deposit", val: "0.0001–1 cUSD" },
+                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Calendar,  color: "text-[#1D4ED8]", label: "Daily deposit", val: "0.0001–1 tUSD" },
                   { bg: "bg-[#FEF9C3]", border: "border-[#CA8A04]", Icon: Clock,      color: "text-[#CA8A04]", label: "Cooldown",      val: "20 hours" },
                   { bg: "bg-[#DCFCE7]", border: "border-[#15803D]", Icon: Shield,     color: "text-[#15803D]", label: "Shields",       val: "Skip 1 day" },
                   { bg: "bg-[#F5F3FF]", border: "border-[#6D28D9]", Icon: Users,      color: "text-[#6D28D9]", label: "Referral",      val: "5% of deposit" },
@@ -1383,9 +1383,9 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { bg: "bg-[#DCFCE7]", border: "border-[#15803D]", Icon: Award,  iconColor: "text-[#CA8A04]", valColor: "text-[#15803D]", day: "Day 7",   val: "+0.005 cUSD", sub: "per cycle" },
-                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Medal,  iconColor: "text-[#1D4ED8]", valColor: "text-[#1D4ED8]", day: "Day 14+", val: "+0.012 cUSD", sub: "per cycle" },
-                  { bg: "bg-[#FEF9C3]", border: "border-[#CA8A04]", Icon: Trophy, iconColor: "text-[#CA8A04]", valColor: "text-[#CA8A04]", day: "Day 35+", val: "+0.025 cUSD", sub: "per cycle" },
+                  { bg: "bg-[#DCFCE7]", border: "border-[#15803D]", Icon: Award,  iconColor: "text-[#CA8A04]", valColor: "text-[#15803D]", day: "Day 7",   val: "+0.005 tUSD", sub: "per cycle" },
+                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Medal,  iconColor: "text-[#1D4ED8]", valColor: "text-[#1D4ED8]", day: "Day 14+", val: "+0.012 tUSD", sub: "per cycle" },
+                  { bg: "bg-[#FEF9C3]", border: "border-[#CA8A04]", Icon: Trophy, iconColor: "text-[#CA8A04]", valColor: "text-[#CA8A04]", day: "Day 35+", val: "+0.025 tUSD", sub: "per cycle" },
                 ].map(({ bg, border, Icon, iconColor, valColor, day, val, sub }) => (
                   <div key={day} className={cn("rounded-2xl border-2 p-4 shadow-[3px_3px_0_#09090B] flex flex-col gap-2", bg, border)}>
                     <div className="w-8 h-8 rounded-xl border border-[#09090B]/15 bg-white/50 flex items-center justify-center">
@@ -1437,7 +1437,7 @@ export default function Home() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#22C55E]" />
-                    <span className="font-sans text-[0.8125rem] font-bold text-[#09090B]">Celo Mainnet</span>
+                    <span className="font-sans text-[0.8125rem] font-bold text-[#09090B]">BNB Testnet</span>
                   </div>
                   <span className="bg-[#DCFCE7] text-[#15803D] text-[0.6875rem] font-black px-2.5 py-1 rounded-lg border border-[#09090B]">Live</span>
                 </div>

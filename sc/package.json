@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "compile": "hardhat compile",
-    "deploy:alfajores": "hardhat deploy --network alfajores",
-    "deploy:celo": "hardhat deploy --network celo",
-    "verify:celo": "hardhat verify --network celo",
+    "deploy": "hardhat deploy --network",
+    "deploy:bnbTestnet": "hardhat deploy --network bnbTestnet",
+    "verify": "hardhat verify --network",
     "test": "hardhat test"
   },
   "devDependencies": {

@@ -11,7 +11,7 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
-// Accent italic only — "On Celo." moments, editorial phrases
+// Accent italic only — "On BNB." moments, editorial phrases
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -32,7 +32,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kibo.vercel.app";
 
 export const metadata: Metadata = {
   title: "Kibo — Daily Savings Streak",
-  description: "Deposit 0.01 cUSD daily, build your streak, earn rewards on Celo.",
+  description: "Deposit 0.01 tUSD daily, build your streak, earn rewards on BNB.",
   manifest: "/manifest.json",
   icons: {
     icon: "/kibo.png",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Kibo — Daily Savings Streak",
-    description: "Save daily on Celo. Build your streak. Earn every 7 days.",
+    description: "Save daily on BNB. Build your streak. Earn every 7 days.",
     url: APP_URL,
     siteName: "Kibo",
     images: [{ url: `${APP_URL}/api/og`, width: 1200, height: 630, alt: "Kibo savings streak" }],
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Kibo — Daily Savings Streak",
-    description: "Save daily on Celo. Build your streak. Earn every 7 days.",
+    description: "Save daily on BNB. Build your streak. Earn every 7 days.",
     images: [`${APP_URL}/api/og`],
   },
   other: {

@@ -1,9 +1,10 @@
 import { createPublicClient, http, parseUnits, maxUint256 } from "viem";
-import { celo } from "viem/chains";
+import { bscTestnet } from "viem/chains";
 import type { WalletClient, PublicClient, Address } from "viem";
 
 export const KIBO_ADDRESS = "0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12" as Address;
-export const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as Address;
+// Savings token (MockERC20 on BNB testnet), set after deploy
+export const CUSD_ADDRESS = ((globalThis as any).process?.env?.KIBO_TOKEN_ADDRESS ?? "0x0000000000000000000000000000000000000000") as Address;
 export const DEPOSIT_AMOUNT = parseUnits("0.01", 18);
 
 // Badge enum (mirrors contract)
@@ -191,8 +192,8 @@ export interface LeaderboardEntry {
 
 // ── Client factory ───────────────────────────────────────────────
 
-export function createKiboClient(rpcUrl = "https://felo-rpc.celo.org"): PublicClient {
-  return createPublicClient({ chain: celo, transport: http(rpcUrl) }) as PublicClient;
+export function createKiboClient(rpcUrl = "https://data-seed-prebsc-1-s1.bnbchain.org:8545"): PublicClient {
+  return createPublicClient({ chain: bscTestnet, transport: http(rpcUrl) }) as PublicClient;
 }
 
 // ── Read functions ───────────────────────────────────────────────
@@ -317,7 +318,7 @@ async function ensureAllowance(
       functionName: "approve",
       args: [KIBO_ADDRESS, maxUint256],
       account,
-      chain: celo,
+      chain: bscTestnet,
     });
   }
 }
@@ -339,7 +340,7 @@ export async function deposit(
     functionName: "deposit",
     args: [amount, ref as Address],
     account,
-    chain: celo,
+    chain: bscTestnet,
   });
 }
 
@@ -358,7 +359,7 @@ export async function depositFor(
     functionName: "depositFor",
     args: [beneficiary, amount],
     account,
-    chain: celo,
+    chain: bscTestnet,
   });
 }
 
@@ -372,7 +373,7 @@ export async function claimReward(
     functionName: "claimReward",
     args: [],
     account,
-    chain: celo,
+    chain: bscTestnet,
   });
 }
 
@@ -381,7 +382,7 @@ export async function recoverStreak(
   rpcUrl?: string,
 ): Promise<`0x${string}`> {
   const [account] = await walletClient.getAddresses();
-  // Recovery fee = brokenStreak × MIN_DEPOSIT (capped at 0.1 cUSD)
+  // Recovery fee = brokenStreak × MIN_DEPOSIT (capped at 0.1 tUSD)
   // Ensure allowance covers max recovery fee
   const publicClient = createKiboClient(rpcUrl);
   await ensureAllowance(publicClient, walletClient, parseUnits("0.1", 18));
@@ -391,7 +392,7 @@ export async function recoverStreak(
     functionName: "recoverStreak",
     args: [],
     account,
-    chain: celo,
+    chain: bscTestnet,
   });
 }
 
@@ -405,7 +406,7 @@ export async function withdraw(
     functionName: "withdraw",
     args: [],
     account,
-    chain: celo,
+    chain: bscTestnet,
   });
 }
 
@@ -419,7 +420,7 @@ export async function claimReferralReward(
     functionName: "claimReferralReward",
     args: [],
     account,
-    chain: celo,
+    chain: bscTestnet,
   });
 }
 
@@ -434,6 +435,6 @@ export async function setGoal(
     functionName: "setGoal",
     args: [target],
     account,
-    chain: celo,
+    chain: bscTestnet,
   });
 }

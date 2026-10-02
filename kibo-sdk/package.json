@@ -1,7 +1,7 @@
 {
   "name": "@kibo/sdk",
   "version": "1.0.0",
-  "description": "TypeScript SDK for the Kibo daily savings contract on Celo",
+  "description": "TypeScript SDK for the Kibo daily savings contract on BNB Testnet",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -13,7 +13,8 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "celo",
+    "bnb",
+    "bsc",
     "minipay",
     "savings",
     "streak",

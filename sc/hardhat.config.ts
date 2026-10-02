@@ -19,37 +19,23 @@ const config: HardhatUserConfig = {
     deployer: { default: 0 },
   },
   networks: {
-    celo: {
-      url: "https://forno.celo.org",
-      chainId: 42220,
-      accounts: [PRIVATE_KEY],
-    },
-    celoSepolia: {
-      url: "https://forno.celo-sepolia.celo-testnet.org",
-      chainId: 11142220,
+    bnbTestnet: {
+      url: process.env.BNB_TESTNET_RPC || "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
+      chainId: 97,
       accounts: [PRIVATE_KEY],
     },
   },
   etherscan: {
     apiKey: {
-      celo: process.env.CELOSCAN_API_KEY || "",
-      celoSepolia: process.env.CELOSCAN_API_KEY || "",
+      bnbTestnet: process.env.ETHERSCAN_API_KEY || "", // Etherscan V2 key covers BscScan
     },
     customChains: [
       {
-        network: "celo",
-        chainId: 42220,
+        network: "bnbTestnet",
+        chainId: 97,
         urls: {
-          apiURL: "https://api.celoscan.io/api",
-          browserURL: "https://celoscan.io",
-        },
-      },
-      {
-        network: "celoSepolia",
-        chainId: 11142220,
-        urls: {
-          apiURL: "https://api-sepolia.celoscan.io/api",
-          browserURL: "https://sepolia.celoscan.io",
+          apiURL: "https://api.etherscan.io/v2/api?chainid=97",
+          browserURL: "https://testnet.bscscan.com",
         },
       },
     ],

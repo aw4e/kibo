@@ -5,13 +5,13 @@
 <h1 align="center">Kibo</h1>
 
 <p align="center">
-  <strong>Daily micro-savings on Celo.</strong><br/>
-  Deposit cUSD every day, build your streak, earn rewards at milestones.
+  <strong>Daily micro-savings on BNB Smart Chain testnet.</strong><br/>
+  Deposit tUSD every day, build your streak, earn rewards at milestones.
 </p>
 
 <p align="center">
-  <a href="https://celoscan.io/address/0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12">
-    <img src="https://img.shields.io/badge/Celo-Mainnet-FCFF52?logo=ethereum&logoColor=000" alt="Celo Mainnet" />
+  <a href="https://testnet.bscscan.com">
+    <img src="https://img.shields.io/badge/BNB-Testnet-F0B90B?logo=binance&logoColor=000" alt="BNB Testnet" />
   </a>
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT License" />
   <img src="https://img.shields.io/badge/Stack-Next.js%2016%20%2B%20wagmi%20v2-black?logo=nextdotjs" alt="Stack" />
@@ -25,7 +25,7 @@ Kibo turns saving into a streak game:
 
 | Action | Result |
 |--------|--------|
-| Deposit 0.01 to 1 cUSD | Streak +1, 20h cooldown starts |
+| Deposit 0.01 to 1 tUSD | Streak +1, 20h cooldown starts |
 | Hit day 7, 14, 21... | Claim milestone reward from shared pool |
 | Miss a day | Streak resets (shields absorb 1 miss) |
 | Reach 30 / 90 / 180 / 365 days | Earn Bronze, Silver, Gold, Diamond badge |
@@ -40,9 +40,9 @@ Kibo turns saving into a streak game:
 
 - **Streak system** — 20h cooldown, milestone rewards every 7 days, escalating tiers
 - **Streak shields** — up to 3 miss-absorbers earned at milestones
-- **Streak recovery** — pay `brokenStreak x 0.01 cUSD` (capped at 0.1) to restore
+- **Streak recovery** — pay `brokenStreak x 0.01 tUSD` (capped at 0.1) to restore
 - **Badge system** — Bronze (30d), Silver (90d), Gold (180d), Diamond (365d), stored on-chain
-- **Savings goal** — set a cUSD target, track progress with a live bar
+- **Savings goal** — set a tUSD target, track progress with a live bar
 - **Referral system** — 5% of referee's first deposit credited to referrer, claimable anytime
 - **Sponsor deposit** — `depositFor(address)` pays a friend's daily deposit
 - **Leaderboard** — top 20 savers by streak, read directly from contract
@@ -54,16 +54,16 @@ Kibo turns saving into a streak game:
 
 | | |
 |---|---|
-| **Network** | Celo Mainnet (chainId 42220) |
-| **Kibo** | [`0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12`](https://celoscan.io/address/0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12) |
-| **cUSD** | [`0x765DE816845861e75A25fCA122bb6898B8B1282a`](https://celoscan.io/address/0x765DE816845861e75A25fCA122bb6898B8B1282a) |
+| **Network** | BNB Smart Chain Testnet (chainId 97) |
+| **Kibo** | set `NEXT_PUBLIC_KIBO_ADDRESS` after deploy |
+| **tUSD** | MockERC20 deployed with Kibo, set `NEXT_PUBLIC_TOKEN_ADDRESS` |
 
 ---
 
 ## Stack
 
 ```
-sc/           Solidity 0.8.20, Hardhat, deployed to Celo mainnet
+sc/           Solidity 0.8.20, Hardhat, deployed to BNB testnet
 frontend/     Next.js 16, React 19, wagmi v2, viem, shadcn/ui, Tailwind CSS
 kibo-sdk/     Framework-agnostic TypeScript SDK
 ```
@@ -90,22 +90,20 @@ cp .env.example .env
 ```
 
 ```env
-NEXT_PUBLIC_KIBO_ADDRESS=0xb103Ef63431753317BeFb1AAfCB7C6E0e0fbCe12
+NEXT_PUBLIC_KIBO_ADDRESS=
+NEXT_PUBLIC_TOKEN_ADDRESS=
 PRIVATE_KEY=           # only needed for deploy
-CELOSCAN_API_KEY=      # only needed for verify
+ETHERSCAN_API_KEY=     # only needed for verify
 ```
 
 ### Contract deploy
 
 ```bash
-# Testnet (Celo Sepolia)
-yarn deploy:celoSepolia
+# Deploy (network name goes last)
+yarn deploy bnbTestnet
 
-# Mainnet
-yarn deploy:celo
-
-# Verify on Celoscan
-yarn verify:celo
+# Verify on BscScan
+yarn verify bnbTestnet <kibo> <token>
 ```
 
 ---
@@ -124,7 +122,7 @@ const user = await getUser("0xYourAddress");
 console.log(user.streak);         // current streak (days)
 console.log(user.badge);          // Badge: None / Bronze / Silver / Gold / Diamond
 console.log(user.brokenStreak);   // recoverable broken streak
-console.log(user.rewardsClaimed); // total cUSD claimed (bigint, 18 decimals)
+console.log(user.rewardsClaimed); // total tUSD claimed (bigint, 18 decimals)
 
 // Write — pass a viem WalletClient
 await deposit(walletClient);
@@ -141,9 +139,9 @@ await claimReferralReward(walletClient);
 
 | Milestone | Reward |
 |-----------|--------|
-| Day 7 | 0.005 cUSD |
-| Day 14+ | 0.012 cUSD |
-| Day 35+ | 0.025 cUSD |
+| Day 7 | 0.005 tUSD |
+| Day 14+ | 0.012 tUSD |
+| Day 35+ | 0.025 tUSD |
 
 Rewards come from a shared pool funded by a 0.5% fee on each deposit.
 

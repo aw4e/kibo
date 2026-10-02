@@ -1,7 +1,7 @@
 {
   "name": "Kibo — Daily Savings Streak",
   "short_name": "Kibo",
-  "description": "Save daily on Celo. Build your streak. Earn every 7 days.",
+  "description": "Save daily on BNB. Build your streak. Earn every 7 days.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F7F5FF",
