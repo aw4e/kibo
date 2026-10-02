@@ -405,7 +405,7 @@ export default function Home() {
               </p>
 
               <p className="font-sans text-[1.0625rem] font-medium text-[#09090B]/50 leading-[1.7] mt-6 max-w-[36ch]">
-                Save 0.0001–1 tUSD daily. Build a streak.<br />
+                Save 0.0001–10,000 tUSD daily. Build a streak.<br />
                 Earn rewards every 7 days on BNB testnet.
               </p>
 
@@ -492,7 +492,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
               {[
-                { num: "01", heading: "Connect & deposit", body: "Deposit 0.0001–1 tUSD daily. 20-hour cooldown between deposits keeps it intentional.", color: "#7C3AED" },
+                { num: "01", heading: "Connect & deposit", body: "Deposit 0.0001–10,000 tUSD daily. 20-hour cooldown between deposits keeps it intentional.", color: "#7C3AED" },
                 { num: "02", heading: "Build your streak",  body: "Every day you deposit extends your streak. Miss a day? Use a shield to protect it safely.", color: "#3B82F6" },
                 { num: "03", heading: "Claim rewards",      body: "Reach 7-day milestones to claim tUSD rewards. Longer streaks earn bigger bonuses.", color: "#22C55E" },
               ].map(({ num, heading, body, color }) => (
@@ -789,7 +789,7 @@ export default function Home() {
                   </div>
                   {/* Quick amounts */}
                   <div className="flex gap-2 px-4 pt-3 pb-2">
-                    {["0.001", "0.01", "0.1", "1"].map((v) => (
+                    {["0.01", "1", "100", "1000"].map((v) => (
                       <button key={v}
                         onClick={() => setDepositInput(v)}
                         className={cn(
@@ -808,8 +808,8 @@ export default function Home() {
                       onClick={() => {
                         const v = parseFloat(depositInput);
                         if (!v || v <= 0) return;
-                        if (v < 0.0001 || v > 1) {
-                          addToast("Amount must be 0.0001–1 tUSD", "error");
+                        if (v < 0.0001 || v > 10000) {
+                          addToast("Amount must be 0.0001–10,000 tUSD", "error");
                           return;
                         }
                         // Self-referral: silently drop ref (hook also guards)
@@ -1360,7 +1360,7 @@ export default function Home() {
                   <h2 className="font-display font-bold text-white text-[2.25rem] leading-none tracking-[-0.02em]">Kibo</h2>
                   <p className="font-serif italic text-[#FFE500] text-[1.375rem] leading-none mt-1.5">Daily savings, on BNB.</p>
                   <p className="font-sans text-white/60 text-[0.875rem] font-medium mt-2.5 leading-relaxed">
-                    0.0001–1 tUSD daily · 7-day streak cycles · Earn rewards
+                    0.0001–10,000 tUSD daily · 7-day streak cycles · Earn rewards
                   </p>
                 </div>
               </div>
@@ -1376,7 +1376,7 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Calendar,  color: "text-[#1D4ED8]", label: "Daily deposit", val: "0.0001–1 tUSD" },
+                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Calendar,  color: "text-[#1D4ED8]", label: "Daily deposit", val: "0.0001–10,000 tUSD" },
                   { bg: "bg-[#FEF9C3]", border: "border-[#CA8A04]", Icon: Clock,      color: "text-[#CA8A04]", label: "Cooldown",      val: "20 hours" },
                   { bg: "bg-[#DCFCE7]", border: "border-[#15803D]", Icon: Shield,     color: "text-[#15803D]", label: "Shields",       val: "Skip 1 day" },
                   { bg: "bg-[#F5F3FF]", border: "border-[#6D28D9]", Icon: Users,      color: "text-[#6D28D9]", label: "Referral",      val: "5% of deposit" },

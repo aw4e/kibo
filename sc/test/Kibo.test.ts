@@ -142,7 +142,7 @@ describe("Kibo", () => {
     });
 
     it("reverts AmountOutOfRange above max", async () => {
-      await expect(dep(alice, ethers.ZeroAddress, ONE + 1n))
+      await expect(dep(alice, ethers.ZeroAddress, 10_000n * ONE + 1n))
         .to.be.revertedWithCustomError(kibo, "AmountOutOfRange");
     });
 

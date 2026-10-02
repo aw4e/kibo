@@ -11,7 +11,7 @@ contract Kibo {
     IERC20 public immutable cUSD; // savings token, set per network at deploy
 
     uint256 public constant MIN_DEPOSIT      = 0.0001 ether;
-    uint256 public constant MAX_DEPOSIT      = 1 ether;
+    uint256 public constant MAX_DEPOSIT      = 10_000 ether;
     uint256 public constant COOLDOWN         = 20 hours;
     uint256 public constant STREAK_THRESHOLD = 7;
     uint8   public constant MAX_SHIELDS      = 3;
