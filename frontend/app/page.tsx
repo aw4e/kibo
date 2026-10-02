@@ -63,10 +63,10 @@ function nextMilestone(streak: number) {
 
 function nextRewardAmt(streak: number): string {
   const n = nextMilestone(streak);
-  if (n >= 49) return "0.05";
-  if (n >= 35) return "0.025";
-  if (n >= 14) return "0.012";
-  return "0.005";
+  if (n >= 49) return "1";
+  if (n >= 35) return "0.5";
+  if (n >= 14) return "0.25";
+  return "0.1";
 }
 
 function StreakRing({ streak, size = 220 }: { streak: number; size?: number }) {
@@ -1404,9 +1404,9 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { bg: "bg-[#DCFCE7]", border: "border-[#15803D]", Icon: Award,  iconColor: "text-[#CA8A04]", valColor: "text-[#15803D]", day: "Day 7",   val: "+0.005 tUSD", sub: "per cycle" },
-                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Medal,  iconColor: "text-[#1D4ED8]", valColor: "text-[#1D4ED8]", day: "Day 14+", val: "+0.012 tUSD", sub: "per cycle" },
-                  { bg: "bg-[#FEF9C3]", border: "border-[#CA8A04]", Icon: Trophy, iconColor: "text-[#CA8A04]", valColor: "text-[#CA8A04]", day: "Day 35+", val: "+0.025 tUSD", sub: "per cycle" },
+                  { bg: "bg-[#DCFCE7]", border: "border-[#15803D]", Icon: Award,  iconColor: "text-[#CA8A04]", valColor: "text-[#15803D]", day: "Day 7",   val: "+0.1 tUSD", sub: "per cycle" },
+                  { bg: "bg-[#DBEAFE]", border: "border-[#1D4ED8]", Icon: Medal,  iconColor: "text-[#1D4ED8]", valColor: "text-[#1D4ED8]", day: "Day 14+", val: "+0.25 tUSD", sub: "per cycle" },
+                  { bg: "bg-[#FEF9C3]", border: "border-[#CA8A04]", Icon: Trophy, iconColor: "text-[#CA8A04]", valColor: "text-[#CA8A04]", day: "Day 35+", val: "+0.5 tUSD", sub: "per cycle" },
                 ].map(({ bg, border, Icon, iconColor, valColor, day, val, sub }) => (
                   <div key={day} className={cn("rounded-2xl border-2 p-4 shadow-[3px_3px_0_#09090B] flex flex-col gap-2", bg, border)}>
                     <div className="w-8 h-8 rounded-xl border border-[#09090B]/15 bg-white/50 flex items-center justify-center">

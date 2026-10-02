@@ -139,9 +139,9 @@ await claimReferralReward(walletClient);
 
 | Milestone | Reward |
 |-----------|--------|
-| Day 7 | 0.005 tUSD |
-| Day 14+ | 0.012 tUSD |
-| Day 35+ | 0.025 tUSD |
+| Day 7 | 0.1 tUSD |
+| Day 14+ | 0.25 tUSD |
+| Day 35+ | 0.5 tUSD |
 
 Rewards come from a shared pool funded by a 0.5% fee on each deposit.
 
