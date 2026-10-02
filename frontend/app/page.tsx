@@ -286,7 +286,7 @@ export default function Home() {
   const {
     streak, longestStreak, totalDeposited, canDeposit, canClaim, nextDepositIn,
     cUSDBalance, shields, badge, brokenStreak, rewardsClaimed, leaderboard,
-    isTxLoading, isLoading, error, clearError, deposit, claimReward, withdraw,
+    isTxLoading, isLoading, error, clearError, deposit, mintTestTokens, claimReward, withdraw,
     recoverStreak, pendingReferralReward, referrer, claimReferralReward,
     savingsGoal, setGoal, depositFor, poolBalance, totalDepositors, depositHistory,
     txConfirmed, referralCount, totalReferralEarned, activityFeed,
@@ -917,7 +917,16 @@ export default function Home() {
                             <RowIcon bg="bg-[#DCFCE7]"><DollarSign className="w-4 h-4 text-[#15803D]" /></RowIcon>
                             <span className="font-semibold">tUSD balance</span>
                           </div>
-                          <span className="font-sans font-semibold text-[#09090B]/50 tabular-nums">{balanceAmount}</span>
+                          <span className="flex items-center gap-2 font-sans font-semibold text-[#09090B]/50 tabular-nums">
+                            {balanceAmount}
+                            <button
+                              onClick={mintTestTokens}
+                              disabled={isTxLoading}
+                              className="rounded-full border-2 border-[#09090B] bg-[#FFE500] px-2.5 py-0.5 text-[0.6875rem] font-black text-[#09090B] disabled:opacity-50"
+                            >
+                              + Get 100 tUSD
+                            </button>
+                          </span>
                         </CardRow>
                         <CardRow>
                           <div className="flex items-center gap-3">

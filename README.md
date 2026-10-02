@@ -55,8 +55,8 @@ Kibo turns saving into a streak game:
 | | |
 |---|---|
 | **Network** | BNB Smart Chain Testnet (chainId 97) |
-| **Kibo** | set `NEXT_PUBLIC_KIBO_ADDRESS` after deploy |
-| **tUSD** | MockERC20 deployed with Kibo, set `NEXT_PUBLIC_TOKEN_ADDRESS` |
+| **Kibo** | [`0x4Ade11aE282597a4673502cfB647370d40290516`](https://testnet.bscscan.com/address/0x4Ade11aE282597a4673502cfB647370d40290516) |
+| **tUSD** | [`0xEC5548229414F70eCA5b6041d16b88A173a5916E`](https://testnet.bscscan.com/address/0xEC5548229414F70eCA5b6041d16b88A173a5916E) (MockERC20, open mint) |
 
 ---
 

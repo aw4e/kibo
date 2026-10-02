@@ -52,7 +52,7 @@ export function useKibo() {
     query: { enabled: !!address && !!KIBO_ADDRESS },
   });
 
-  const { data: cUSDBalance } = useReadContract({
+  const { data: cUSDBalance, refetch: refetchBalance } = useReadContract({
     address: CUSD_ADDRESS,
     abi: ERC20_ABI,
     functionName: "balanceOf",
@@ -131,11 +131,12 @@ export function useKibo() {
   useEffect(() => {
     if (txConfirmed) {
       refetchUser();
+      refetchBalance();
       refetchAllowance();
       refetchGoal();
       setTxHash(undefined);
     }
-  }, [txConfirmed, refetchUser, refetchAllowance, refetchGoal]);
+  }, [txConfirmed, refetchUser, refetchBalance, refetchAllowance, refetchGoal]);
 
   // Tick every 30s to keep countdown fresh
   useEffect(() => {
@@ -237,6 +238,22 @@ export function useKibo() {
         abi: KIBO_ABI,
         functionName: "deposit",
         args: [amount, safeRef],
+      });
+      setTxHash(hash);
+    } catch (e: unknown) {
+      setError(parseContractError(e));
+    }
+  }
+
+  // Testnet only: MockERC20 has open mint, so users can self-fund tUSD
+  async function mintTestTokens() {
+    setError(null);
+    try {
+      const hash = await writeContractAsync({
+        address: CUSD_ADDRESS,
+        abi: ERC20_ABI,
+        functionName: "mint",
+        args: [address!, parseUnits("100", 18)],
       });
       setTxHash(hash);
     } catch (e: unknown) {
@@ -382,6 +399,7 @@ export function useKibo() {
     error,
     clearError: () => setError(null),
     deposit,
+    mintTestTokens,
     claimReward,
     withdraw,
     recoverStreak,
