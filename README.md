@@ -38,15 +38,15 @@ Kibo turns saving into a streak game:
 
 ## Features
 
-- **Streak system** — 20h cooldown, milestone rewards every 7 days, escalating tiers
-- **Streak shields** — up to 3 miss-absorbers earned at milestones
-- **Streak recovery** — pay `brokenStreak x 0.01 tUSD` (capped at 0.1) to restore
-- **Badge system** — Bronze (30d), Silver (90d), Gold (180d), Diamond (365d), stored on-chain
-- **Savings goal** — set a tUSD target, track progress with a live bar
-- **Referral system** — 5% of referee's first deposit credited to referrer, claimable anytime
-- **Sponsor deposit** — `depositFor(address)` pays a friend's daily deposit
-- **Leaderboard** — top 20 savers by streak, read directly from contract
-- **Non-custodial** — funds sit in contract, withdrawable anytime
+- **Streak system**: 20h cooldown, milestone rewards every 7 days, escalating tiers
+- **Streak shields**: up to 3 miss-absorbers earned at milestones
+- **Streak recovery**: pay `brokenStreak x 0.01 tUSD` (capped at 0.1) to restore
+- **Badge system**: Bronze (30d), Silver (90d), Gold (180d), Diamond (365d), stored on-chain
+- **Savings goal**: set a tUSD target, track progress with a live bar
+- **Referral system**: 5% of referee's first deposit credited to referrer, claimable anytime
+- **Sponsor deposit**: `depositFor(address)` pays a friend's daily deposit
+- **Leaderboard**: top 20 savers by streak, read directly from contract
+- **Non-custodial**: funds sit in contract, withdrawable anytime
 
 ---
 
@@ -124,7 +124,7 @@ console.log(user.badge);          // Badge: None / Bronze / Silver / Gold / Diam
 console.log(user.brokenStreak);   // recoverable broken streak
 console.log(user.rewardsClaimed); // total tUSD claimed (bigint, 18 decimals)
 
-// Write — pass a viem WalletClient
+// Write - pass a viem WalletClient
 await deposit(walletClient);
 await deposit(walletClient, parseUnits("0.05", 18), referrerAddr);
 await depositFor(walletClient, friendAddr);

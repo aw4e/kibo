@@ -129,7 +129,7 @@ contract Kibo {
     function pause() external onlyOwner { paused = true; emit ContractPaused(msg.sender); }
     function unpause() external onlyOwner { paused = false; emit ContractUnpaused(msg.sender); }
 
-    // 2-step ownership transfer — prevents accidental loss of contract control
+    // 2-step ownership transfer - prevents accidental loss of contract control
     function transferOwnership(address newOwner) external onlyOwner {
         if (newOwner == address(0)) revert InvalidAddress();
         pendingOwner = newOwner;
@@ -193,7 +193,7 @@ contract Kibo {
         if (!cUSD.transferFrom(msg.sender, address(this), amount)) revert TransferFailed();
         _processDeposit(msg.sender, amount, ts);
 
-        // Accrue referral reward on first deposit — 5% of deposit from pool (pull pattern).
+        // Accrue referral reward on first deposit - 5% of deposit from pool (pull pattern).
         // Silently skips if pool is insufficient rather than reverting.
         if (isFirst) {
             address r = referrer[msg.sender];
@@ -214,7 +214,7 @@ contract Kibo {
     }
 
     // Anyone can deposit on behalf of a beneficiary (enables automation / scheduled bots).
-    // Cannot be used while beneficiary has a pending streak recovery — prevents griefing.
+    // Cannot be used while beneficiary has a pending streak recovery - prevents griefing.
     function depositFor(address beneficiary, uint256 amount) external notPaused {
         if (beneficiary == address(0)) revert InvalidAddress();
         if (amount < MIN_DEPOSIT || amount > MAX_DEPOSIT) revert AmountOutOfRange();
@@ -238,12 +238,12 @@ contract Kibo {
         unchecked { poolFunds += fee; }
         uint256 net = amount - fee;
 
-        // Missed a day — shield absorbs the break if available
+        // Missed a day - shield absorbs the break if available
         bool didBreak = false;
         if (u.lastDeposit != 0 && ts > u.lastDeposit + 48 hours) {
             if (u.shields > 0) {
                 unchecked { u.shields--; }
-                u.brokenStreak = 0; // clear stale value — shield absorbed, no recovery available
+                u.brokenStreak = 0; // clear stale value - shield absorbed, no recovery available
                 emit ShieldUsed(user, u.streak, u.shields);
             } else {
                 u.brokenStreak = u.streak;
@@ -311,7 +311,7 @@ contract Kibo {
 
     // Restore broken streak by paying fee = brokenStreak × MIN_DEPOSIT (capped at MAX_RECOVERY_FEE).
     // Only available while current streak is 0 (before starting a new streak after the break).
-    // Recovery fee goes entirely to the pool — not counted as user deposit.
+    // Recovery fee goes entirely to the pool - not counted as user deposit.
     function recoverStreak() external notPaused {
         UserData storage u = users[msg.sender];
         if (u.brokenStreak == 0 || u.streak > 0) revert NoStreakToRecover();
@@ -350,7 +350,7 @@ contract Kibo {
         uint256 penalty = (uint256(amount) * penaltyBps) / 10_000;
         uint256 payout  = uint256(amount) - penalty;
 
-        // CEI — full state reset so returning users start fresh (badges re-earn, leaderboard cleaned)
+        // CEI - full state reset so returning users start fresh (badges re-earn, leaderboard cleaned)
         u.totalDeposited    = 0;
         u.streak            = 0;
         u.longestStreak     = 0;
@@ -473,7 +473,7 @@ contract Kibo {
             unchecked { i++; }
         }
 
-        // Partial selection sort — only sort the top `count` slots
+        // Partial selection sort - only sort the top `count` slots
         for (uint256 i; i < count;) {
             uint256 best = i;
             for (uint256 j = i + 1; j < scope;) {

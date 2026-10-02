@@ -17,7 +17,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     }
     const mock = await deploy("MockERC20", { from: deployer, args: [], log: true });
     token = mock.address;
-    console.log(`MockERC20 (test token) deployed to: ${token} — mint(to, amount) is open`);
+    console.log(`MockERC20 (test token) deployed to: ${token} - mint(to, amount) is open`);
   }
 
   const kibo = await deploy("Kibo", {

@@ -3,7 +3,7 @@ import { Space_Grotesk, Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 
-// Primary display — headlines, numbers, bold UI
+// Primary display - headlines, numbers, bold UI
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -11,7 +11,7 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
-// Accent italic only — "On BNB." moments, editorial phrases
+// Accent italic only - "On BNB." moments, editorial phrases
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -31,7 +31,7 @@ const dmSans = DM_Sans({
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kibo.vercel.app";
 
 export const metadata: Metadata = {
-  title: "Kibo — Daily Savings Streak",
+  title: "Kibo - Daily Savings Streak",
   description: "Deposit 0.01 tUSD daily, build your streak, earn rewards on BNB.",
   manifest: "/manifest.json",
   icons: {
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     apple: "/kibo.png",
   },
   openGraph: {
-    title: "Kibo — Daily Savings Streak",
+    title: "Kibo - Daily Savings Streak",
     description: "Save daily on BNB. Build your streak. Earn every 7 days.",
     url: APP_URL,
     siteName: "Kibo",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kibo — Daily Savings Streak",
+    title: "Kibo - Daily Savings Streak",
     description: "Save daily on BNB. Build your streak. Earn every 7 days.",
     images: [`${APP_URL}/api/og`],
   },

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// @dev Minimal mintable ERC20 for testing. No access control on mint — test-only.
+/// @dev Minimal mintable ERC20 for testing. No access control on mint - test-only.
 contract MockERC20 {
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;

@@ -185,7 +185,7 @@ export function useKibo() {
     return () => { cancelled = true; };
   }, [address, publicClient, txConfirmed]);
 
-  // Global activity feed — last 20 deposits across all users
+  // Global activity feed - last 20 deposits across all users
   useEffect(() => {
     if (!publicClient || !KIBO_ADDRESS) return;
     let cancelled = false;

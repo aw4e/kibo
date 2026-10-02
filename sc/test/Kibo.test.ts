@@ -52,7 +52,7 @@ describe("Kibo", () => {
     }
   }
 
-  /** Build streak of N with late deposits — no precision shields earned. */
+  /** Build streak of N with late deposits - no precision shields earned. */
   async function buildStreakSlow(user: HardhatEthersSigner, n: number) {
     for (let i = 0; i < n; i++) {
       await dep(user);
@@ -162,7 +162,7 @@ describe("Kibo", () => {
       await dep(alice);
       await time.increase(COOLDOWN + 2 * 3600 + 1); // past precision window
       await dep(alice);
-      // streak broke (>48h)? No — LATE = 48h+1. COOLDOWN+2h+1 = 22h+1 < 48h. No break.
+      // streak broke (>48h)? No - LATE = 48h+1. COOLDOWN+2h+1 = 22h+1 < 48h. No break.
       // Also 22h > 20h so past cooldown. But within 48h window = no break.
       const u = await kibo.getUser(alice.address);
       // shields should be 0 (first deposit never had precision; second is past precision window)
@@ -174,7 +174,7 @@ describe("Kibo", () => {
       expect(await kibo.referrer(alice.address)).to.equal(bob.address);
     });
 
-    it("referrer locked — cannot change after first deposit", async () => {
+    it("referrer locked - cannot change after first deposit", async () => {
       await dep(alice, bob.address);
       await tick();
       await dep(alice, carol.address); // attempt change
@@ -188,7 +188,7 @@ describe("Kibo", () => {
 
     it("blocks circular referral A→B→A", async () => {
       await dep(alice, bob.address); // alice refers bob
-      // Now bob tries to refer alice — should be blocked (referrer[alice]=bob, so referrer[bob] cannot be alice)
+      // Now bob tries to refer alice - should be blocked (referrer[alice]=bob, so referrer[bob] cannot be alice)
       await dep(bob, alice.address);
       expect(await kibo.referrer(bob.address)).to.equal(ethers.ZeroAddress);
     });
@@ -212,7 +212,7 @@ describe("Kibo", () => {
       await cusd.connect(bob).approve(k2Addr, MIN);
       await k2.connect(bob).deposit(MIN, ethers.ZeroAddress);
 
-      // Alice first deposit with referral — pool has only 0.5% of bob's MIN ≈ 0
+      // Alice first deposit with referral - pool has only 0.5% of bob's MIN ≈ 0
       // refAmount = 5% of 1 cUSD = 0.05, pool < that → skip
       const amount = ONE;
       await cusd.mint(alice.address, amount);
@@ -242,7 +242,7 @@ describe("Kibo", () => {
     });
 
     it("recoverStreak restores streak from brokenStreak", async () => {
-      // Use slow builds so no shields are earned — real breaks happen
+      // Use slow builds so no shields are earned - real breaks happen
       await buildStreakSlow(alice, 5); // streak = 5, shields = 0
       await breakTime();
       await dep(alice);               // break! streak = 0, brokenStreak = 5
@@ -286,9 +286,9 @@ describe("Kibo", () => {
     it("fresh deposit after break (no recover) clears brokenStreak", async () => {
       await dep(alice);   // streak 1
       await breakTime();
-      await dep(alice);   // break — streak 0, brokenStreak 1
+      await dep(alice);   // break - streak 0, brokenStreak 1
       await tick();
-      await dep(alice);   // fresh start — streak 1, brokenStreak cleared
+      await dep(alice);   // fresh start - streak 1, brokenStreak cleared
       const u = await kibo.getUser(alice.address);
       expect(u.streak).to.equal(1n);
       expect(u.brokenStreak).to.equal(0n);
@@ -328,7 +328,7 @@ describe("Kibo", () => {
       await dep(alice);        // streak 1
       await breakTime();
       await dep(alice);        // streak 0, brokenStreak 1
-      // alice.lastDeposit just updated — tick so cooldown passes
+      // alice.lastDeposit just updated - tick so cooldown passes
       await tick();
       await expect(depFor(bob, alice))
         .to.be.revertedWithCustomError(kibo, "RecoveryPending");
@@ -462,7 +462,7 @@ describe("Kibo", () => {
       expect(u.shields).to.equal(0n);
     });
 
-    it("isDepositor reset — re-deposit after withdraw adds to depositors again", async () => {
+    it("isDepositor reset - re-deposit after withdraw adds to depositors again", async () => {
       await dep(alice);
       await kibo.connect(alice).withdraw();
       const countBefore = await kibo.totalDepositors();

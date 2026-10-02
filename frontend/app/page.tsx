@@ -43,7 +43,7 @@ function timeAgo(timestamp: number): string {
   return `${Math.floor(diff / 86400)}d ago`;
 }
 
-const BADGE_LABEL = ["—", "Bronze", "Silver", "Gold", "Diamond"] as const;
+const BADGE_LABEL = ["-", "Bronze", "Silver", "Gold", "Diamond"] as const;
 const BADGE_BG    = ["", "bg-[#FDE68A]", "bg-[#E5E7EB]", "bg-[#FDE68A]", "bg-[#BAE6FD]"] as const;
 const BADGE_ICON  = [null, Award, Medal, Trophy, Star] as const;
 
@@ -315,7 +315,7 @@ export default function Home() {
 
   const countdown     = formatCountdown(nextDepositIn);
   const savedAmount   = parseFloat(formatUnits(totalDeposited, 18));
-  const balanceAmount = cUSDBalance ? fmtAmt(cUSDBalance) : "—";
+  const balanceAmount = cUSDBalance ? fmtAmt(cUSDBalance) : "-";
   const goalPct       = savingsGoal > BigInt(0)
     ? Math.min(100, Number((totalDeposited * BigInt(100)) / savingsGoal))
     : 0;
@@ -462,7 +462,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Stat cards — staggered float */}
+              {/* Stat cards - staggered float */}
               <div className="grid grid-cols-2 gap-3 w-full max-w-[360px]">
                 {[
                   { val: "0.0001 tUSD", sub: "daily minimum", bg: "bg-[#FFFBEB]", tc: "text-[#CA8A04]" },
@@ -719,7 +719,7 @@ export default function Home() {
                   <div className="grid grid-cols-3 border-t-[2px] border-[#09090B]">
                     {[
                       { label: "Best",    value: `${longestStreak}d`,                 bg: "bg-[#EDE9FE]", tc: "text-[#6D28D9]" },
-                      { label: "Shields", value: shields > 0 ? `${shields}/3` : "—", bg: "bg-[#DBEAFE]", tc: "text-[#1D4ED8]" },
+                      { label: "Shields", value: shields > 0 ? `${shields}/3` : "-", bg: "bg-[#DBEAFE]", tc: "text-[#1D4ED8]" },
                       { label: "Saved",   value: fmtAmt(totalDeposited),              bg: "bg-[#DCFCE7]", tc: "text-[#15803D]" },
                     ].map(({ label, value, bg, tc }, i) => (
                       <div key={label} className={cn(
@@ -882,7 +882,7 @@ export default function Home() {
                         <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.12em] text-[#09090B]/50">Global Pool</span>
                       </div>
                       <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#1D4ED8]">
-                        {poolBalance ? fmtAmt(poolBalance) : "—"}
+                        {poolBalance ? fmtAmt(poolBalance) : "-"}
                         <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">tUSD</span>
                       </span>
                     </div>
@@ -893,7 +893,7 @@ export default function Home() {
                         <span className="font-sans text-[0.625rem] font-bold uppercase tracking-[0.12em] text-[#09090B]/50">Total Savers</span>
                       </div>
                       <span className="font-display font-black text-[1.375rem] tracking-[-0.03em] tabular-nums leading-none text-[#CA8A04]">
-                        {totalDepositors || "—"}
+                        {totalDepositors || "-"}
                         <span className="font-sans font-semibold text-[0.6875rem] text-[#09090B]/40 ml-1">wallets</span>
                       </span>
                     </div>
@@ -946,7 +946,7 @@ export default function Home() {
                             <span className="font-semibold">Shields</span>
                           </div>
                           <span className="font-black">
-                            {shields > 0 ? `${shields}/3` : "—"}
+                            {shields > 0 ? `${shields}/3` : "-"}
                             {shields > 0 && <span className="font-sans text-[0.8125rem] font-semibold text-[#09090B]/35 ml-1">active</span>}
                           </span>
                         </CardRow>
@@ -1152,7 +1152,7 @@ export default function Home() {
                 <Card>
                   <CardContent>
                     <p className="font-sans px-5 pt-4 pb-3 text-[0.8125rem] font-medium text-[#09090B]/50 leading-relaxed border-b-2 border-[#09090B]">
-                      Pay tUSD on behalf of another address — boosts their streak without them spending anything.
+                      Pay tUSD on behalf of another address - boosts their streak without them spending anything.
                     </p>
                     <div className="px-5 py-4 flex flex-col gap-3">
                       <Input placeholder="0x… wallet address" value={sponsorAddr}
