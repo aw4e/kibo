@@ -253,7 +253,7 @@ export function useKibo() {
         address: CUSD_ADDRESS,
         abi: ERC20_ABI,
         functionName: "mint",
-        args: [address!, parseUnits("100", 18)],
+        args: [address!, parseUnits("10000", 18)],
       });
       setTxHash(hash);
     } catch (e: unknown) {

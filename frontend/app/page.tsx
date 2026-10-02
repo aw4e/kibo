@@ -831,7 +831,7 @@ export default function Home() {
                       disabled={isTxLoading}
                     >
                       <DollarSign className="w-4 h-4" />
-                      Get 100 free test tUSD
+                      Get 10,000 free test tUSD
                     </Button>
                     <p className="mt-2 text-center font-sans text-[0.75rem] font-semibold text-[#09090B]/40">
                       Balance: {balanceAmount} tUSD · testnet token, needs a little tBNB for gas
@@ -936,7 +936,7 @@ export default function Home() {
                               disabled={isTxLoading}
                               className="rounded-full border-2 border-[#09090B] bg-[#FFE500] px-2.5 py-0.5 text-[0.6875rem] font-black text-[#09090B] disabled:opacity-50"
                             >
-                              + Get 100 tUSD
+                              + Get 10,000 tUSD
                             </button>
                           </span>
                         </CardRow>
